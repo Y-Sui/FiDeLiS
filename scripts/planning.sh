@@ -1,5 +1,6 @@
 SPLIT="test"
-DATASET_LIST="RoG-webqsp RoG-cwq"
+# DATASET_LIST="RoG-webqsp RoG-cwq"
+DATASET_LIST="RoG-webqsp"
 MODEL_NAME=RoG
 MODEL_PATH=rmanluo/RoG
 

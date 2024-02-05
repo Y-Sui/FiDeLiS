@@ -1,3 +1,10 @@
+pybind11
+sentencepiece
+google
+protobuf
+datasets
+python-dotenv
+tiktoken
 openai==0.27.9
 transformers==4.32.0
 trl==0.7.1

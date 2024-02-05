@@ -47,8 +47,9 @@ def merge_rule_result(qa_dataset, rule_dataset, n_proc=1, filter_empty=False):
         qid = sample["id"]
         sample["predicted_paths"] = []
         sample["ground_paths"] = []
-        sample["predicted_paths"] = question_to_rule[qid]["predicted_paths"]
-        sample["ground_paths"] = question_to_rule[qid]["ground_paths"]
+        if qid in question_to_rule.keys(): # make sure all the qid from sample aligns with the question_to_rule
+            sample["predicted_paths"] = question_to_rule[qid]["predicted_paths"]
+            sample["ground_paths"] = question_to_rule[qid]["ground_paths"]
         return sample  # TODO: ignore the sample with zero paths.
 
     qa_dataset = qa_dataset.map(find_rule, num_proc=n_proc)
