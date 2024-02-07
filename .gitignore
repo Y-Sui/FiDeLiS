@@ -3,7 +3,8 @@ datasets/joint_training
 datasets/AlignData
 logs/
 ref_examples/
-results/
+results/gen_rule_path/
+results/KGQA/
 test/
 wandb/
 save_models/
