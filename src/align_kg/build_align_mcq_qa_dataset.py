@@ -43,8 +43,13 @@ def build_data(args):
 def process_data(data, remove_duplicate=False):
     question = data['question']
     graph = utils.build_graph(data['graph'])
-    paths = utils.get_truth_paths(data['q_entity'], data['a_entity'], graph)
+    paths = utils.get_truth_paths(
+        data['q_entity'], data['a_entity'], graph
+    )  # supervision
+
+    mcq_paths = utils.explore_graph(data['q_entity'], data['a_entity'], graph)
     result = []
+
     # Split each Q-P pair into a single data
     rel_paths = []
     for path in paths:
@@ -72,6 +77,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.save_name == "":
-        args.save_name = args.d + "_" + args.split + ".jsonl"
+        args.save_name = (
+            args.d + "_mcq_" + args.split + ".jsonl"
+        )  # save as mcq_style path
 
     build_data(args)
