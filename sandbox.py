@@ -110,17 +110,25 @@ def main():
                 reasoning_path_str = process_str(reasoning_path)
                 prompt = f"""
                     User query: {question} \n
+                    
                     To proceed, you must identify the most relevant reasoning path based on the current reasoning steps: {reasoning_path_str} \n
+                    
                     Please review the following options and select the most appropriate reasoning path for the query, also including the corresponding entity where applicable: \n
+                    
                     {options_str} \n
+                    
                     After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning steps directly answers the query, respond with option 0: EOS, End of Selection.
                 """
             else:
                 prompt = f"""
                     User query: {question} \n
+                    
                     To proceed, the starting entity is {starting_entity}. \n
+                    
                     Please review the following options and select the most appropriate reasoning path for the query, also including the corresponding entity where applicable: \n
+                    
                     {options_str} \n
+                    
                     After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning steps directly answers the query, respond with option 0: EOS, End of Selection.
                 """
 
