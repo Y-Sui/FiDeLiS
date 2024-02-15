@@ -163,7 +163,7 @@ def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
     neighbors = []
     edges = []
 
-    if entity in graph:
+    if graph.has_node(entity):
         for neighbor in graph.neighbors(entity):
             neighbors.append(neighbor)
             edges.append(graph[entity][neighbor]['relation'])
