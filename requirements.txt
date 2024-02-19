@@ -1,3 +1,4 @@
+pybind11
 openai
 transformers
 trl
@@ -8,7 +9,6 @@ pybind11
 networkx
 graph-walker
 tqdm
-pybind11
 walker
 sentencepiece
 google
