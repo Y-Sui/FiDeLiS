@@ -10,7 +10,6 @@ import multiprocessing as mp
 import utils
 from tqdm import tqdm
 from functools import partial
-from openai import OpenAI
 
 
 def build_data(args):
@@ -41,70 +40,22 @@ def build_data(args):
                     fout.write(json.dumps(r) + '\n')
 
 
-def query_api(prompt):
-    client = OpenAI()
-    response = (
-        client.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0,
-            # max_tokens=500,
-        )
-        .choices[0]
-        .message.content
-    )
-    print("PROMPT: ", prompt)
-    print("=" * 20)
-    print("RECEIVED RESPONSE: ", response)
-    # outputs_file = open(fpath, "w")
-    # outputs_file.write(json.dumps({
-    #     'prompt': prompt,
-    #     'response': response
-    # }))
-    return {"prompt": prompt, "response": response}
-
-
 def process_data(data, remove_duplicate=False):
     question = data['question']
     graph = utils.build_graph(data['graph'])
-    starting_entity = data['q_entity']
-
-    path_candidates, neighbors = utils.get_entity_edges_with_neighbors(
-        starting_entity, graph
-    )
-
-    print(f"Question: {question}")
-    print(f"Starting entity: {starting_entity}")
-    print(f"Path candidates: {path_candidates}")
-    print(f"Neighbors: {neighbors}")
-
-    options = []
-    for p, n in zip(path_candidates, neighbors):
-        options.append(f"{starting_entity} -> {p} -> {n}")
-
-    options_str = "\n".join(options)
-
-    prompt = f"""
-        User query: {question} \n 
-        Based on the question, select the most relevant path from the following options (also provide the corresponding entity when attach the reasoning path):\n
-        {options_str} \n
-        Once you have selected the most relevant path, please only provide the index of reasoning path and the corresponding entity (the index starts from 0).
-        """
-
-    response = query_api(prompt)['response'].strip()
-    print(response)
-
-    # # Split each Q-P pair into a single data
-    # rel_paths = []
-    # for path in paths:
-    #     rel_path = [p[1] for p in path]  # extract relation path
-    #     if remove_duplicate:
-    #         if tuple(rel_path) in rel_paths:
-    #             continue
-    #     rel_paths.append(tuple(rel_path))
-    # for rel_path in rel_paths:
-    #     result.append({"question": question, "path": rel_path})
-    # return result
+    paths = utils.get_truth_paths(data['q_entity'], data['a_entity'], graph)
+    result = []
+    # Split each Q-P pair into a single data
+    rel_paths = []
+    for path in paths:
+        rel_path = [p[1] for p in path]  # extract relation path
+        if remove_duplicate:
+            if tuple(rel_path) in rel_paths:
+                continue
+        rel_paths.append(tuple(rel_path))
+    for rel_path in rel_paths:
+        result.append({"question": question, "path": rel_path})
+    return result
 
 
 if __name__ == "__main__":
@@ -121,8 +72,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.save_name == "":
-        args.save_name = (
-            args.d + "_mcq_" + args.split + ".jsonl"
-        )  # save as mcq_style path
+        args.save_name = args.d + "_" + args.split + ".jsonl"
 
     build_data(args)
