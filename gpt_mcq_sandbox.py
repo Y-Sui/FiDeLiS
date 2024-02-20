@@ -20,6 +20,9 @@ logging.basicConfig(
 )
 
 
+with open("config.json", "r") as f:
+    config = json.load(f)
+
 def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
     '''
     given an entity, find all edges and neighbors
@@ -36,7 +39,7 @@ def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
 
 
 def query_api(prompt):
-    client = OpenAI(api_key="sk-xx")
+    client = OpenAI(api_key=config["OPENAI_API_KEY"])
     response = (
         client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
@@ -47,7 +50,9 @@ def query_api(prompt):
         .choices[0]
         .message.content
     )
-    # print("PROMPT: ", prompt)
+    logging.info(f"PROMPT: {prompt}")
+    logging.info("===" * 50)
+    logging.info(f"RECEIVED RESPONSE: {response}")
     # print("=" * 50)
     # print("RECEIVED RESPONSE: ", response)
     # outputs_file = open(fpath, "w")
@@ -115,31 +120,21 @@ def main():
 
             options_str = "\n".join(options)
 
-            if len(reasoning_path) > 0:
-                reasoning_path_str = process_str(reasoning_path)
-                prompt = f"""
-                    User query: {question} \n
-                    
-                    To proceed, you must identify the most relevant reasoning path based on the current reasoning steps: {reasoning_path_str} \n
-                    
-                    Please review the following options and select the most appropriate reasoning path for the query, also including the corresponding entity where applicable: \n
-                    
-                    {options_str} \n
-                    
-                    After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning steps directly answers the query, respond with option 0: EOS, End of Selection.
-                """
-            else:
-                prompt = f"""
-                    User query: {question} \n
-                    
-                    To proceed, the starting entity is {starting_entity}. \n
-                    
-                    Please review the following options and select the most appropriate reasoning path for the query, also including the corresponding entity where applicable: \n
-                    
-                    {options_str} \n
-                    
-                    After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning steps directly answers the query, respond with option 0: EOS, End of Selection.
-                """
+            
+            reasoning_path_str = process_str(reasoning_path)
+            prompt = f"""
+                Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n
+                
+                *IF AT START*: To proceed, the starting entity is {starting_entity}. \n
+                *IF IN PROGRESS*: The current reasoning path that has been constructed so far is {reasoning_path_str}. \n
+                
+                Now your goal is: examine the reasoning paths to see whether the final entity in the path is the answer to the question; If so, answer EOS. 
+                If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. \n
+                
+                {options_str} \n
+                
+                    After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'.
+            """
 
             try:
                 response = query_api(prompt)['response'].strip()
