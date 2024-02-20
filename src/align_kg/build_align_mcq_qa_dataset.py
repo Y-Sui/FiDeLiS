@@ -11,6 +11,10 @@ import utils
 from tqdm import tqdm
 from functools import partial
 
+SEP = '<SEP>'
+BOP = '<PATH>'
+EOP = '</PATH>'
+
 
 def build_data(args):
     '''
@@ -61,17 +65,22 @@ def process_data(data, remove_duplicate=False):
         for path in shortest_path:
             if starting_flag:
                 h, r, t = path
-                history = f"{h}"
+                history = utils.rule_to_string([h], sep_token=SEP, bop=BOP, eop=EOP)
                 starting_flag = False
             else:
-                history = f"{history} -> {r} -> {t}"
+                history = history.replace("</PATH>", "")
+                history = history + "<SEP>" + str(r) + "<SEP>" + str(t) + "</PATH>"
                 h, r, t = path
             _, path_candidates, neighbors = (
                 utils.get_entity_edges_with_neighbors_single(h, graph)
             )
             options = []
             for j, p in enumerate(path_candidates):
-                options.append(f"{h} -> {p} -> {neighbors[j]}")
+                options.append(
+                    utils.rule_to_string(
+                        [h, p, neighbors[j]], sep_token=SEP, bop=BOP, eop=EOP
+                    )
+                )
             options = "\n".join(options)
             results.append(
                 {
