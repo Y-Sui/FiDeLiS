@@ -1,150 +1,141 @@
-2024-02-20 16:08:55,356 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:08:55,363 - INFO - RESPONSE: The correct option for finding the name of Justin Bieber's brother is:
-336: Justin Bieber -> people.sibling_relationship.sibling -> m.0gxnnwc; INDEX: 335
-2024-02-20 16:08:56,448 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:08:56,450 - INFO - RESPONSE: 4: m.0yrkgd6 -> award.award_honor.award_winner -> Justin Bieber; INDEX: 3
-2024-02-20 16:08:57,911 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:08:57,913 - INFO - RESPONSE: 335: Justin Bieber -> people.sibling_relationship.sibling -> m.0gxnnwc; INDEX: 334
-2024-02-20 16:08:58,910 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:08:58,914 - INFO - RESPONSE: 1: m.0gxnnwc -> people.person.sibling_s -> Jazmyn Bieber; INDEX: 0
-2024-02-20 16:08:59,783 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:08:59,787 - INFO - RESPONSE: 1: Jazmyn Bieber -> people.person.parents -> Jeremy Bieber; INDEX: 0
-2024-02-20 16:09:00,588 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:00,590 - INFO - RESPONSE: 3: Jeremy Bieber -> people.person.children -> Justin Bieber; INDEX: 2
-2024-02-20 16:09:03,052 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:03,056 - INFO - RESPONSE: 336: Justin Bieber -> award.award_honor.award_winner -> m.0yrkgd6 -> award.award_honor.award_winner -> Justin Bieber -> people.sibling_relationship.sibling -> m.0gxnnwc -> people.person.sibling_s -> Jazmyn Bieber -> people.person.parents -> Jeremy Bieber -> people.person.children -> Justin Bieber; INDEX: 335
-2024-02-20 16:09:03,652 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:03,657 - INFO - END of SELECTION: Justin Bieber -> award.award_honor.award_winner -> m.0yrkgd6 -> award.award_honor.award_winner -> Justin Bieber -> people.sibling_relationship.sibling -> m.0gxnnwc -> people.person.sibling_s -> Jazmyn Bieber -> people.person.parents -> Jeremy Bieber -> people.person.children -> Justin Bieber -> award.award_honor.award_winner -> m.0yrkgd6
-2024-02-20 16:09:05,203 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:05,207 - INFO - RESPONSE: The correct index for the selected reasoning path is: 3: Natalie Portman -> film.actor.film -> m.0k3qzz; INDEX: 2
-2024-02-20 16:09:06,374 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:06,379 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
-2024-02-20 16:09:07,333 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:07,337 - INFO - RESPONSE: 3: Padmé Amidala -> film.film_character.portrayed_in_films -> m.0k3qzz; INDEX: 2
-2024-02-20 16:09:08,277 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:08,279 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
-2024-02-20 16:09:09,195 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:09,202 - INFO - RESPONSE: 3: Padmé Amidala -> film.film_character.portrayed_in_films -> m.0k3qzz; INDEX: 2
-2024-02-20 16:09:10,279 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:10,283 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
-2024-02-20 16:09:11,326 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:11,329 - INFO - RESPONSE: 3: Padmé Amidala -> film.film_character.portrayed_in_films -> m.0k3qzz; INDEX: 2
-2024-02-20 16:09:12,423 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:12,426 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
-2024-02-20 16:09:13,487 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:13,489 - INFO - RESPONSE: 3: Padmé Amidala -> film.film_character.portrayed_in_films -> m.0k3qzz; INDEX: 2
-2024-02-20 16:09:14,824 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:14,826 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
-2024-02-20 16:09:15,600 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:15,620 - INFO - RESPONSE: 8: Grand Bahama -> location.location.contains -> Bahamas; INDEX: 7
-2024-02-20 16:09:17,089 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
-2024-02-20 16:09:17,090 - ERROR - Error response: Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 28016 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
-2024-02-20 16:09:17,090 - ERROR - Failed to get response for query for error Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 28016 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}: what country is the grand bahama island in
-2024-02-20 16:09:18,227 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
-2024-02-20 16:09:18,237 - ERROR - Error response: Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 28559 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
-2024-02-20 16:09:18,238 - ERROR - Failed to get response for query for error Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 28559 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}: what kind of money to take to bahamas
-2024-02-20 16:09:19,128 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:19,138 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
-2024-02-20 16:09:20,010 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:20,020 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
-2024-02-20 16:09:21,195 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:21,200 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
-2024-02-20 16:09:22,082 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:22,087 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
-2024-02-20 16:09:22,927 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:22,931 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
-2024-02-20 16:09:23,838 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:23,842 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
-2024-02-20 16:09:24,730 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:24,735 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
-2024-02-20 16:09:25,576 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:25,579 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
-2024-02-20 16:09:26,540 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:26,542 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
-2024-02-20 16:09:27,261 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:27,263 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
-2024-02-20 16:09:28,577 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:28,579 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn
+2024-02-20 21:50:25,852 - INFO - Created directory: results/gpt-3.5-turbo-0125
+2024-02-20 21:50:39,115 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2024-02-20 21:50:39,118 - ERROR - Error response: Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 42520 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+2024-02-20 21:50:39,118 - ERROR - Failed to get response for query for error Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 42520 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}: what does jamaican people speak
+2024-02-20 21:50:39,937 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 21:50:39,951 - INFO - PROMPT: 
+        Your goal is to answer the following question: what does jamaican people speak based on the reasoning path: . Only return the answer without any additional information.
+        
+2024-02-20 21:50:39,951 - INFO - ======================================================================================================================================================
+2024-02-20 21:50:39,951 - INFO - RECEIVED RESPONSE: Jamaican people speak Jamaican Patois.
+2024-02-20 21:50:41,294 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 21:50:41,298 - INFO - PROMPT: 
+                Your goal is to find a path from a knowledge graph that is useful for answering the following question:  what did james k polk do before he was president 
 
-The selected reasoning path indicates that Joakim Noah plays for a sports team.; INDEX: 11
-2024-02-20 16:09:29,504 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:29,507 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
-2024-02-20 16:09:30,316 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:30,318 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn; INDEX: 11
-2024-02-20 16:09:31,369 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:31,371 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
-2024-02-20 16:09:32,559 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:32,561 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn; INDEX: 11
-2024-02-20 16:09:33,956 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:33,958 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
-2024-02-20 16:09:34,919 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:34,922 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn; INDEX: 11
-2024-02-20 16:09:36,747 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:36,812 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
-2024-02-20 16:09:37,938 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:37,940 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn; INDEX: 11
-2024-02-20 16:09:39,039 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:39,042 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
-2024-02-20 16:09:41,133 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:41,136 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
-2024-02-20 16:09:42,022 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:42,025 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
-2024-02-20 16:09:43,970 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:43,973 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
-2024-02-20 16:09:44,722 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:44,724 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
-2024-02-20 16:09:46,982 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:46,986 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
-2024-02-20 16:09:47,875 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:47,880 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
-2024-02-20 16:09:49,254 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:49,258 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
-2024-02-20 16:09:50,180 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:50,181 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
-2024-02-20 16:09:51,679 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:51,683 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
-2024-02-20 16:09:52,877 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:52,881 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
-2024-02-20 16:09:53,818 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:53,822 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
-2024-02-20 16:09:54,599 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:54,603 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
-2024-02-20 16:09:55,872 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:55,875 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
-2024-02-20 16:09:57,461 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:57,465 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
-2024-02-20 16:09:58,667 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:58,672 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
-2024-02-20 16:09:59,495 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:09:59,499 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
-2024-02-20 16:10:00,439 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:00,442 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
-2024-02-20 16:10:01,984 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:01,986 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
-2024-02-20 16:10:02,939 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:02,943 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
-2024-02-20 16:10:03,781 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:03,786 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
-2024-02-20 16:10:04,954 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:04,956 - INFO - RESPONSE: 30: Draco Malfoy -> fictional_universe.fictional_character.married_to -> m.09k254w; INDEX: 29
-2024-02-20 16:10:06,486 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:06,490 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
-2024-02-20 16:10:08,264 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:08,268 - INFO - RESPONSE: 4: Astoria Greengrass -> fictional_universe.fictional_character.married_to -> m.09k254w; INDEX: 3
-2024-02-20 16:10:09,348 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:09,353 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
-2024-02-20 16:10:10,484 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:10,486 - INFO - RESPONSE: 4: Astoria Greengrass -> fictional_universe.fictional_character.married_to -> m.09k254w; INDEX: 3
-2024-02-20 16:10:11,547 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:11,551 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
-2024-02-20 16:10:12,600 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:12,604 - INFO - RESPONSE: 4: Astoria Greengrass -> fictional_universe.fictional_character.married_to -> m.09k254w; INDEX: 3
-2024-02-20 16:10:13,591 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:13,596 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
-2024-02-20 16:10:14,541 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:14,542 - INFO - RESPONSE: 4: Astoria Greengrass -> fictional_universe.fictional_character.married_to -> Draco Malfoy; INDEX: 3
-2024-02-20 16:10:15,909 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-2024-02-20 16:10:15,912 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
-2024-02-20 16:10:17,452 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
-2024-02-20 16:10:17,453 - ERROR - Error response: Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 49253 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
-2024-02-20 16:10:17,453 - ERROR - Failed to get response for query for error Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 49253 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}: which countries border the us
+                
+                *IF AT START*: To proceed, the starting entity is James K. Polk. 
+
+                *IF IN PROGRESS*: The current reasoning path that has been constructed so far is . 
+
+                
+                Now your goal is: examine the reasoning paths to see whether the final entity in the path is the answer to the question; If so, answer EOS. 
+                If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. 
+
+                
+                0: EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection.
+1: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> During his presidency, the U.S. Naval Academy was established at Annapolis and the Smithsonian Institution was founded.
+2: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> Polk's view was that slaves were property and that the practice of slavery, though repugnant to many, had to be accepted.
+3: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> In a belligerent speech in 1845, he cited the Monroe doctrine and called for the entire territory to be turned over to the U.S.  He eventually persuaded Britain to accept a boundary on the 49th parallel.
+4: James K. Polk -> people.place_lived.person -> m.03phtbg
+5: James K. Polk -> people.person.parents -> Samuel Polk
+6: James K. Polk -> government.government_position_held.office_holder -> m.04j60kc
+7: James K. Polk -> government.political_appointer.appointees -> m.08v_t28
+8: James K. Polk -> base.kwebbase.kwtopic.connections_to -> james smithson smithsonian founded under james knox polk
+9: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> His appointment of author Nathaniel Hawthorne to a customs post in Boston caused particular annoyance,  as it was rumored that Hawthorne had not voted during the two years he lived in Concord.
+10: James K. Polk -> people.person.quotations -> The Constitution itself, plainly written as it is, the safeguard of our federative compact, the offspring of concession and compromise, binding together in the bonds of peace and union this great and increasing family of free and independent States, will be the chart by which I shall be directed.
+11: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> Like Jackson, Polk believed there was no need for a national bank.
+12: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> In 1839, in an effort to win back Tennessee for the Democrats, Polk resigned as Speaker and ran for State Governor.
+13: James K. Polk -> symbols.namesake.named_after -> Polk County
+14: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> Before he took office, Congress voted to annex Texas, a move favored by most Democrats.
+15: James K. Polk -> media_common.quotation.author -> No union exists between church and state, and perfect freedom of opinion is guaranteed to all sects and creeds.
+16: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> Four years later, when Jackson became President, Polk worked tirelessly on Jackson's program.
+17: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> He became a leading spokesman for tariff reduction, and also supported Jackson's veto of a bill that would have renewed the charter for the Second Bank of the United States.
+18: James K. Polk -> symbols.namesake.named_after -> Polk City
+19: James K. Polk -> symbols.name_source.namesakes -> Polk
+20: James K. Polk -> government.government_position_held.appointed_by -> m.04kq1r9
+21: James K. Polk -> base.kwebbase.kwconnection.other -> samuel finley breese morse telegraphed news of james knox polk
+22: James K. Polk -> symbols.namesake.named_after -> James K. Polk Ancestral Home
+23: James K. Polk -> location.location.people_born_here -> Stanley Eric Reinhart
+24: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> America's success owed much to his vigor and unflagging attention to detail.
+25: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> The final treaty gave the United States all the  Mexican territory Polk wanted, including California.
+26: James K. Polk -> book.author.series_written_or_contributed_to -> Correspondence of James K. Polk
+27: James K. Polk -> book.written_work.subjects -> Polk: The Diary of an American President, 1845-1849
+28: James K. Polk -> government.politician.party -> m.03gjg4v
+29: James K. Polk -> symbols.namesake.named_after -> James K. Polk Elementary School
+30: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> Mexico had always refused to recognize Texan independence and thus had no diplomatic relations with the U.S.  Polk sent troops to the Texas-Mexico border, which he claimed was along the Rio Grande, a hundred miles further into Mexico than Mexico had ever allowed.
+31: James K. Polk -> people.appointer.appointment_made -> m.0hn42fb
+32: James K. Polk -> government.government_position_held.office_holder -> m.04j60kh
+33: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> In 1835, Jackson rewarded Polk by making him Speaker of the House.
+34: James K. Polk -> base.kwebbase.kwtopic.connections_to -> matthew calbraith perry appointed by james knox polk
+35: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> He was elected, then re- elected, but life as a Governor was not challenging enough for him, so he returned to national politics.
+36: James K. Polk -> common.topic.notable_for -> g.1258gz3ht
+37: James K. Polk -> base.kwebbase.kwconnection.subject -> james knox polk appointed matthew calbraith perry
+38: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> Polk even disappointed Jackson, who wanted to reward an old ally, Amos Kendall , with the job of Washington postmaster.
+39: James K. Polk -> base.inaugurations.inauguration.president -> James K. Polk 1845 presidential inauguration
+40: James K. Polk -> base.kwebbase.kwtopic.connections_to -> andrew jackson supported by james knox polk
+41: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> After some skirmishes, the Americans provoked the Mexicans to retaliate at Matamoras.
+42: James K. Polk -> common.topic.image -> James K. Polk
+43: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> At 28, Polk was elected to the North Carolina State House of Representatives, where he served two years.
+44: James K. Polk -> base.kwebbase.kwtopic.connections_to -> john quincy adams work related to james knox polk
+45: James K. Polk -> people.ethnicity.people -> Scotch-Irish American
+46: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> He appointed Perry to naval post,  and Sholes as a postmaster He backed Santa Anna as Mexican President.
+47: James K. Polk -> book.book_subject.works -> Polk: The Man Who Transformed the Presidency and America
+48: James K. Polk -> people.person.spouse_s -> m.0j4k7n3
+49: James K. Polk -> symbols.namesake.named_after -> Polk County School District
+50: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> In  1844, recognizing there were far more American settlers than British, Britain said it was willing to accept a boundary on the Columbia River.
+51: James K. Polk -> people.person.profession -> Politician
+52: James K. Polk -> symbols.namesake.named_after -> Polk Street
+53: James K. Polk -> people.person.place_of_birth -> Pineville
+54: James K. Polk -> government.politician.government_positions_held -> m.04469y8
+55: James K. Polk -> base.kwebbase.kwtopic.connections_to -> amos kendall turned down by james knox polk
+56: James K. Polk -> people.deceased_person.place_of_death -> Nashville
+57: James K. Polk -> book.written_work.author -> Correspondence of James K. Polk, Vol. 10: July-December 1845
+58: James K. Polk -> people.person.profession -> Farmer
+59: James K. Polk -> people.deceased_person.cause_of_death -> Cholera
+60: James K. Polk -> government.government_position_held.office_holder -> m.04j5sk8
+61: James K. Polk -> common.topic.notable_types -> US President
+62: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> In 1844, he was considered a shoo-in for the Democratic vice-presidency, but when van Buren antagonized his followers by opposing the annexation of the independent republic of Texas, Polk was made presidential nominee, and was elected -- though as a minority President, with less than half the popular vote.
+63: James K. Polk -> people.person.profession -> Lawyer
+64: James K. Polk -> common.image.size -> m.03tdw8g
+65: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> It was a time when the debate over the constitutional rights of states and the issue of slavery was becoming  heated and more partisan.
+66: James K. Polk -> common.image.appears_in_topic_gallery -> United States presidential election, 1844
+67: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> As he set about replacing federalists with loyal Democrats, Polk was deluged with job applicants, and some of his choices nettled the administration.
+68: James K. Polk -> education.education.student -> m.03l5_lg
+69: James K. Polk -> government.politician.government_positions_held -> m.0944j8_
+70: James K. Polk -> people.appointer.appointment_made -> m.0hn416l
+71: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> In 1825 Polk was elected to the U.S. House of Representatives, where he continued his support of Jackson, even though the House had passed him over as President in favor of John Quincy Adams .
+72: James K. Polk -> base.kwebbase.kwtopic.connections_to -> franklin pierce appointed by james knox polk
+73: James K. Polk -> organization.organization_founder.organizations_founded -> United States Naval Academy
+74: James K. Polk -> base.kwebbase.kwtopic.connections_from -> james knox polk passed over amos kendall
+75: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> In 1846, Polk pushed through legislation to make the treasury independent of the banks, declaring that \"public money should not be mingled with the private funds of banks\".
+76: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> Polk gave the post to a relative.
+77: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> In the matter of Oregon, both Britain and the U.S. had claimed the territory since 1818.
+78: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> When the first American soldiers were killed, Polk got Congressional support for declaring war.
+79: James K. Polk -> common.topic.article -> m.042fc
+80: James K. Polk -> government.politician.election_campaigns -> James K. Polk Presidential Campaign, 1844
+81: James K. Polk -> people.deceased_person.place_of_burial -> Tennessee State Capitol
+82: James K. Polk -> book.written_work.author -> Ostend Manifesto
+83: James K. Polk -> base.kwebbase.kwtopic.connections_to -> christopher latham sholes appointed postmaster by james knox polk
+84: James K. Polk -> common.topic.image -> Picture 12.png
+85: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> He also engineered the lowering of tariffs on imports.
+86: James K. Polk -> people.person.nationality -> United States of America
+87: James K. Polk -> base.kwebbase.kwtopic.connections_to -> nathaniel hawthorne appointed by james knox polk
+88: James K. Polk -> people.person.quotations -> It is confidently believed that our system may be safely extended to the utmost bounds of our territorial limits...
+89: James K. Polk -> base.kwebbase.kwtopic.connections_from -> james knox polk appointed nathaniel hawthorne
+90: James K. Polk -> media_common.quotation.author -> All distinctions of birth or of rank have been abolished. All citizens, whether native or adopted, are placed upon terms of precise equality. All are entitled to equal rights and equal protection.
+91: James K. Polk -> government.us_president.vice_president -> George M. Dallas
+92: James K. Polk -> base.kwebbase.kwtopic.connections_from -> james knox polk passed over for john quincy adams
+93: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> When he completed his term in March, 1849, he was exhausted, and died three months later at his home in Nashville.
+94: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> He opposed the old-style politicians who supported land speculators and bankers, and was a follower of Andrew Jackson, a popular military hero.
+95: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> Polk added extensive and valuable territory to the United States and restored the independence of the Treasury.
+96: James K. Polk -> symbols.name_source.namesakes -> Polk Township
+97: James K. Polk -> people.person.sibling_s -> m.0w4g5mr
+98: James K. Polk -> people.person.gender -> Male
+99: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> And he believed that state powers should hold sway and that the powers of the President and Congress should be limited.
+100: James K. Polk -> base.kwebbase.kwtopic.has_sentences -> This did not satisfy Polk.
+101: James K. Polk -> people.person.children -> Jane Polk
+102: James K. Polk -> people.person.religion -> Methodism
+103: James K. Polk -> base.kwebbase.kwtopic.connections_to -> antonio lopez de santa anna supported by james knox polk
+104: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> When he took office, Polk had announced he would not serve a second term.
+105: James K. Polk -> people.person.ethnicity -> White people
+106: James K. Polk -> base.kwebbase.kwconnection.subject -> james knox polk appointed christopher latham sholes
+107: James K. Polk -> common.image.size -> m.02g0521
+108: James K. Polk -> people.person.religion -> Presbyterianism
+109: James K. Polk -> people.person.ethnicity -> Scottish American 
+
+                
+                After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'.
+            
+2024-02-20 21:50:41,298 - INFO - ======================================================================================================================================================
+2024-02-20 21:50:41,298 - INFO - RECEIVED RESPONSE: 14: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> Before he took office, Congress voted to annex Texas, a move favored by most Democrats.
+2024-02-20 21:50:41,299 - INFO - RESPONSE: 14: James K. Polk -> base.kwebbase.kwsentence.kwtopic -> Before he took office, Congress voted to annex Texas, a move favored by most Democrats.; INDEX: 13

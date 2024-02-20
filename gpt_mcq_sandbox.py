@@ -7,6 +7,7 @@ import networkx as nx
 import re
 import logging
 import multiprocessing as mp
+import wandb
 from tqdm import tqdm
 from functools import partial
 from openai import OpenAI
@@ -38,11 +39,11 @@ def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
     return edges, neighbors
 
 
-def query_api(prompt):
+def query_api(args, prompt):
     client = OpenAI(api_key=config["OPENAI_API_KEY"])
     response = (
         client.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
+            model=args.model_name,
             messages=[{"role": "user", "content": prompt}],
             temperature=0,
             # max_tokens=500,
@@ -83,9 +84,20 @@ def build_graph(graph: list) -> nx.Graph:
     return G
 
 
-def main():
-    input_file = os.path.join("rmanluo", "RoG-webqsp")
-    output_dir = os.path.join("datasets/AlignData", "RoG-webqsp")
+def main(args):
+    settings = wandb.Settings(job_name=f"{args.d}-{args.model_name}-{args.sample}")
+    wandb.init(
+        project="rog-mcq",
+        notes="modifying the prompt to be more informative",
+        tags=["zero-shot"],
+        settings=settings,
+        config=args,
+    )
+    prediction_table = wandb.Table(columns=["id", "question", "prompt", "completion"])
+    final_table = wandb.Table(columns=["id", "question", "reasoning_path"])
+    
+    input_file = os.path.join(args.data_path, args.d)
+    output_dir = os.path.join(args.output_path, args.model_name)
 
     # print("Save results to: ", output_dir)
     if os.path.exists(output_dir) == False:
@@ -93,12 +105,16 @@ def main():
         logging.info("Created directory: {}".format(output_dir))
 
     # Load dataset, select first 10 examples
-    dataset = load_dataset(input_file, split="train").select(range(10))
+    if args.sample != -1:
+        dataset = load_dataset(input_file, split=args.split).select(range(args.sample))
+    else:
+        dataset = load_dataset(input_file, split=args.split)
 
     for data in tqdm(dataset):
         id = data['id']
         question = data['question']
         graph = build_graph(data['graph'])
+        answer = data['a_entity']
         starting_entity = data['q_entity'][0]
 
         # start MCQ reasoning
@@ -133,11 +149,13 @@ def main():
                 
                 {options_str} \n
                 
-                    After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'.
+                After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'.
             """
 
             try:
-                response = query_api(prompt)['response'].strip()
+                response = query_api(args, prompt)['response'].strip()
+                prediction_table.add_data(id, question, prompt, response)
+                
             except Exception as e:
                 logging.error("Error response: {}".format(e))
                 logging.error(
@@ -157,11 +175,35 @@ def main():
                 reasoning_path.append(f"{starting_entity} -> {path} -> {neighbor}")
                 starting_entity = neighbor
 
-        with open(os.path.join(output_dir, f"{id}.json"), "w") as f:
-            json.dump(
-                {"question": question, "reasoning_path": process_str(reasoning_path)}, f
+        # reasoning based on the final MCQ reasoning path
+        prompt = f"""
+        Your goal is to answer the following question: {question} based on the reasoning path: {process_str(reasoning_path)}. Only return the answer without any additional information.
+        """
+        
+        prediction = query_api(args, prompt)['response'].strip()
+        
+        with open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "w") as f:
+            json_str = json.dumps(
+                {"question": question, "reasoning_path": process_str(reasoning_path), "plus_round_prediction": prediction, "answer": answer}
             )
+            f.write(json_str + "\n")
+            final_table.add_data(id, question, process_str(reasoning_path))
 
+    wandb.log(
+        {
+            "predictions": prediction_table,
+            "reasoning_paths": final_table
+        }
+    )
+    wandb.finish()
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--sample", type=int, default=-1)
+    parser.add_argument("--data_path", type=str, default="rmanluo")
+    parser.add_argument("--d", "-d", type=str, default="RoG-webqsp")
+    parser.add_argument("--split", type=str, default="test")
+    parser.add_argument("--output_path", type=str, default="results")
+    parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
+    args = parser.parse_args()
+    main(args)
