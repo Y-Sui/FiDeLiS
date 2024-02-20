@@ -40,43 +40,83 @@ def build_data(args):
                     fout.write(json.dumps(r) + '\n')
 
 
+# def process_data(data, remove_duplicate=False):
+#     """
+#     result = {
+#         "question": str,
+#         "options": List[str]
+#         "reasoning_path_str": str
+#         "answer": str
+#     }
+#     """
+#     results = []
+#     question = data['question']
+#     graph = utils.build_graph(data['graph'])
+#     paths = utils.get_truth_paths(data['q_entity'], data['a_entity'], graph)
+#     shortest_paths = []
+#     for path in paths:
+#         rel_path = [p[1] for p in path]  # extract relation path
+#         if remove_duplicate:
+#             if tuple(rel_path) in shortest_paths:
+#                 continue
+#         shortest_paths.append(tuple(rel_path))
+
+#     triple = utils.get_entity_edges_with_neighbors(data['q_entity'], graph)
+
+#     flag = 0
+#     while flag < len(shortest_paths):
+#         for i in triple:
+#             entity = i[0]
+#             path_candidates = i[1]
+#             neighbors = i[2]
+#             for i, path_candidate in enumerate(path_candidates):
+#                 if path_candidate in shortest_paths:
+#                     results.append(
+#                         {
+#                             "question": question,
+#                             "options": path_candidates,
+#                             "answer": (entity, path_candidate, neighbors[i]),
+#                         }
+#                     )
+#                     entity = neighbors[i]
+#         flag += 1
+#     return results
+
+
 def process_data(data, remove_duplicate=False):
-    """
-    result = {
-        "question": str,
-        "options": List[str]
-        "reasoning_path_str": str
-        "answer": str
-    }
-    """
-    result = []
+    results = []
     question = data['question']
     graph = utils.build_graph(data['graph'])
-    paths = utils.get_truth_paths(data['q_entity'], data['a_entity'], graph)
-    shortest_paths = []
-    for path in paths:
-        rel_path = [p[1] for p in path]  # extract relation path
-        if remove_duplicate:
-            if tuple(rel_path) in shortest_paths:
-                continue
-        shortest_paths.append(tuple(rel_path))
+    shortest_paths = utils.get_truth_paths(
+        data['q_entity'], data['a_entity'], graph
+    )  # [[(h, r, t), ...], ...]
 
-    triple = utils.get_entity_edges_with_neighbors(data['q_entity'], graph)
+    history = ""
+    while shortest_paths:
+        paths = shortest_paths.pop(0)
+        for i, path in enumerate(paths):
+            h, r, t = path
+            _, path_candidates, neighbors = (
+                utils.get_entity_edges_with_neighbors_single(h, graph)
+            )
+            options = []
+            for i, p in enumerate(path_candidates):
+                options.append(f"{h} -> {p} -> {neighbors[i]}")
+            options = "\n".join(options)
+            if i == 0:
+                history = f"{h}"
+            else:
+                history = f"{history} -> {r} -> {t}"
+            results.append(
+                {
+                    "question": question,
+                    "options": options,
+                    "reasoning_path_str": history,
+                    "answer": paths[-1],
+                }
+            )
 
-    for i in triple:
-        entity = i[0]
-        path_candidates = i[1]
-        neighbors = i[2]
-        for i, path_candidate in enumerate(path_candidates):
-            if path_candidate in shortest_paths:
-                result.append(
-                    {
-                        "question": question,
-                        "options": path_candidates,
-                        "answer": (entity, path_candidate, neighbors[i]),
-                    }
-                )
-    return result
+    return results
 
 
 if __name__ == "__main__":
