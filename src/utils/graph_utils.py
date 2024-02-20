@@ -156,19 +156,30 @@ def get_random_paths(q_entity: list, graph: nx.Graph, n=3, hop=2) -> tuple[list,
     return result_paths, rules
 
 
-def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
+def get_entity_edges_with_neighbors(entity: list, graph: nx.Graph) -> list:
     '''
     given an entity, find all edges and neighbors
     '''
+    results = []
+    for h in entity:
+        neighbors = []
+        edges = []
+        if graph.has_node(h):
+            for neighbor in graph.neighbors(h):
+                neighbors.append(neighbor)
+                edges.append(graph[h][neighbor]['relation'])
+            results.append(h, neighbors, edges)
+    return results
+
+
+def get_entity_edges_with_neighbors_single(entity: str, graph: nx.Graph) -> list:
     neighbors = []
     edges = []
-
     if graph.has_node(entity):
         for neighbor in graph.neighbors(entity):
             neighbors.append(neighbor)
             edges.append(graph[entity][neighbor]['relation'])
-
-    return edges, neighbors
+    return entity, edges, neighbors
 
 
 def get_next_entity(entity: str, relation: str, graph: nx.Graph) -> list:
