@@ -41,20 +41,41 @@ def build_data(args):
 
 
 def process_data(data, remove_duplicate=False):
+    """
+    result = {
+        "question": str,
+        "options": List[str]
+        "reasoning_path_str": str
+        "answer": str
+    }
+    """
+    result = []
     question = data['question']
     graph = utils.build_graph(data['graph'])
     paths = utils.get_truth_paths(data['q_entity'], data['a_entity'], graph)
-    result = []
-    # Split each Q-P pair into a single data
-    rel_paths = []
+    shortest_paths = []
     for path in paths:
         rel_path = [p[1] for p in path]  # extract relation path
         if remove_duplicate:
-            if tuple(rel_path) in rel_paths:
+            if tuple(rel_path) in shortest_paths:
                 continue
-        rel_paths.append(tuple(rel_path))
-    for rel_path in rel_paths:
-        result.append({"question": question, "path": rel_path})
+        shortest_paths.append(tuple(rel_path))
+
+    triple = utils.get_entity_edges_with_neighbors(data['q_entity'], graph)
+
+    for i in triple:
+        entity = i[0]
+        path_candidates = i[1]
+        neighbors = i[2]
+        for i, path_candidate in enumerate(path_candidates):
+            if path_candidate in shortest_paths:
+                result.append(
+                    {
+                        "question": question,
+                        "options": path_candidates,
+                        "answer": (entity, path_candidate, neighbors[i]),
+                    }
+                )
     return result
 
 
@@ -72,6 +93,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.save_name == "":
-        args.save_name = args.d + "_" + args.split + ".jsonl"
+        args.save_name = args.d + "_cwq_" + args.split + ".jsonl"
 
     build_data(args)
