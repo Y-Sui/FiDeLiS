@@ -12,7 +12,7 @@ N_CPUS = (
 
 save_dir = "datasets/joint_training/align"
 # prompt_path = "prompts/llama2_chat.txt"
-data_template = "datasets/AlignData/{}/{}_cwq_train.jsonl"
+data_template = "datasets/AlignData/{}/{}_mcq_train_sample100.jsonl"
 data_list = ['RoG-webqsp', 'RoG-cwq']
 model_name_or_path = "meta-llama/Llama-2-7b-chat-hf"
 # prompter = InstructFormater(prompt_path)
@@ -57,7 +57,7 @@ def formatting_prompts_func(example):
 
 for data_name in data_list:
     data_path = data_template.format(data_name, data_name)
-    save_path = os.path.join(save_dir, data_name, data_name + "_train.jsonl")
+    save_path = os.path.join(save_dir, data_name, data_name + "_train_sample100.jsonl")
     train_dataset = datasets.load_dataset('json', data_files=data_path, split="train")
     # if not os.path.exists(os.path.dirname(save_path)):
     #     os.makedirs(os.path.dirname(save_path))
@@ -70,7 +70,7 @@ for data_name in data_list:
 
     train_dataset = train_dataset.map(
         formatting_prompts_func,
-        remove_columns=["question", "path"],
+        remove_columns=["question", "answer", "history", "options"],
         num_proc=N_CPUS,
     )
     train_dataset.to_json(save_path, orient="records", lines=True)

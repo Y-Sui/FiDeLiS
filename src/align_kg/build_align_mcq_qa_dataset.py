@@ -25,7 +25,10 @@ def build_data(args):
         os.makedirs(output_dir)
 
     # Load dataset
-    dataset = load_dataset(input_file, split=args.split)
+    if args.sample != -1:
+        dataset = load_dataset(input_file, split=args.split).select(range(args.sample))
+    else:
+        dataset = load_dataset(input_file, split=args.split)
     with open(os.path.join(output_dir, args.save_name), 'w') as fout:
         with mp.Pool(args.n) as pool:
 
@@ -93,9 +96,15 @@ if __name__ == "__main__":
     parser.add_argument("--save_name", type=str, default="")
     parser.add_argument('--n', '-n', type=int, default=1)
     parser.add_argument('--remove_duplicate', action='store_true')
+    parser.add_argument('--sample', type=int, default=-1)
     args = parser.parse_args()
 
     if args.save_name == "":
-        args.save_name = args.d + "_cwq_" + args.split + ".jsonl"
+        if args.sample != -1:
+            args.save_name = (
+                args.d + "_mcq_" + args.split + "_sample" + str(args.sample) + ".jsonl"
+            )
+        else:
+            args.save_name = args.d + "_mcq_" + args.split + ".jsonl"
 
     build_data(args)
