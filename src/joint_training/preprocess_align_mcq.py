@@ -41,17 +41,12 @@ tokenizer = AutoTokenizer.from_pretrained(
 
 
 def formatting_prompts_func(example):
-    output_label = rule_to_string(example["path"], sep_token=SEP, bop=BOP, eop=EOP)
+    output_label = rule_to_string(example["answer"], sep_token=SEP, bop=BOP, eop=EOP)
     output_text = (
         INSTRUCTION.format(
             question=example["question"],
-            reasoning_path_str=example["path"],
-            options_str=list_to_string(
-                [
-                    f"{i}: {p[0]} -> {p[1]} -> {p[2]}"
-                    for i, p in enumerate(example["path"])
-                ]
-            ),
+            reasoning_path_str=example["history"],
+            options_str=example["options"],
         )
         + " "
         + output_label
