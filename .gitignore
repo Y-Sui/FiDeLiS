@@ -5,6 +5,7 @@ logs/
 ref_examples/
 results/gen_rule_path/
 results/KGQA/
+results/gpt-3.5-turbo-0125
 test/
 wandb/
 save_models/
