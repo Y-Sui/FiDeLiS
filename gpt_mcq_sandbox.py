@@ -3,13 +3,21 @@ import os
 import argparse
 import os
 import json
-from datasets import load_dataset
+import networkx as nx
+import re
+import logging
 import multiprocessing as mp
 from tqdm import tqdm
 from functools import partial
 from openai import OpenAI
-import networkx as nx
-import re
+from datasets import load_dataset
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filename='webq.log',
+    filemode='w',
+)
 
 
 def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
@@ -28,7 +36,7 @@ def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
 
 
 def query_api(prompt):
-    client = OpenAI(api_key="sk-xxx")
+    client = OpenAI(api_key="sk-xx")
     response = (
         client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
@@ -77,6 +85,7 @@ def main():
     # print("Save results to: ", output_dir)
     if os.path.exists(output_dir) == False:
         os.makedirs(output_dir)
+        logging.info("Created directory: {}".format(output_dir))
 
     # Load dataset, select first 10 examples
     dataset = load_dataset(input_file, split="train").select(range(10))
@@ -135,16 +144,18 @@ def main():
             try:
                 response = query_api(prompt)['response'].strip()
             except Exception as e:
-                print(e)
-                print(f"Failed to get response for query: {question}")
+                logging.error("Error response: {}".format(e))
+                logging.error(
+                    f"Failed to get response for query for error {e}: {question}"
+                )
                 break
 
             if "EOS" in response:
-                # print(f"END of SELECTION: {process_str(reasoning_path)}")
+                logging.info(f"END of SELECTION: {process_str(reasoning_path)}")
                 flag = False
             else:
                 index = int(re.findall(r"[-+]?\d*\.\d+|\d+", response)[0]) - 1
-                # print(f"RESPONSE: {response}; INDEX: {index}")
+                logging.info(f"RESPONSE: {response}; INDEX: {index}")
 
                 path = path_candidates[index]
                 neighbor = neighbors[index]

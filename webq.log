@@ -1,0 +1,150 @@
+2024-02-20 16:08:55,356 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:08:55,363 - INFO - RESPONSE: The correct option for finding the name of Justin Bieber's brother is:
+336: Justin Bieber -> people.sibling_relationship.sibling -> m.0gxnnwc; INDEX: 335
+2024-02-20 16:08:56,448 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:08:56,450 - INFO - RESPONSE: 4: m.0yrkgd6 -> award.award_honor.award_winner -> Justin Bieber; INDEX: 3
+2024-02-20 16:08:57,911 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:08:57,913 - INFO - RESPONSE: 335: Justin Bieber -> people.sibling_relationship.sibling -> m.0gxnnwc; INDEX: 334
+2024-02-20 16:08:58,910 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:08:58,914 - INFO - RESPONSE: 1: m.0gxnnwc -> people.person.sibling_s -> Jazmyn Bieber; INDEX: 0
+2024-02-20 16:08:59,783 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:08:59,787 - INFO - RESPONSE: 1: Jazmyn Bieber -> people.person.parents -> Jeremy Bieber; INDEX: 0
+2024-02-20 16:09:00,588 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:00,590 - INFO - RESPONSE: 3: Jeremy Bieber -> people.person.children -> Justin Bieber; INDEX: 2
+2024-02-20 16:09:03,052 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:03,056 - INFO - RESPONSE: 336: Justin Bieber -> award.award_honor.award_winner -> m.0yrkgd6 -> award.award_honor.award_winner -> Justin Bieber -> people.sibling_relationship.sibling -> m.0gxnnwc -> people.person.sibling_s -> Jazmyn Bieber -> people.person.parents -> Jeremy Bieber -> people.person.children -> Justin Bieber; INDEX: 335
+2024-02-20 16:09:03,652 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:03,657 - INFO - END of SELECTION: Justin Bieber -> award.award_honor.award_winner -> m.0yrkgd6 -> award.award_honor.award_winner -> Justin Bieber -> people.sibling_relationship.sibling -> m.0gxnnwc -> people.person.sibling_s -> Jazmyn Bieber -> people.person.parents -> Jeremy Bieber -> people.person.children -> Justin Bieber -> award.award_honor.award_winner -> m.0yrkgd6
+2024-02-20 16:09:05,203 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:05,207 - INFO - RESPONSE: The correct index for the selected reasoning path is: 3: Natalie Portman -> film.actor.film -> m.0k3qzz; INDEX: 2
+2024-02-20 16:09:06,374 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:06,379 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
+2024-02-20 16:09:07,333 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:07,337 - INFO - RESPONSE: 3: Padmé Amidala -> film.film_character.portrayed_in_films -> m.0k3qzz; INDEX: 2
+2024-02-20 16:09:08,277 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:08,279 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
+2024-02-20 16:09:09,195 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:09,202 - INFO - RESPONSE: 3: Padmé Amidala -> film.film_character.portrayed_in_films -> m.0k3qzz; INDEX: 2
+2024-02-20 16:09:10,279 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:10,283 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
+2024-02-20 16:09:11,326 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:11,329 - INFO - RESPONSE: 3: Padmé Amidala -> film.film_character.portrayed_in_films -> m.0k3qzz; INDEX: 2
+2024-02-20 16:09:12,423 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:12,426 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
+2024-02-20 16:09:13,487 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:13,489 - INFO - RESPONSE: 3: Padmé Amidala -> film.film_character.portrayed_in_films -> m.0k3qzz; INDEX: 2
+2024-02-20 16:09:14,824 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:14,826 - INFO - RESPONSE: 2: m.0k3qzz -> film.film_character.portrayed_in_films -> Padmé Amidala; INDEX: 1
+2024-02-20 16:09:15,600 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:15,620 - INFO - RESPONSE: 8: Grand Bahama -> location.location.contains -> Bahamas; INDEX: 7
+2024-02-20 16:09:17,089 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2024-02-20 16:09:17,090 - ERROR - Error response: Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 28016 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+2024-02-20 16:09:17,090 - ERROR - Failed to get response for query for error Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 28016 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}: what country is the grand bahama island in
+2024-02-20 16:09:18,227 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2024-02-20 16:09:18,237 - ERROR - Error response: Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 28559 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+2024-02-20 16:09:18,238 - ERROR - Failed to get response for query for error Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 28559 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}: what kind of money to take to bahamas
+2024-02-20 16:09:19,128 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:19,138 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
+2024-02-20 16:09:20,010 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:20,020 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
+2024-02-20 16:09:21,195 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:21,200 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
+2024-02-20 16:09:22,082 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:22,087 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
+2024-02-20 16:09:22,927 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:22,931 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
+2024-02-20 16:09:23,838 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:23,842 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
+2024-02-20 16:09:24,730 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:24,735 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
+2024-02-20 16:09:25,576 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:25,579 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
+2024-02-20 16:09:26,540 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:26,542 - INFO - RESPONSE: 1: John Noble -> film.performance.actor -> m.0h1ldcx; INDEX: 0
+2024-02-20 16:09:27,261 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:27,263 - INFO - RESPONSE: 1: m.0h1ldcx -> film.performance.actor -> John Noble; INDEX: 0
+2024-02-20 16:09:28,577 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:28,579 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn
+
+The selected reasoning path indicates that Joakim Noah plays for a sports team.; INDEX: 11
+2024-02-20 16:09:29,504 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:29,507 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
+2024-02-20 16:09:30,316 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:30,318 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn; INDEX: 11
+2024-02-20 16:09:31,369 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:31,371 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
+2024-02-20 16:09:32,559 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:32,561 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn; INDEX: 11
+2024-02-20 16:09:33,956 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:33,958 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
+2024-02-20 16:09:34,919 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:34,922 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn; INDEX: 11
+2024-02-20 16:09:36,747 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:36,812 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
+2024-02-20 16:09:37,938 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:37,940 - INFO - RESPONSE: 12: Joakim Noah -> sports.sports_team_roster.player -> m.0n819kn; INDEX: 11
+2024-02-20 16:09:39,039 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:39,042 - INFO - RESPONSE: 1: m.0n819kn -> sports.sports_team_roster.player -> Joakim Noah; INDEX: 0
+2024-02-20 16:09:41,133 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:41,136 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
+2024-02-20 16:09:42,022 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:42,025 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
+2024-02-20 16:09:43,970 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:43,973 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
+2024-02-20 16:09:44,722 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:44,724 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
+2024-02-20 16:09:46,982 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:46,986 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
+2024-02-20 16:09:47,875 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:47,880 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
+2024-02-20 16:09:49,254 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:49,258 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
+2024-02-20 16:09:50,180 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:50,181 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
+2024-02-20 16:09:51,679 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:51,683 - INFO - RESPONSE: 524: Washington Redskins -> sports.sports_team.location -> Washington, D.C.; INDEX: 523
+2024-02-20 16:09:52,877 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:52,881 - INFO - RESPONSE: 7: Washington, D.C. -> sports.sports_team.location -> Washington Redskins; INDEX: 6
+2024-02-20 16:09:53,818 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:53,822 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
+2024-02-20 16:09:54,599 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:54,603 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
+2024-02-20 16:09:55,872 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:55,875 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
+2024-02-20 16:09:57,461 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:57,465 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
+2024-02-20 16:09:58,667 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:58,672 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
+2024-02-20 16:09:59,495 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:09:59,499 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
+2024-02-20 16:10:00,439 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:00,442 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
+2024-02-20 16:10:01,984 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:01,986 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
+2024-02-20 16:10:02,939 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:02,943 - INFO - RESPONSE: 62: Saki -> people.deceased_person.place_of_death -> Beaumont-Hamel; INDEX: 61
+2024-02-20 16:10:03,781 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:03,786 - INFO - RESPONSE: 7: Beaumont-Hamel -> people.deceased_person.place_of_death -> Saki; INDEX: 6
+2024-02-20 16:10:04,954 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:04,956 - INFO - RESPONSE: 30: Draco Malfoy -> fictional_universe.fictional_character.married_to -> m.09k254w; INDEX: 29
+2024-02-20 16:10:06,486 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:06,490 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
+2024-02-20 16:10:08,264 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:08,268 - INFO - RESPONSE: 4: Astoria Greengrass -> fictional_universe.fictional_character.married_to -> m.09k254w; INDEX: 3
+2024-02-20 16:10:09,348 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:09,353 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
+2024-02-20 16:10:10,484 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:10,486 - INFO - RESPONSE: 4: Astoria Greengrass -> fictional_universe.fictional_character.married_to -> m.09k254w; INDEX: 3
+2024-02-20 16:10:11,547 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:11,551 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
+2024-02-20 16:10:12,600 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:12,604 - INFO - RESPONSE: 4: Astoria Greengrass -> fictional_universe.fictional_character.married_to -> m.09k254w; INDEX: 3
+2024-02-20 16:10:13,591 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:13,596 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
+2024-02-20 16:10:14,541 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:14,542 - INFO - RESPONSE: 4: Astoria Greengrass -> fictional_universe.fictional_character.married_to -> Draco Malfoy; INDEX: 3
+2024-02-20 16:10:15,909 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-02-20 16:10:15,912 - INFO - RESPONSE: 1: m.09k254w -> fictional_universe.fictional_character.married_to -> Astoria Greengrass; INDEX: 0
+2024-02-20 16:10:17,452 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2024-02-20 16:10:17,453 - ERROR - Error response: Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 49253 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
+2024-02-20 16:10:17,453 - ERROR - Failed to get response for query for error Error code: 400 - {'error': {'message': "This model's maximum context length is 16385 tokens. However, your messages resulted in 49253 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}: which countries border the us
