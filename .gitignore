@@ -15,3 +15,4 @@ tmp/
 RoG_train.tar.gz
 config.json
 webq.log
+.DS_Store
