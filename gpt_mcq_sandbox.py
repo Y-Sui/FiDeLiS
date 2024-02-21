@@ -76,6 +76,9 @@ def process_str(s):
     return ' -> '.join(processed)
 
 
+def extract_a_entity(s):
+    return s.split(" -> ")[-1]
+
 def build_graph(graph: list) -> nx.Graph:
     G = nx.Graph()
     for triplet in graph:
@@ -94,7 +97,9 @@ def main(args):
         config=args,
     )
     prediction_table = wandb.Table(columns=["id", "question", "prompt", "completion"])
-    final_table = wandb.Table(columns=["id", "question", "reasoning_path"])
+    final_table = wandb.Table(columns=["id", "question", "reasoning_path", "prediction", "ground_truth", "w_o_extra"])
+    
+    save_list = []
     
     input_file = os.path.join(args.data_path, args.d)
     output_dir = os.path.join(args.output_path, args.model_name)
@@ -120,6 +125,7 @@ def main(args):
         # start MCQ reasoning
         reasoning_path = []
         flag = True
+        w_o_extra = False # without extra LLM calling
         while flag == True and len(reasoning_path) < 10:
             path_candidates, neighbors = get_entity_edges_with_neighbors(
                 starting_entity, graph
@@ -166,6 +172,7 @@ def main(args):
             if "EOS" in response:
                 logging.info(f"END of SELECTION: {process_str(reasoning_path)}")
                 flag = False
+                w_o_extra = True
             else:
                 index = int(re.findall(r"[-+]?\d*\.\d+|\d+", response)[0]) - 1
                 logging.info(f"RESPONSE: {response}; INDEX: {index}")
@@ -175,20 +182,34 @@ def main(args):
                 reasoning_path.append(f"{starting_entity} -> {path} -> {neighbor}")
                 starting_entity = neighbor
 
-        # reasoning based on the final MCQ reasoning path
-        prompt = f"""
-        Your goal is to answer the following question: {question} based on the reasoning path: {process_str(reasoning_path)}. Only return the answer without any additional information.
-        """
-        
-        prediction = query_api(args, prompt)['response'].strip()
-        
-        with open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "w") as f:
-            json_str = json.dumps(
-                {"question": question, "reasoning_path": process_str(reasoning_path), "plus_round_prediction": prediction, "answer": answer}
-            )
-            f.write(json_str + "\n")
-            final_table.add_data(id, question, process_str(reasoning_path))
+        if w_o_extra == False:
+            # reasoning based on the final MCQ reasoning path
+            prompt = f"""
+            Your goal is to answer the following question: {question} based on the reasoning path: {process_str(reasoning_path)}. Only return the answer without any additional information.
+            """
+            
+            prediction = query_api(args, prompt)['response'].strip()
+        else:
+            prediction = extract_a_entity(process_str(reasoning_path))
 
+        
+        # save the results to a jsonl file
+        save_list.append(
+            {
+                "question": question,
+                "reasoning_path": process_str(reasoning_path),
+                "prediction": prediction,
+                "ground_truth": answer,
+                "w_o_extra": w_o_extra
+            }
+        )
+        final_table.add_data(id, question, process_str(reasoning_path), prediction, answer, w_o_extra)
+        
+    with open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "w") as f:
+        for item in save_list:
+            json_str = json.dumps(item)
+            f.write(json_str + "\n")
+        
     wandb.log(
         {
             "predictions": prediction_table,
