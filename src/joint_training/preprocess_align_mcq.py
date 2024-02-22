@@ -111,6 +111,6 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--sample', type=int, default=-1)
-    parser.add_argument('--d', type=str, default="RoG-webqsp")
+    parser.add_argument('--d', '-d', type=str, default="RoG-webqsp")
     args = parser.parse_args()
     main(args)

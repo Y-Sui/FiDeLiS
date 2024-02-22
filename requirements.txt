@@ -16,3 +16,4 @@ protobuf
 datasets
 python-dotenv
 tiktoken
+deepspeed
