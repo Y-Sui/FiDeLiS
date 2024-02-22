@@ -59,12 +59,14 @@ def process_data(data, remove_duplicate=False):
         shortest_paths = list(set(map(tuple, shortest_paths)))
 
     history = ""
+    starting_entity = ""
     while shortest_paths:
         shortest_path = shortest_paths.pop(0)
         starting_flag = True
         for path in shortest_path:
             if starting_flag:
                 h, r, t = path
+                starting_entity = h
                 history = utils.rule_to_string([h], sep_token=SEP, bop=BOP, eop=EOP)
                 starting_flag = False
             else:
@@ -85,6 +87,7 @@ def process_data(data, remove_duplicate=False):
             results.append(
                 {
                     "question": question,
+                    "starting_entity": starting_entity,
                     "options": options,
                     "history": history,
                     "answer": path,
