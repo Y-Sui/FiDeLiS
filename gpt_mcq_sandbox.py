@@ -8,6 +8,8 @@ import re
 import logging
 import multiprocessing as mp
 import wandb
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 from functools import partial
 from openai import OpenAI
@@ -24,6 +26,7 @@ logging.basicConfig(
 with open("config.json", "r") as f:
     config = json.load(f)
 
+
 def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
     '''
     given an entity, find all edges and neighbors
@@ -37,6 +40,14 @@ def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
             edges.append(graph[entity][neighbor]['relation'])
 
     return edges, neighbors
+
+
+def get_embedding(text, model="text-embedding-3-small"):
+    client = OpenAI(api_key=config["OPENAI_API_KEY"])
+    response = client.embeddings.create(
+        model=model, input=[text]
+    )
+    return response.data[0].embedding
 
 
 def query_api(args, prompt):
@@ -64,6 +75,24 @@ def query_api(args, prompt):
     return {"prompt": prompt, "response": response}
 
 
+def query_api_with_top_k_completions(args, prompt):
+    #TODO: implement this function
+    """
+    generate top-k completions for the given prompt based on the calculated log-likelihood ratio for each token
+    """
+    client = OpenAI(api_key=config["OPENAI_API_KEY"])
+    response = (
+        client.chat.completions.create(
+            model=args.model_name,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+            n=args.n_beam,
+        )
+        .choices[0]
+        .message.content
+    )
+
+
 def process_str(s):
     processed = []
 
@@ -79,12 +108,42 @@ def process_str(s):
 def extract_a_entity(s):
     return s.split(" -> ")[-1]
 
+
 def build_graph(graph: list) -> nx.Graph:
     G = nx.Graph()
     for triplet in graph:
         h, r, t = triplet
         G.add_edge(h, t, relation=r.strip())
     return G
+
+
+def prepare_options_for_each_step(entity, query, path_candidates, neighbors, whether_filtering):
+    options = []
+    options.append(
+        "0: EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection."
+    )
+    i = 1
+    for p, n in zip(path_candidates, neighbors):
+        options.append(f"{i}: {entity} -> {p} -> {n}")
+        i += 1
+    
+    def semantic_filtering(query, options, top_k=10):
+        query_embedding = get_embedding(query)
+        option_embeddings = np.array([get_embedding(option) for option in options])
+        similarities = cosine_similarity([query_embedding], option_embeddings)
+        top_k_indices = np.argsort(similarities[0])[-top_k:][::-1]
+        
+        print(f"Top {top_k} options: {top_k_indices}")
+        
+        return [options[i] for i in top_k_indices]
+    
+    if whether_filtering:
+        options.pop(0)
+        options = semantic_filtering(query, options)
+        options.insert(0, "0: EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection.")
+        
+    options_str = "\n".join(options)
+    return options_str
 
 
 def main(args):
@@ -96,8 +155,8 @@ def main(args):
         settings=settings,
         config=args,
     )
-    prediction_table = wandb.Table(columns=["id", "question", "prompt", "completion"])
-    final_table = wandb.Table(columns=["id", "question", "reasoning_path", "prediction", "ground_truth", "w_o_extra"])
+    prediction_table = wandb.Table(columns=["id", "question", "starting_entity", "prompt", "completion"])
+    final_table = wandb.Table(columns=["id", "question", "q_entities", "reasoning_path", "prediction", "ground_truth", "w_o_extra"])
     
     save_list = []
     
@@ -120,90 +179,84 @@ def main(args):
         question = data['question']
         graph = build_graph(data['graph'])
         answer = data['a_entity']
-        starting_entity = data['q_entity'][0]
+        # starting_entity = data['q_entity'][0]
 
-        # start MCQ reasoning
-        reasoning_path = []
-        flag = True
-        w_o_extra = False # without extra LLM calling
-        while flag == True and len(reasoning_path) < 10:
-            path_candidates, neighbors = get_entity_edges_with_neighbors(
-                starting_entity, graph
-            )
-
-            options = []
-            options.append(
-                "0: EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection."
-            )
-            i = 1
-            for p, n in zip(path_candidates, neighbors):
-                options.append(f"{i}: {starting_entity} -> {p} -> {n}")
-                i += 1
-
-            options_str = "\n".join(options)
-
-            
-            reasoning_path_str = process_str(reasoning_path)
-            prompt = f"""
-                Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n
-                
-                *IF AT START*: To proceed, the starting entity is {starting_entity}. \n
-                *IF IN PROGRESS*: The current reasoning path that has been constructed so far is {reasoning_path_str}. \n
-                
-                Now your goal is: examine the reasoning paths to see whether the final entity in the path is the answer to the question; If so, answer EOS. 
-                If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. \n
-                
-                {options_str} \n
-                
-                After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'.
-            """
-
-            try:
-                response = query_api(args, prompt)['response'].strip()
-                prediction_table.add_data(id, question, prompt, response)
-                
-            except Exception as e:
-                logging.error("Error response: {}".format(e))
-                logging.error(
-                    f"Failed to get response for query for error {e}: {question}"
+        pred_list, reasoning_path_list, w_o_extra_list = [], [], []
+        for entity in data['q_entity']:
+            # start MCQ reasoning
+            reasoning_path = []
+            flag = True
+            w_o_extra = False # without extra LLM calling
+            while flag == True and len(reasoning_path) < 10:
+                path_candidates, neighbors = get_entity_edges_with_neighbors(
+                    entity, graph
                 )
-                break
+                options_str = prepare_options_for_each_step(entity, question, path_candidates, neighbors, args.whether_filtering)
 
-            if "EOS" in response:
-                logging.info(f"END of SELECTION: {process_str(reasoning_path)}")
-                flag = False
-                w_o_extra = True
+                reasoning_path_str = process_str(reasoning_path)
+                prompt = f"""
+                    Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n
+                    
+                    *IF AT START*: To proceed, the starting entity is {entity}. \n
+                    *IF IN PROGRESS*: The current reasoning path that has been constructed so far is {reasoning_path_str}. \n
+                    
+                    Now your goal is: examine the reasoning paths to see whether the final entity in the path is the answer to the question; If so, answer EOS. 
+                    If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. \n
+                    
+                    {options_str} \n
+                    
+                    After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'.
+                """
+
+                try:
+                    response = query_api(args, prompt)['response'].strip()
+                    prediction_table.add_data(id, question, entity, prompt, response)
+                    
+                except Exception as e:
+                    logging.error("Error response: {}".format(e))
+                    logging.error(
+                        f"Failed to get response for query for error {e}: {question}"
+                    )
+                    break
+
+                if "EOS" in response:
+                    logging.info(f"END of SELECTION: {process_str(reasoning_path)}")
+                    flag = False
+                    w_o_extra = True
+                else:
+                    index = int(re.findall(r"[-+]?\d*\.\d+|\d+", response)[0]) - 1
+                    logging.info(f"RESPONSE: {response}; INDEX: {index}")
+
+                    path = path_candidates[index]
+                    neighbor = neighbors[index]
+                    reasoning_path.append(f"{entity} -> {path} -> {neighbor}")
+                    entity = neighbor
+
+            reasoning_path_list.append(process_str(reasoning_path))
+            w_o_extra_list.append(w_o_extra)
+            if w_o_extra == False:
+                # reasoning based on the final MCQ reasoning path
+                prompt = f"""
+                Your goal is to answer the following question: {question} based on the reasoning path: {process_str(reasoning_path)}. Only return the answer without any additional information.
+                """
+                
+                pred_list.append(query_api(args, prompt)['response'].strip())
             else:
-                index = int(re.findall(r"[-+]?\d*\.\d+|\d+", response)[0]) - 1
-                logging.info(f"RESPONSE: {response}; INDEX: {index}")
-
-                path = path_candidates[index]
-                neighbor = neighbors[index]
-                reasoning_path.append(f"{starting_entity} -> {path} -> {neighbor}")
-                starting_entity = neighbor
-
-        if w_o_extra == False:
-            # reasoning based on the final MCQ reasoning path
-            prompt = f"""
-            Your goal is to answer the following question: {question} based on the reasoning path: {process_str(reasoning_path)}. Only return the answer without any additional information.
-            """
-            
-            prediction = query_api(args, prompt)['response'].strip()
-        else:
-            prediction = extract_a_entity(process_str(reasoning_path))
+                pred_list.append(extract_a_entity(process_str(reasoning_path)))
 
         
         # save the results to a jsonl file
         save_list.append(
             {
                 "question": question,
-                "reasoning_path": process_str(reasoning_path),
-                "prediction": prediction,
+                "q_entities": data['q_entity'],
+                "reasoning_path": reasoning_path_list,
+                "prediction": pred_list,
                 "ground_truth": answer,
-                "w_o_extra": w_o_extra
+                "w_o_extra": w_o_extra_list
             }
         )
-        final_table.add_data(id, question, process_str(reasoning_path), prediction, answer, w_o_extra)
+        final_table.add_data(id, question, data['q_entity'], reasoning_path_list, pred_list, answer, w_o_extra_list)
         
     with open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "w") as f:
         for item in save_list:
@@ -226,5 +279,7 @@ if __name__ == "__main__":
     parser.add_argument("--split", type=str, default="test")
     parser.add_argument("--output_path", type=str, default="results")
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
+    parser.add_argument("--n_beam", type=int, default=1)
+    parser.add_argument("--whether_filtering", type=bool, default=False)
     args = parser.parse_args()
     main(args)
