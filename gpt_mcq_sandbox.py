@@ -211,26 +211,25 @@ def main(args):
                 try:
                     response = query_api(args, prompt)['response'].strip()
                     prediction_table.add_data(id, question, entity, prompt, response)
-                    
+                    if "EOS" in response:
+                        logging.info(f"END of SELECTION: {process_str(reasoning_path)}")
+                        flag = False
+                        w_o_extra = True
+                    else:
+                        index = int(re.findall(r"[-+]?\d*\.\d+|\d+", response)[0]) - 1
+                        logging.info(f"RESPONSE: {response}; INDEX: {index}")
+
+                        path = path_candidates[index]
+                        neighbor = neighbors[index]
+                        reasoning_path.append(f"{entity} -> {path} -> {neighbor}")
+                        entity = neighbor
+                        
                 except Exception as e:
                     logging.error("Error response: {}".format(e))
                     logging.error(
                         f"Failed to get response for query for error {e}: {question}"
                     )
                     break
-
-                if "EOS" in response:
-                    logging.info(f"END of SELECTION: {process_str(reasoning_path)}")
-                    flag = False
-                    w_o_extra = True
-                else:
-                    index = int(re.findall(r"[-+]?\d*\.\d+|\d+", response)[0]) - 1
-                    logging.info(f"RESPONSE: {response}; INDEX: {index}")
-
-                    path = path_candidates[index]
-                    neighbor = neighbors[index]
-                    reasoning_path.append(f"{entity} -> {path} -> {neighbor}")
-                    entity = neighbor
 
             reasoning_path_list.append(process_str(reasoning_path))
             w_o_extra_list.append(w_o_extra)
