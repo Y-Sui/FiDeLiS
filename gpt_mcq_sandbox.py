@@ -216,7 +216,7 @@ def main(args):
                         flag = False
                         w_o_extra = True
                     else:
-                        index = int(re.findall(r"[-+]?\d*\.\d+|\d+", response)[0]) - 1
+                        index = int(re.findall(r"\b\d+\b", response)[0]) - 1
                         logging.info(f"RESPONSE: {response}; INDEX: {index}")
 
                         path = path_candidates[index]
