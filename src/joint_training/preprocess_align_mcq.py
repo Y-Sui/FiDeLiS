@@ -28,17 +28,14 @@ N_CPUS = (
                 
 # V2    
 INSTRUCTION = """
-                    Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n
-                    
-                    *IF AT START*: To proceed, the starting entity is {entity}. \n
-                    *IF IN PROGRESS*: The current reasoning path that has been constructed so far is {reasoning_path_str}. \n
-                    
-                    Now your goal is: examine the reasoning paths to see whether the final entity in the path is the answer to the question; If so, answer EOS. 
+                    [INST] <<SYS>>
+                    <</SYS>>Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n
+                    *IF AT START*: To proceed, the starting entity is {entity}.\n
+                    *IF IN PROGRESS*: The current reasoning path that has been constructed so far is {reasoning_path_str}.\n
+                    Now your goal is: examine the reasoning paths to see whether the final entity in the path is the answer to the question; If so, answer EOS.
                     If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. \n
-                    
                     {options_str} \n
-                    
-                    After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'.
+                    After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'.[INST]
                 """
 SEP = '<SEP>'
 BOP = '<PATH>'
