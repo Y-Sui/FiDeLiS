@@ -9,6 +9,7 @@ import logging
 import multiprocessing as mp
 import wandb
 import numpy as np
+from src.qa_prediction.evaluate_results import eval_result
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 from functools import partial
@@ -246,7 +247,7 @@ def main(args):
                 "question": question,
                 "q_entities": data['q_entity'],
                 "reasoning_path": reasoning_path_list,
-                "prediction": pred_list,
+                "prediction": "\n".join(pred_list),
                 "ground_truth": answer,
                 "w_o_extra": w_o_extra_list
             }
@@ -257,7 +258,7 @@ def main(args):
         for item in save_list:
             json_str = json.dumps(item)
             f.write(json_str + "\n")
-        
+            
     wandb.log(
         {
             "predictions": prediction_table,
@@ -265,6 +266,9 @@ def main(args):
         }
     )
     wandb.finish()
+    
+    # evaluate
+    eval_result(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), cal_f1=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
