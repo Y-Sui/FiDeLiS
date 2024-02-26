@@ -1,11 +1,11 @@
 MODEL_PATH=meta-llama/Llama-2-7b-chat-hf
 DATASET_LIST="datasets/joint_training/align/cwq/cwq_train.jsonl datasets/joint_training/align/webqsp/webqsp_train.jsonl datasets/joint_training/qa/webqsp/webqsp_train.jsonl datasets/joint_training/qa/cwq/cwq_train.jsonl datasets/joint_training/ExplainQAData/cwq/cwq_train_1000.jsonl datasets/joint_training/ExplainQAData/webqsp/webqsp_train_1000.jsonl"
-SAVE_NAME=rog-mcq
+SAVE_NAME=rog
 SAVE_PATH=save_models/${SAVE_NAME}
 ADD_REL=False
 
 # finetune the model
-accelerate launch --config_file config/deepspeed_zero3.yml src/joint_training/joint_finetuning.py \
+accelerate launch --config_file config/deepspeed_zero3.yml --main_process_port 20688 src/joint_training/joint_finetuning.py \
     --data_path_list ${DATASET_LIST}  \
     --model_name_or_path ${MODEL_PATH} \
     --output_dir ${SAVE_PATH} \
@@ -27,4 +27,4 @@ accelerate launch --config_file config/deepspeed_zero3.yml src/joint_training/jo
     --tf32 True \
     --report_to "wandb" \
     --gradient_checkpointing True \
-    --run_name ${SAVE_NAME}"
+    --run_name ${SAVE_NAME}

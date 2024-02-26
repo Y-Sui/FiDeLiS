@@ -104,7 +104,7 @@ if __name__ == "__main__":
     )  # this link is from the root of the dataset (https://huggingface.co/datasets/rmanluo/RoG-webqsp/viewer/default/test?p=15)
     parser.add_argument('--d', '-d', type=str, default='webqsp')
     parser.add_argument('--split', type=str, default='train')
-    parser.add_argument("--output_path", type=str, default="datasets/AlignData")
+    parser.add_argument("--output_path", type=str, default="/data/shared/yuansui/rog/AlignData")
     parser.add_argument("--save_name", type=str, default="")
     parser.add_argument('--n', '-n', type=int, default=1)
     parser.add_argument('--remove_duplicate', action='store_true')
