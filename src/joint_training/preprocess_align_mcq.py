@@ -35,7 +35,7 @@ INSTRUCTION = """
                     Now your goal is: examine the reasoning paths to see whether the final entity in the path is the answer to the question; If so, answer EOS.
                     If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. \n
                     {options_str} \n
-                    After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'.[INST]
+                    After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS'. [/INST]
                 """
 SEP = '<SEP>'
 BOP = '<PATH>'
@@ -43,12 +43,13 @@ EOP = '</PATH>'
 
 
 def main(args):
-    save_dir = "datasets/joint_training/align"
+    source_path = "/data/shared/yuansui/rog"
+    save_dir = f"{source_path}/joint_training/align"
     # prompt_path = "prompts/llama2_chat.txt"
     if args.sample != -1:
-        data_template = "datasets/AlignData/{}/{}_mcq_train_sample{}.jsonl"
+        data_template = f"{source_path}" + "/AlignData/{}/{}_mcq_train_sample{}.jsonl"
     else:
-        data_template = "datasets/AlignData/{}/{}_mcq_train.jsonl"
+        data_template = f"{source_path}" + "/AlignData/{}/{}_mcq_train.jsonl"
     # data_list = ['RoG-webqsp', 'RoG-cwq']
     data_name = args.d
     model_name_or_path = "meta-llama/Llama-2-7b-chat-hf"

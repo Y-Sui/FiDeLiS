@@ -2,6 +2,7 @@ import sys
 import os
 
 import torch
+import logging
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/..")
 import os
@@ -14,6 +15,7 @@ from transformers import (
     AutoTokenizer,
     HfArgumentParser,
     TrainingArguments,
+    BitsAndBytesConfig,
 )
 from utils import *
 import logging
@@ -21,17 +23,20 @@ from transformers.trainer_utils import get_last_checkpoint
 from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 from align_kg.data_loader import load_multiple_datasets, load_new_tokens
 from peft import AutoPeftModelForCausalLM, LoraConfig
+from accelerate import PartialState
 
 import datasets
 datasets.disable_progress_bar()
 
-N_CPUS = int(os.environ['SLURM_CPUS_PER_TASK']) if 'SLURM_CPUS_PER_TASK' in os.environ else 1
+# N_CPUS = int(os.environ['SLURM_CPUS_PER_TASK']) if 'SLURM_CPUS_PER_TASK' in os.environ else 1
+
+DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 INSTRUCTION = """Please generate a valid relation path that can be helpful for answering the following question: """
 SEP = '<SEP>'
 BOP = '<PATH>'
 EOP = '</PATH>'
-
+MAX_MEMORY = f'{24573}MB'
 
 @dataclass
 class ScriptArguments:
@@ -59,13 +64,13 @@ class ScriptArguments:
         default=False, metadata={"help": "Wether to save merged model"}
     )
     lora_alpha: Optional[float] = field(
-        default=16, metadata={"help": "the lora alpha parameter"}
+        default=32, metadata={"help": "the lora alpha parameter"}
     )
     lora_dropout: Optional[float] = field(
         default=0.05, metadata={"help": "the lora dropout parameter"}
     )
     lora_r: Optional[int] = field(
-        default=8, metadata={"help": "the lora r parameter"}
+        default=32, metadata={"help": "the lora r parameter"}
     )
 
 @dataclass
@@ -76,20 +81,43 @@ class ScriptTrainingArguments(TrainingArguments):
     )
     optim: str = field(default="adamw_torch")
     model_max_length: int = field(
-        default=2048,
+        default=8192,
         metadata={"help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."},
     )
     ddp_find_unused_parameters: bool = field(default=False)
 
+
+def create_bnb_config():
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16,
+    )
+    return bnb_config
+
+
 def train():
     parser = HfArgumentParser((ScriptArguments, ScriptTrainingArguments))
     script_args, training_args = parser.parse_args_into_dataclasses()
-
+    
+    device_string = PartialState().process_index
+    
     # Load models
     model = AutoModelForCausalLM.from_pretrained(
         script_args.model_name_or_path,
         trust_remote_code=True,
         use_auth_token=True,
+        device_map={'': device_string},
+        # device_map="auto",
+        # max_memory={i: MAX_MEMORY for i in range(torch.cuda.device_count())},
+        # quantization_config=create_bnb_config(),
+    )
+    
+    tokenizer = AutoTokenizer.from_pretrained(
+        script_args.model_name_or_path,
+        trust_remote_code=True,
+        use_fast=False,
     )
 
     model.config.use_cache = False
@@ -105,12 +133,6 @@ def train():
     else:
         peft_config = None
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        script_args.model_name_or_path,
-        trust_remote_code=True,
-        use_fast=False,
-    )
-
     # Add new tokens
     special_tokens_dict = dict()
     if tokenizer.pad_token is None:
@@ -122,15 +144,17 @@ def train():
     
     tokenizer.padding_side = "right"  # Fix weird overflow issue with fp16 training
     
+    print("Start preparing datasets...")
     # Load datasets
     train_dataset = load_multiple_datasets(script_args.data_path_list, shuffle=True)
-
+    
     # Prepare instruct tuning
     response_template = "[/INST]"
     data_collator = DataCollatorForCompletionOnlyLM(
         response_template, tokenizer=tokenizer, mlm=False
     )
-
+    
+    print("Start training...")
     trainer = SFTTrainer(
         model=model,
         train_dataset=train_dataset,
