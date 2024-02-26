@@ -107,7 +107,7 @@ def train():
     model = AutoModelForCausalLM.from_pretrained(
         script_args.model_name_or_path,
         trust_remote_code=True,
-        use_auth_token=True,
+        token=True,
         device_map={'': device_string},
         # device_map="auto",
         # max_memory={i: MAX_MEMORY for i in range(torch.cuda.device_count())},

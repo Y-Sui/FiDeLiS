@@ -111,7 +111,7 @@ def gen_prediction(args):
             args.model_path,
             device_map="auto",
             torch_dtype=torch.float16,
-            use_auth_token=True,
+            token=True,
         )
 
     input_file = os.path.join(args.data_path, args.d)
