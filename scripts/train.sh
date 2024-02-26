@@ -1,3 +1,6 @@
+SOURCE_PATH="/data/shared/yuansui/rog"
+export HF_HOME=${SOURCE_PATH}/.cache/huggingface
+
 MODEL_PATH=meta-llama/Llama-2-7b-chat-hf
 DATASET_LIST="datasets/joint_training/align/cwq/cwq_train.jsonl datasets/joint_training/align/webqsp/webqsp_train.jsonl datasets/joint_training/qa/webqsp/webqsp_train.jsonl datasets/joint_training/qa/cwq/cwq_train.jsonl datasets/joint_training/ExplainQAData/cwq/cwq_train_1000.jsonl datasets/joint_training/ExplainQAData/webqsp/webqsp_train_1000.jsonl"
 SAVE_NAME=rog

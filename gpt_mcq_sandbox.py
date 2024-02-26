@@ -42,12 +42,12 @@ def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
     return edges, neighbors
 
 
-def get_embedding(text, model="text-embedding-3-small"):
+def get_embedding(texts, model="text-embedding-3-small"):
     client = OpenAI(api_key=config["OPENAI_API_KEY"])
     response = client.embeddings.create(
-        model=model, input=[text]
+        model=model, input=texts
     )
-    return response.data[0].embedding
+    return [item.embedding for item in response.data]
 
 
 def query_api(args, prompt):
@@ -118,29 +118,25 @@ def build_graph(graph: list) -> nx.Graph:
 
 
 def prepare_options_for_each_step(entity, query, path_candidates, neighbors, whether_filtering):
-    options = []
-    options.append(
+    options = [
         "0: EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection."
-    )
-    i = 1
-    for p, n in zip(path_candidates, neighbors):
-        options.append(f"{i}: {entity} -> {p} -> {n}")
-        i += 1
+    ] + [f"{i}: {entity} -> {p} -> {n}" for i, (p, n) in enumerate(zip(path_candidates, neighbors), start=1)]
     
     def semantic_filtering(query, options, top_k=10):
-        query_embedding = get_embedding(query)
-        option_embeddings = np.array([get_embedding(option) for option in options])
+        texts = [query] + options
+        embeddings = get_embedding(texts)
+        query_embedding = np.array(embeddings[0])
+        option_embeddings = np.array(embeddings[1:])
         similarities = cosine_similarity([query_embedding], option_embeddings)
         top_k_indices = np.argsort(similarities[0])[-top_k:][::-1]
         
-        print(f"Top {top_k} options: {top_k_indices}")
+        # print(f"Top {top_k} options: {top_k_indices}")
         
         return [options[i] for i in top_k_indices]
     
     if whether_filtering:
-        options.pop(0)
-        options = semantic_filtering(query, options)
-        options.insert(0, "0: EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection.")
+        filtered_options = semantic_filtering(query, options[1:])
+        options = [options[0]] + filtered_options
         
     options_str = "\n".join(options)
     return options_str

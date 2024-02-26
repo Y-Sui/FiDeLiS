@@ -1,3 +1,6 @@
+SOURCE_PATH="/data/shared/yuansui/rog"
+export HF_HOME=${SOURCE_PATH}/.cache/huggingface
+
 SPLIT="test"
 DATASET_LIST="RoG-webqsp RoG-cwq"
 BEAM_LIST="3" # "1 2 3 4 5"
