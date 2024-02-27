@@ -9,6 +9,7 @@ import logging
 import multiprocessing as mp
 import wandb
 import numpy as np
+import datetime
 from src.qa_prediction.evaluate_results import eval_result
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
@@ -16,13 +17,8 @@ from functools import partial
 from openai import OpenAI
 from datasets import load_dataset
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    filename='webq.log',
-    filemode='w',
-)
-
+now = datetime.datetime.now()
+timestamp = now.strftime(f"%Y_%m_%d_%H_%M")
 
 with open("config.json", "r") as f:
     config = json.load(f)
@@ -118,10 +114,10 @@ def build_graph(graph: list) -> nx.Graph:
     return G
 
 
-def prepare_options_for_each_step(entity, query, path_candidates, neighbors, whether_filtering):
-    options = [
-        "0: EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection."
-    ] + [f"{i}: {entity} -> {p} -> {n}" for i, (p, n) in enumerate(zip(path_candidates, neighbors), start=1)]
+def prepare_options_for_each_step(reasoning_path, query, path_candidates, neighbors, whether_filtering):
+    options = [f"{i}: {reasoning_path} -> {p} -> {n}" for i, (p, n) in enumerate(zip(path_candidates, neighbors), start=1)] + [
+        "EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection."
+    ]
     
     def semantic_filtering(query, options, top_k=10):
         texts = [query] + options
@@ -136,14 +132,27 @@ def prepare_options_for_each_step(entity, query, path_candidates, neighbors, whe
         return [options[i] for i in top_k_indices]
     
     if whether_filtering:
-        filtered_options = semantic_filtering(query, options[1:])
-        options = [options[0]] + filtered_options
+        filtered_options = semantic_filtering(query, options[:-1])
+        options = filtered_options + [options[-1]] 
         
     options_str = "\n".join(options)
     return options_str
 
 
 def main(args):
+    input_file = os.path.join(args.data_path, args.d)
+    output_dir = os.path.join(args.output_path, args.model_name, timestamp)
+    # print("Save results to: ", output_dir)
+    if os.path.exists(output_dir) == False:
+        os.makedirs(output_dir)
+    
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        filename=os.path.join(output_dir,'webq.log'),
+        filemode='w',
+    )
+
     settings = wandb.Settings(job_name=f"{args.d}-{args.model_name}-{args.sample}")
     wandb.init(
         project="rog-mcq",
@@ -156,14 +165,6 @@ def main(args):
     final_table = wandb.Table(columns=["id", "question", "q_entities", "reasoning_path", "prediction", "ground_truth", "w_o_extra"])
     
     save_list = []
-    
-    input_file = os.path.join(args.data_path, args.d)
-    output_dir = os.path.join(args.output_path, args.model_name)
-
-    # print("Save results to: ", output_dir)
-    if os.path.exists(output_dir) == False:
-        os.makedirs(output_dir)
-        logging.info("Created directory: {}".format(output_dir))
 
     # Load dataset, select first 10 examples
     if args.sample != -1:
@@ -188,9 +189,8 @@ def main(args):
                 path_candidates, neighbors = get_entity_edges_with_neighbors(
                     entity, graph
                 )
-                options_str = prepare_options_for_each_step(entity, question, path_candidates, neighbors, args.whether_filtering)
-
                 reasoning_path_str = process_str(reasoning_path)
+                options_str = prepare_options_for_each_step(reasoning_path_str, question, path_candidates, neighbors, args.whether_filtering)
                 prompt = f"""
                     Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n
                     
