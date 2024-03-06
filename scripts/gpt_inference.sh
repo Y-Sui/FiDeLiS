@@ -9,7 +9,8 @@ REASONING_TYPE="llm_reasoning"
 
 for DATA_NAME in $DATASET_LIST; do
    python gpt_mcq_sandbox.py \
-      --sample 50 --d ${DATA_NAME} \
+      --sample 25 \
+      --d ${DATA_NAME} \
       --model_name $MODEL_NAME \
       --retrieval_type $RETRIEVAL_TYPE \
       --reasoning_type $REASONING_TYPE
