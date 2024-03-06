@@ -67,6 +67,7 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
     # predict_file = os.path.join(result_path, 'predictions.jsonl')
     eval_name = "_detailed_eval_result_top_{topk}.jsonl" if topk > 0 else '_detailed_eval_result.jsonl'
     detailed_eval_file = predict_file.replace('.jsonl', eval_name)
+    error_file = predict_file.replace('.jsonl', '_error.jsonl')
     
     print(f"Predict file: {predict_file}")
     # Load results
@@ -75,9 +76,10 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
     f1_list = []
     precission_list = []
     recall_list = []
+    error_list = []
     f = open(predict_file, 'r')
     f2 = open(detailed_eval_file, 'w')
-    # with open(predict_file, 'r') as f, open(detailed_eval_file, 'w') as f2:
+    f3 = open(error_file, 'w')
     for line in f:
         try:
             data = json.loads(line)
@@ -87,6 +89,11 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
         id = data['id'] if 'id' in data else "null"
         prediction = data['prediction']
         answer = data['ground_truth']
+        question = data['question']
+        prompt = data['prompt']
+        q_entities = data['q_entities']
+        reasoning_path = data['reasoning_path']
+        reasoning_options = data['reasoning_options']
         
         if cal_f1:
             if not isinstance(prediction, list):
@@ -103,18 +110,49 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
             acc_list.append(acc)
             hit_list.append(hit)
             f2.write(json.dumps({'id': id, 'prediction': prediction, 'ground_truth': answer, 'acc': acc, 'hit': hit, 'f1': f1_score, 'precission': precision_score, 'recall': recall_score}) + '\n')
+            if hit == 0:
+                f3.write(
+                    json.dumps(
+                        {
+                            'id': id, 
+                            'prediction': prediction, 
+                            'ground_truth': answer, 
+                            'question': question,
+                            'q_entities': q_entities,
+                            'reasoning_path': reasoning_path,
+                            'reasoning_options': reasoning_options,
+                            'prompt': prompt,
+                            
+                        }) + '\n')
+                error_list.append(id)
         else:
             acc = eval_acc(prediction, answer)
             hit = eval_hit(prediction, answer)
             acc_list.append(acc)
             hit_list.append(hit)
             f2.write(json.dumps({'id': id, 'prediction': prediction, 'ground_truth': answer, 'acc': acc, 'hit': hit}) + '\n')
+            if hit == 0:
+                f3.write(
+                    json.dumps(
+                        {
+                            'id': id, 
+                            'prediction': prediction, 
+                            'ground_truth': answer, 
+                            'question': question,
+                            'q_entities': q_entities,
+                            'reasoning_path': reasoning_path,
+                            'reasoning_options': reasoning_options,
+                            'prompt': prompt,
+                            
+                        }) + '\n')
+                error_list.append(id)
     f.close()
     f2.close()
+    f3.close()
     if len(f1_list) > 0:
-        result_str = "Accuracy: " + str(sum(acc_list) * 100 / len(acc_list)) + " Hit: " + str(sum(hit_list) * 100 / len(hit_list)) + " F1: " + str(sum(f1_list) * 100 / len(f1_list)) + " Precision: " + str(sum(precission_list) * 100 / len(precission_list)) + " Recall: " + str(sum(recall_list) * 100 / len(recall_list))
+        result_str = "Accuracy: " + str(sum(acc_list) * 100 / len(acc_list)) + " Hit: " + str(sum(hit_list) * 100 / len(hit_list)) + " F1: " + str(sum(f1_list) * 100 / len(f1_list)) + " Precision: " + str(sum(precission_list) * 100 / len(precission_list)) + " Recall: " + str(sum(recall_list) * 100 / len(recall_list)) + " Error Number: " + str(len(error_list))
     else:
-        result_str = "Accuracy: " + str(sum(acc_list) * 100 / len(acc_list)) + " Hit: " + str(sum(hit_list) * 100 / len(hit_list))
+        result_str = "Accuracy: " + str(sum(acc_list) * 100 / len(acc_list)) + " Hit: " + str(sum(hit_list) * 100 / len(hit_list)) + " Error Number: " + str(len(error_list))
     print(result_str)
     result_name = "_eval_result_top_{topk}.txt" if topk > 0 else '_eval_result.txt'
     eval_result_path = predict_file.replace('.jsonl', result_name)
