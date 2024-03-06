@@ -10,6 +10,7 @@ import multiprocessing as mp
 import wandb
 import numpy as np
 import datetime
+import random
 from src.qa_prediction.evaluate_results import eval_result
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
@@ -48,13 +49,6 @@ def query_api(args, prompt):
     logging.info(f"PROMPT: {prompt}")
     logging.info("===" * 50)
     logging.info(f"RECEIVED RESPONSE: {response}")
-    # print("=" * 50)
-    # print("RECEIVED RESPONSE: ", response)
-    # outputs_file = open(fpath, "w")
-    # outputs_file.write(json.dumps({
-    #     'prompt': prompt,
-    #     'response': response
-    # }))
     return {"prompt": prompt, "response": response}
 
 
@@ -182,12 +176,12 @@ def main(args):
     )
     prediction_table = wandb.Table(columns=["id", "question", "starting_entity", "prompt", "completion"])
     final_table = wandb.Table(columns=["id", "question", "q_entities", "reasoning_path", "prediction", "ground_truth", "w_o_extra"])
-    
     save_list = []
 
-    # Load dataset, select first 10 examples
     if args.sample != -1:
-        dataset = load_dataset(input_file, split=args.split).select(range(args.sample))
+        dataset = load_dataset(input_file, split=args.split)
+        dataset = load_dataset(input_file, split=args.split).select(random.sample(range(len(dataset)), args.sample))
+        
     else:
         dataset = load_dataset(input_file, split=args.split)
 
@@ -200,6 +194,7 @@ def main(args):
         reasoning_path_list = []
         reasoning_options_list = []
         w_o_extra_list = []
+        logging.info(f"Processing ID: {id}")
         
         for q_entity in data['q_entity']:
             # start MCQ reasoning
@@ -217,7 +212,7 @@ def main(args):
                         f"You are asked to start from the starting entity and choose the next step from the following path candidates that is most likely to lead to useful reasoning paths for answering the question. \n"
                         f"Question: {question} \n"
                         f"Starting entity: {q_entity} \n"
-                        f"Path candidates: {_new_line_char.join(options)} \n"
+                        f"Path candidates: \n{_new_line_char.join(options)} \n"
                         f"Please only return the index of the selected reasoning path."
                     )
                 else:
@@ -225,8 +220,8 @@ def main(args):
                         f"Your goal is to find a path from a knowledge graph that is useful for answering the following question. \n" 
                         f"You are asked to consider the reasoning path that has been constructed so far and choose the next step from the following path candidates that is most likely to lead to useful reasoning paths for answering the question. \n"
                         f"Question: {question} \n"
-                        f"Reasoning paths: {process_str(reasoning_path)} \n"
-                        f"Path candidates: {_new_line_char.join(options)} \n"
+                        f"Reasoning paths: {q_entity} -> {process_str(reasoning_path)} \n"
+                        f"Path candidates: \n{_new_line_char.join(options)} \n"
                         f"Please only return the index of the selected reasoning path."
                     )   
                 try:
