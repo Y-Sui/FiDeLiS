@@ -6,32 +6,34 @@ import walker
 
 
 def build_graph(graph: list) -> nx.Graph:
-    G = nx.Graph()
+    # G = nx.Graph()
+    G = nx.DiGraph()
     for triplet in graph:
         h, r, t = triplet
         G.add_edge(h, t, relation=r.strip())
     return G
 
 
-# 定义一个函数来进行宽度优先搜索
+# bfs with rule
 def bfs_with_rule(graph, start_node, target_rule, max_p=10):
     result_paths = []
-    queue = deque([(start_node, [])])  # 使用队列存储待探索节点和对应路径
+    queue = deque([(start_node, [])]) # (node, path), deque is a double-ended queue for quick append and pop
     while queue:
         current_node, current_path = queue.popleft()
 
-        # 如果当前路径符合规则，将其添加到结果列表中
+        # if current path length equals to target rule length, add to result
         if len(current_path) == len(target_rule):
             result_paths.append(current_path)
             # if len(result_paths) >= max_p:
             #     break
+            
 
-        # 如果当前路径长度小于规则长度，继续探索
+        # if current path length less than target rule length, continue to explore
         if len(current_path) < len(target_rule):
             if current_node not in graph:
                 continue
             for neighbor in graph.neighbors(current_node):
-                # 剪枝：如果当前边类型与规则中的对应位置不匹配，不继续探索该路径
+                # if the relation is not the same as the target rule, continue
                 rel = graph[current_node][neighbor]['relation']
                 if rel != target_rule[len(current_path)] or len(current_path) > len(
                     target_rule
@@ -184,15 +186,31 @@ def get_entity_edges_with_neighbors_single(entity: str, graph: nx.Graph) -> list
     return entity, edges, neighbors
 
 
-def get_next_entity(entity: str, relation: str, graph: nx.Graph) -> list:
+def get_next_entities(entity: str, relation: str, graph: nx.Graph) -> list:
     '''
     given an entity and relation, find the next entity
     '''
+    next_entites = []
     if entity in graph:
         for neighbor in graph.neighbors(entity):
             if graph[entity][neighbor]['relation'] == relation:
-                return neighbor
+                next_entites.append(neighbor)
+    
+    return next_entites
 
+
+def get_entity_edges(entities, graph: nx.Graph) -> list:
+    '''
+    given a set of entities, find all edges and corresponding neighbors (noted that each edge may has multiple neighbors)
+    '''
+    edges = []
+
+    for entity in entities:
+        if graph.has_node(entity):
+            for neighbor in graph.neighbors(entity):
+                edges.append(graph[entity][neighbor]['relation'])
+    return edges
+    
 
 def get_mcq_paths(
     q_entity: list, a_entity: list, graph: nx.Graph, shortest_paths: list[list]

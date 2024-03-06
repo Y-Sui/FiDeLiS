@@ -25,21 +25,6 @@ with open("config.json", "r") as f:
     config = json.load(f)
 
 
-def get_entity_edges_with_neighbors(entity: str, graph: nx.Graph) -> list:
-    '''
-    given an entity, find all edges and neighbors
-    '''
-    neighbors = []
-    edges = []
-
-    if graph.has_node(entity):
-        for neighbor in graph.neighbors(entity):
-            neighbors.append(neighbor)
-            edges.append(graph[entity][neighbor]['relation'])
-
-    return edges, neighbors
-
-
 def get_embedding(texts, model="text-embedding-3-small"):
     client = OpenAI(api_key=config["OPENAI_API_KEY"])
     response = client.embeddings.create(
@@ -95,11 +80,13 @@ def process_str(s):
     processed = []
 
     for item in s:
-        parts = item.split(" -> ")
-        for part in parts:
-            if not processed or (processed and processed[-1] != part):
-                processed.append(part)
-
+        if " -> " in item:
+            parts = item.split(" -> ")
+            for part in parts:
+                if not processed or (processed and processed[-1] != part):
+                    processed.append(part)
+        else:
+            processed.append(item)
     return ' -> '.join(processed)
 
 
@@ -107,25 +94,35 @@ def extract_a_entity(s):
     return s.split(" -> ")[-1]
 
 
+def apply_rules(graph, rules, source_entities):
+    results = []
+    for entity in source_entities:
+        res = utils.bfs_with_rule(graph, entity, rules)
+        results.extend(res)
+    return results
+    
+
 def build_graph(graph: list) -> nx.Graph:
-    G = nx.Graph()
+    # G = nx.Graph()
+    G = nx.DiGraph()
     for triplet in graph:
         h, r, t = triplet
         G.add_edge(h, t, relation=r.strip())
     return G
 
 
-def prepare_options_for_each_step(reasoning_path, query, path_candidates, whether_filtering) -> list:
-    if reasoning_path == "":
-        options = path_candidates + [
-            "EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection."
-        ]
+def prepare_options_for_each_step(q_entity, reasoning_path, query, graph, retrieval_type = "vector_rag") -> list:
+    """
+    prepare options for each step of the reasoning path
+    """
+    if len(reasoning_path) == 0:
+        raw_options = list(set(utils.get_entity_edges([q_entity], graph)))
     else:
-        options = [f"{reasoning_path} -> {p}" for p in path_candidates] + [
-            "EOS -> The final entity of current reasoning steps can directly answers the query. End of Selection."
-        ]
+        entire_path = apply_rules(graph, reasoning_path, [q_entity])
+        next_entities = [p[-1][-1] for p in entire_path] # noted that E_t is an entity set as a head entity and a relation can usually derive multiple tail entities
+        raw_options = list(set(utils.get_entity_edges(next_entities, graph))) # get edges of the entities 
     
-    def semantic_filtering(query, options, top_k=10):
+    def vector_rag_engine(query, options, top_k=10):
         texts = [query] + options
         embeddings = get_embedding(texts)
         query_embedding = np.array(embeddings[0])
@@ -133,16 +130,34 @@ def prepare_options_for_each_step(reasoning_path, query, path_candidates, whethe
         similarities = cosine_similarity([query_embedding], option_embeddings)
         top_k_indices = np.argsort(similarities[0])[-top_k:][::-1]
         top_k_options = [options[i] for i in top_k_indices]
+        # corresponding_neighbors = [neighbors[i] for i in top_k_indices]
         
         return top_k_options
-        # return [f"{i}: {option}" for i, option in enumerate(top_k_options, start=1)]
+        # return [f"{i+1}: {option} -> {neighbor}" for i, (option, neighbor) in enumerate(zip(top_k_options, corresponding_neighbors))]
     
-    if whether_filtering:
-        filtered_options = semantic_filtering(query, options[:-1])
-        options = filtered_options + [options[-1]] 
+    if retrieval_type == "vector_rag":
+        """
+        create embedding of query and options; semantic search top-k related options; select the next step reasoning path based on the top-k options
+        """
+        retrieved_options = vector_rag_engine(query, raw_options) # de-duplicate the same options
         
-    return options
+    elif retrieval_type == "graph_rag":
+        """
+        get n-depth subgraphs of q_entity from KG; select the next step reasoning path based on the related subgraphs
+        """
+        pass
+    
+    elif retrieval_type == "graph_vector_rag":
+        """
+        do retrieval as Vector and Graph RAG; select the next step reasoning path based on both subgraphs and top-k related options 
+        """
+        pass
+    
+    processed_options = []
+    for i, option in enumerate(retrieved_options):
+        processed_options.append(f"{i+1}: {option}")
 
+    return processed_options
 
 def main(args):
     input_file = os.path.join(args.data_path, args.d)
@@ -187,72 +202,59 @@ def main(args):
         reasoning_options_list = []
         w_o_extra_list = []
         
-        for entity in data['q_entity']:
+        for q_entity in data['q_entity']:
             # start MCQ reasoning
             reasoning_path = []
             reasoning_options = []
             flag = True
             w_o_extra = False # without extra LLM calling
             while flag == True and len(reasoning_path) < 10:
-                path_candidates, neighbors = get_entity_edges_with_neighbors(
-                    entity, graph
-                )
-                reasoning_path_str = process_str(reasoning_path)
-                options = prepare_options_for_each_step(reasoning_path_str, question, path_candidates, args.whether_filtering)
+                options = prepare_options_for_each_step(q_entity, reasoning_path, question, graph, args.retrieval_type)
                 reasoning_options.append(options)
-                
-                # options_str = "\n".join([f"{i}: {option}" for i, option in enumerate(options[:-1], start=1)] + [options[-1]])
-                options_str = "\n".join(options)
-                
+                _new_line_char = "\n"
                 if len(reasoning_path) == 0:
-                    prompt = f"""
-                        Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n
-                        
-                        *IF AT START*: To proceed, the starting entity is {entity}. \n
-                        
-                        Now your goal is: examine this reasoning path to see whether the final entity in this path is the answer to the question; If so, respond with 'EOS'.
-                        If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. \n
-                        
-                        {options_str} \n
-                        
-                        After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS' 
-                    """
+                    prompt = (
+                        f"Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n"
+                        f"To proceed, the starting entity is {q_entity}. \n"
+                        f"Now your goal is: choose the next step from the following reasoning paths candidates that is most likely to lead to useful reasoning paths for answering the question. \n"
+                        f"{_new_line_char.join(options)} \n"
+                        f"Please only return the index of the selected reasoning path."
+                    )
                 else:
-                    prompt = f"""
-                        Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n
-                        
-                        *IF IN PROGRESS*: The current reasoning path that has been constructed so far is {reasoning_path_str}. \n
-                        
-                        Now your goal is: examine this reasoning path to see whether the final entity in this path is the answer to the question; If so, respond with 'EOS'.
-                        If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. \n
-                        
-                        {options_str} \n
-                        
-                        After evaluating the options, please provide only the index of the selected reasoning path. If the final entity from the current reasoning path directly answers the query, respond with 'EOS' 
-                    """
-                
+                    prompt = (
+                        f"Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n"
+                        f"The current reasoning path that has been constructed so far is {process_str(reasoning_path)}. \n"
+                        f"Now your goal is: examine this reasoning path to see whether the reasoning path can lead to useful paths for answering the question; If none of the provided options are suitable for answering the query, respond with 'EOS'."
+                        f"If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. \n"
+                        f"{_new_line_char.join(options)} \n"
+                        f"After evaluating the options, please provide only the index of the selected reasoning path."
+                    )  
+                # If the final entity from the current reasoning path directly answers the query, respond with 'EOS'"    
                 try:
                     response = query_api(args, prompt)['response'].strip()
-                    prediction_table.add_data(id, question, entity, prompt, response)
+                    prediction_table.add_data(id, question, q_entity, prompt, response)
                     
                     if "EOS" in response:
                         logging.info(f"END of SELECTION: {process_str(reasoning_path)}")
                         logging.info(f"FINAL ENTITY: {extract_a_entity(process_str(reasoning_path))}")
                         logging.info(f"GROUND TRUTH: {answer}")
+                        logging.info(f"\n\n")
                         flag = False
                         w_o_extra = True
                     else:
                         index = int(re.findall(r"\b\d+\b", response)[0]) - 1
-                        logging.info(f"RESPONSE: {response}; INDEX: {index}")
+                        # logging.info(f"RESPONSE: {response}; INDEX: {index}")
                         
-                        # path = options[index] 
-                        # neighbor = utils.get_next_entity(entity, path, graph)
-                        path = path_candidates[index]
-                        neighbor = neighbors[index]
+                        # # path = options[index] 
+                        # # neighbor = utils.get_next_entity(entity, path, graph)
+                        # path = path_candidates[index]
+                        # neighbor = neighbors[index]
                         
                         # neighbor = neighbors[index] # tail entity may have multiple candidates
-                        reasoning_path.append(f"{entity} -> {path} -> {neighbor}")
-                        entity = neighbor
+                        # reasoning_path.append(f"-> {path} -> {neighbor}")
+                        
+                        reasoning_path.append(options[index].replace(f"{index+1}: ", ""))
+                        # entity = options[index].split(" -> ")[-1]
                         
                 except Exception as e:
                     logging.error("Error response: {}".format(e))
@@ -267,22 +269,28 @@ def main(args):
             
             if w_o_extra == False:
                 # reasoning based on the final MCQ reasoning path
-                prompt = f"""
+                prompt_extra = f"""
                 Your goal is to answer the following question: {question} based on the reasoning path: {process_str(reasoning_path)}. Only return the answer without any additional information.
                 """
-                pred_list.append(query_api(args, prompt)['response'].strip())
+                pred_list.append(query_api(args, prompt_extra)['response'].strip())
             else:
-                pred_list.append(extract_a_entity(process_str(reasoning_path)))
+                # directly answer the question based on the final entity from the reasoning path
+                if len(reasoning_path) > 0:
+                    entire_path = apply_rules(graph, reasoning_path, [q_entity])
+                    for p in entire_path:
+                        if len(p) > 0:
+                            pred_list.append(p[-1][-1])
         
         # save the results to a jsonl file
         save_list.append(
             {
                 "id": id,
+                "prompt": prompt,
                 "question": question,
                 "q_entities": data['q_entity'],
                 "reasoning_path": reasoning_path_list,
                 "reasoning_options": reasoning_options_list,
-                "prediction": "\n".join(pred_list),
+                "prediction": "\n".join(set(pred_list)), # remove duplicate predictions
                 "ground_truth": answer,
                 "w_o_extra": w_o_extra_list
             }
@@ -314,6 +322,6 @@ if __name__ == "__main__":
     parser.add_argument("--output_path", type=str, default="results")
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
     parser.add_argument("--n_beam", type=int, default=1)
-    parser.add_argument("--whether_filtering", type=bool, default=False)
+    parser.add_argument("--retrieval_type", type=str, default="vector_rag", choices=["vector_rag", "graph_rag", "graph_vector_rag", "NA"])
     args = parser.parse_args()
     main(args)
