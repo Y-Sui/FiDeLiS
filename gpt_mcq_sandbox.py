@@ -103,8 +103,7 @@ def apply_rules(graph, rules, source_entities):
     
 
 def build_graph(graph: list) -> nx.Graph:
-    # G = nx.Graph()
-    G = nx.DiGraph()
+    G = nx.Graph()
     for triplet in graph:
         h, r, t = triplet
         G.add_edge(h, t, relation=r.strip())
@@ -207,54 +206,47 @@ def main(args):
             reasoning_path = []
             reasoning_options = []
             flag = True
-            w_o_extra = False # without extra LLM calling
+            # w_o_extra = False # without extra LLM calling
             while flag == True and len(reasoning_path) < 10:
                 options = prepare_options_for_each_step(q_entity, reasoning_path, question, graph, args.retrieval_type)
                 reasoning_options.append(options)
                 _new_line_char = "\n"
                 if len(reasoning_path) == 0:
-                    prompt = (
-                        f"Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n"
-                        f"To proceed, the starting entity is {q_entity}. \n"
-                        f"Now your goal is: choose the next step from the following reasoning paths candidates that is most likely to lead to useful reasoning paths for answering the question. \n"
-                        f"{_new_line_char.join(options)} \n"
+                    relation_prune_prompt = (
+                        f"Your goal is to find a path from a knowledge graph that is useful for answering the following question. \n" 
+                        f"You are asked to start from the starting entity and choose the next step from the following path candidates that is most likely to lead to useful reasoning paths for answering the question. \n"
+                        f"Question: {question} \n"
+                        f"Starting entity: {q_entity} \n"
+                        f"Path candidates: {_new_line_char.join(options)} \n"
                         f"Please only return the index of the selected reasoning path."
                     )
                 else:
-                    prompt = (
-                        f"Your goal is to find a path from a knowledge graph that is useful for answering the following question:  {question} \n"
-                        f"The current reasoning path that has been constructed so far is {process_str(reasoning_path)}. \n"
-                        f"Now your goal is: examine this reasoning path to see whether the reasoning path can lead to useful paths for answering the question; If none of the provided options are suitable for answering the query, respond with 'EOS'."
-                        f"If not, you need to choose the next step in the reasoning: from the following triples starting from the last entity from the reasoning path, select one of them that is likely to lead to useful paths for answering the question. \n"
-                        f"{_new_line_char.join(options)} \n"
-                        f"After evaluating the options, please provide only the index of the selected reasoning path."
-                    )  
-                # If the final entity from the current reasoning path directly answers the query, respond with 'EOS'"    
+                    relation_prune_prompt = (
+                        f"Your goal is to find a path from a knowledge graph that is useful for answering the following question. \n" 
+                        f"You are asked to consider the reasoning path that has been constructed so far and choose the next step from the following path candidates that is most likely to lead to useful reasoning paths for answering the question. \n"
+                        f"Question: {question} \n"
+                        f"Reasoning paths: {process_str(reasoning_path)} \n"
+                        f"Path candidates: {_new_line_char.join(options)} \n"
+                        f"Please only return the index of the selected reasoning path."
+                    )   
                 try:
-                    response = query_api(args, prompt)['response'].strip()
-                    prediction_table.add_data(id, question, q_entity, prompt, response)
+                    response = query_api(args, relation_prune_prompt)['response'].strip()
+                    prediction_table.add_data(id, question, q_entity, relation_prune_prompt, response)
+                    index = int(re.findall(r"\b\d+\b", response)[0]) - 1 # get the index of the selected reasoning path
+                    reasoning_path.append(options[index].replace(f"{index+1}: ", ""))
                     
-                    if "EOS" in response:
-                        logging.info(f"END of SELECTION: {process_str(reasoning_path)}")
-                        logging.info(f"FINAL ENTITY: {extract_a_entity(process_str(reasoning_path))}")
-                        logging.info(f"GROUND TRUTH: {answer}")
-                        logging.info(f"\n\n")
+                    termination_check_prompt = (
+                        f"Your goal is to answer whether it's sufficient for you to answer the question with the following reasoning path and your knowledge \n"
+                        f"Question: {question} \n"
+                        f"Reasong paths: {q_entity} -> {process_str(reasoning_path)} \n"
+                        f"If it is sufficient to answer the question, respond with 'Yes'; otherwise, respond with 'No'."
+                    )
+                    termination_check = query_api(args, termination_check_prompt)['response'].strip()
+                    if "Yes" in termination_check:
                         flag = False
-                        w_o_extra = True
-                    else:
-                        index = int(re.findall(r"\b\d+\b", response)[0]) - 1
-                        # logging.info(f"RESPONSE: {response}; INDEX: {index}")
-                        
-                        # # path = options[index] 
-                        # # neighbor = utils.get_next_entity(entity, path, graph)
-                        # path = path_candidates[index]
-                        # neighbor = neighbors[index]
-                        
-                        # neighbor = neighbors[index] # tail entity may have multiple candidates
-                        # reasoning_path.append(f"-> {path} -> {neighbor}")
-                        
-                        reasoning_path.append(options[index].replace(f"{index+1}: ", ""))
-                        # entity = options[index].split(" -> ")[-1]
+                
+                    elif "No" in termination_check:
+                        flag = True
                         
                 except Exception as e:
                     logging.error("Error response: {}".format(e))
@@ -262,30 +254,35 @@ def main(args):
                         f"Failed to get response for query for error {e}: {question}"
                     )
                     break
-
+            
+            # append the reasoning path and options to the list
             reasoning_path_list.append(process_str(reasoning_path))
-            w_o_extra_list.append(w_o_extra)
             reasoning_options_list.append(reasoning_options)
             
-            if w_o_extra == False:
+            if args.reasoning_type == "llm_reasoning":
                 # reasoning based on the final MCQ reasoning path
-                prompt_extra = f"""
-                Your goal is to answer the following question: {question} based on the reasoning path: {process_str(reasoning_path)}. Only return the answer without any additional information.
-                """
-                pred_list.append(query_api(args, prompt_extra)['response'].strip())
-            else:
+                reasoning_prompt = (
+                    f"Your goal is to answer the following question based on the reasoning path and your knowledge. \n"
+                    f"Question: {question} \n"
+                    f"Reasoning path: {q_entity} -> {process_str(reasoning_path)} \n"
+                    f"Only return the answer to the question."
+                )
+                pred_list.append(query_api(args, reasoning_prompt)['response'].strip())
+            elif args.reasoning_type == "direct_answer":
                 # directly answer the question based on the final entity from the reasoning path
                 if len(reasoning_path) > 0:
                     entire_path = apply_rules(graph, reasoning_path, [q_entity])
                     for p in entire_path:
                         if len(p) > 0:
                             pred_list.append(p[-1][-1])
+            else:
+                raise ValueError("Invalid reasoning type")
         
         # save the results to a jsonl file
         save_list.append(
             {
                 "id": id,
-                "prompt": prompt,
+                "prompt": relation_prune_prompt,
                 "question": question,
                 "q_entities": data['q_entity'],
                 "reasoning_path": reasoning_path_list,
@@ -323,5 +320,6 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
     parser.add_argument("--n_beam", type=int, default=1)
     parser.add_argument("--retrieval_type", type=str, default="vector_rag", choices=["vector_rag", "graph_rag", "graph_vector_rag", "NA"])
+    parser.add_argument("--reasoning_type", type=str, default="direct_answer", choices=["direct_answer", "llm_reasoning"])
     args = parser.parse_args()
     main(args)
