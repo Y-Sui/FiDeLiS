@@ -93,7 +93,6 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
         prompt = data['prompt']
         q_entities = data['q_entities']
         reasoning_path = data['reasoning_path']
-        reasoning_options = data['reasoning_options']
         
         if cal_f1:
             if not isinstance(prediction, list):
@@ -120,7 +119,6 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
                             'question': question,
                             'q_entities': q_entities,
                             'reasoning_path': reasoning_path,
-                            'reasoning_options': reasoning_options,
                             'prompt': prompt,
                             
                         }) + '\n')
@@ -141,7 +139,6 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
                             'question': question,
                             'q_entities': q_entities,
                             'reasoning_path': reasoning_path,
-                            'reasoning_options': reasoning_options,
                             'prompt': prompt,
                             
                         }) + '\n')
