@@ -3,6 +3,7 @@ import os
 import argparse
 import os
 import json
+import ast
 import networkx as nx
 import re
 import logging
@@ -175,7 +176,7 @@ def main(args):
         config=args,
     )
     prediction_table = wandb.Table(columns=["id", "question", "starting_entity", "prompt", "completion"])
-    final_table = wandb.Table(columns=["id", "question", "q_entities", "reasoning_path", "prediction", "ground_truth", "w_o_extra"])
+    final_table = wandb.Table(columns=["id", "question", "q_entities", "reasoning_path", "prediction", "ground_truth"])
     save_list = []
 
     if args.sample != -1:
@@ -192,86 +193,112 @@ def main(args):
         answer = data['a_entity']
         pred_list = []
         reasoning_path_list = []
-        reasoning_options_list = []
-        w_o_extra_list = []
+        _new_line_char = "\n" # for formatting the prompt
+        
         logging.info(f"Processing ID: {id}")
         
         for q_entity in data['q_entity']:
             # start MCQ reasoning
-            reasoning_path = []
-            reasoning_options = []
-            flag = True
-            # w_o_extra = False # without extra LLM calling
-            while flag == True and len(reasoning_path) < 10:
-                options = prepare_options_for_each_step(q_entity, reasoning_path, question, graph, args.retrieval_type)
-                reasoning_options.append(options)
-                _new_line_char = "\n"
-                if len(reasoning_path) == 0:
-                    relation_prune_prompt = (
-                        f"Your goal is to find a path from a knowledge graph that is useful for answering the following question. \n" 
-                        f"You are asked to start from the starting entity and choose the next step from the following path candidates that is most likely to lead to useful reasoning paths for answering the question. \n"
+            reasoning_path = [[] for _ in range(args.top_k)] # for each q_entity, we retrieve top-k reasoning paths
+            stage_1_options = prepare_options_for_each_step(q_entity, [], question, graph, args.retrieval_type)
+            relation_prune_prompt = (
+                        f"Your goal is to retrieve {args.top_k} paths from the following candidates that contribute to answering the following question. \n" 
                         f"Question: {question} \n"
                         f"Starting entity: {q_entity} \n"
-                        f"Path candidates: \n{_new_line_char.join(options)} \n"
-                        f"Please only return the index of the selected reasoning path."
+                        f"Path candidates: \n{_new_line_char.join(stage_1_options)} \n"
+                        f"Please only return the index of the {args.top_k} selected reasoning path in a list. (for example [1, 2, 3])"
                     )
-                else:
+            try:
+                stage_1_response = query_api(args, relation_prune_prompt)['response'].strip() 
+                prediction_table.add_data(id, question, q_entity, relation_prune_prompt, stage_1_response)
+                stage_1_response = ast.literal_eval(stage_1_response) # use ast.literal_eval to convert string to list
+                if type(stage_1_response) == list:
+                    stage_1_index = [int(re.findall(r"\b\d+\b", str(stage_1_res))[0]) - 1 for stage_1_res in stage_1_response] # get the index of the selected reasoning paths
+                    for k in range(args.top_k):
+                        reasoning_path[k].append(stage_1_options[stage_1_index[k]].replace(f"{stage_1_index[k]+1}: ", ""))
+                            
+            except Exception as e:
+                logging.error("Error response: {}".format(e))
+                logging.error(
+                    f"Error occurred at stage 1"
+                    f"Failed to get response for query due to error {e}: {question}"
+                )
+                break
+            
+            # evaluate whether the reasoning path is sufficient to answer the question
+            for k in range(args.top_k):
+                logging.info(f"Reasoning path {k+1}: {reasoning_path[k]}")
+                termination_check_prompt = (
+                            f"Your goal is to answer whether it's sufficient for you to answer the question with the following reasoning path and your knowledge \n"
+                            f"Question: {question} \n"
+                            f"Reasong paths: {q_entity} -> {process_str(reasoning_path[k])} \n"
+                            f"If it is sufficient to answer the question, respond with 'Yes'; otherwise, respond with 'No'."
+                        )
+                termination_check = query_api(args, termination_check_prompt)['response'].strip()
+                
+                if "Yes" in termination_check:
+                    flag = False
+                elif "No" in termination_check:
+                    flag = True
+                    
+                while flag == True and len(reasoning_path[k]) < 10:
+                    stage_n_options = prepare_options_for_each_step(q_entity, reasoning_path[k], question, graph, args.retrieval_type)
                     relation_prune_prompt = (
                         f"Your goal is to find a path from a knowledge graph that is useful for answering the following question. \n" 
                         f"You are asked to consider the reasoning path that has been constructed so far and choose the next step from the following path candidates that is most likely to lead to useful reasoning paths for answering the question. \n"
                         f"Question: {question} \n"
-                        f"Reasoning paths: {q_entity} -> {process_str(reasoning_path)} \n"
-                        f"Path candidates: \n{_new_line_char.join(options)} \n"
+                        f"Reasoning paths: {q_entity} -> {process_str(reasoning_path[k])} \n"
+                        f"Path candidates: \n{_new_line_char.join(stage_n_options)} \n"
                         f"Please only return the index of the selected reasoning path."
                     )   
-                try:
-                    response = query_api(args, relation_prune_prompt)['response'].strip()
-                    prediction_table.add_data(id, question, q_entity, relation_prune_prompt, response)
-                    index = int(re.findall(r"\b\d+\b", response)[0]) - 1 # get the index of the selected reasoning path
-                    reasoning_path.append(options[index].replace(f"{index+1}: ", ""))
+                    try:
+                        stage_n_response = query_api(args, relation_prune_prompt)['response'].strip()
+                        prediction_table.add_data(id, question, q_entity, relation_prune_prompt, stage_n_response)
+                        index = int(re.findall(r"\b\d+\b", stage_n_response)[0]) - 1 # get the index of the selected reasoning path
+                        reasoning_path[k].append(stage_n_options[index].replace(f"{index+1}: ", ""))
+                    except Exception as e:
+                        logging.error("Error response: {}".format(e))
+                        logging.error(
+                            f"Error occurred at stage {k+1}"
+                            f"Failed to get response for query due to error {e}: {question}"
+                        )
+                        break
                     
                     termination_check_prompt = (
-                        f"Your goal is to answer whether it's sufficient for you to answer the question with the following reasoning path and your knowledge \n"
-                        f"Question: {question} \n"
-                        f"Reasong paths: {q_entity} -> {process_str(reasoning_path)} \n"
-                        f"If it is sufficient to answer the question, respond with 'Yes'; otherwise, respond with 'No'."
-                    )
+                            f"Your goal is to answer whether it's sufficient for you to answer the question with the following reasoning path and your knowledge \n"
+                            f"Question: {question} \n"
+                            f"Reasong paths: {q_entity} -> {process_str(reasoning_path[k])} \n"
+                            f"If it is sufficient to answer the question, respond with 'Yes'; otherwise, respond with 'No'."
+                        )
+                    
                     termination_check = query_api(args, termination_check_prompt)['response'].strip()
                     if "Yes" in termination_check:
                         flag = False
-                
                     elif "No" in termination_check:
                         flag = True
-                        
-                except Exception as e:
-                    logging.error("Error response: {}".format(e))
-                    logging.error(
-                        f"Failed to get response for query for error {e}: {question}"
+
+                # answer the question based on the reasoning path
+                reasoning_path[k] = process_str(reasoning_path[k])
+                if args.reasoning_type == "llm_reasoning":
+                    # reasoning based on the final MCQ reasoning path
+                    reasoning_prompt = (
+                        f"Your goal is to answer the following question based on the reasoning path and your knowledge. \n"
+                        f"Question: {question} \n"
+                        f"Reasoning path: {q_entity} -> {reasoning_path[k]} \n"
+                        f"Only return the answer to the question."
                     )
-                    break
-            
-            # append the reasoning path and options to the list
-            reasoning_path_list.append(process_str(reasoning_path))
-            reasoning_options_list.append(reasoning_options)
-            
-            if args.reasoning_type == "llm_reasoning":
-                # reasoning based on the final MCQ reasoning path
-                reasoning_prompt = (
-                    f"Your goal is to answer the following question based on the reasoning path and your knowledge. \n"
-                    f"Question: {question} \n"
-                    f"Reasoning path: {q_entity} -> {process_str(reasoning_path)} \n"
-                    f"Only return the answer to the question."
-                )
-                pred_list.append(query_api(args, reasoning_prompt)['response'].strip())
-            elif args.reasoning_type == "direct_answer":
-                # directly answer the question based on the final entity from the reasoning path
-                if len(reasoning_path) > 0:
-                    entire_path = apply_rules(graph, reasoning_path, [q_entity])
-                    for p in entire_path:
-                        if len(p) > 0:
-                            pred_list.append(p[-1][-1])
-            else:
-                raise ValueError("Invalid reasoning type")
+                    pred_list.append(query_api(args, reasoning_prompt)['response'].strip())
+                elif args.reasoning_type == "direct_answer":
+                    # directly answer the question based on the final entity from the reasoning path
+                    if len(reasoning_path[k]) > 0:
+                        entire_path = apply_rules(graph, reasoning_path[k], [q_entity])
+                        for p in entire_path:
+                            if len(p) > 0:
+                                pred_list.append(p[-1][-1])
+                else:
+                    raise ValueError("Invalid reasoning type")
+                
+            reasoning_path_list.append(reasoning_path)
         
         # save the results to a jsonl file
         save_list.append(
@@ -281,13 +308,11 @@ def main(args):
                 "question": question,
                 "q_entities": data['q_entity'],
                 "reasoning_path": reasoning_path_list,
-                "reasoning_options": reasoning_options_list,
                 "prediction": "\n".join(set(pred_list)), # remove duplicate predictions
                 "ground_truth": answer,
-                "w_o_extra": w_o_extra_list
             }
         )
-        final_table.add_data(id, question, data['q_entity'], reasoning_path_list, pred_list, answer, w_o_extra_list)
+        final_table.add_data(id, question, data['q_entity'], reasoning_path_list, pred_list, answer)
         
     with open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "w") as f:
         for item in save_list:
@@ -313,7 +338,7 @@ if __name__ == "__main__":
     parser.add_argument("--split", type=str, default="test")
     parser.add_argument("--output_path", type=str, default="results")
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
-    parser.add_argument("--n_beam", type=int, default=1)
+    parser.add_argument("--top_k", type=int, default=3)
     parser.add_argument("--retrieval_type", type=str, default="vector_rag", choices=["vector_rag", "graph_rag", "graph_vector_rag", "NA"])
     parser.add_argument("--reasoning_type", type=str, default="direct_answer", choices=["direct_answer", "llm_reasoning"])
     args = parser.parse_args()
