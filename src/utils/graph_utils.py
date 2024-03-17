@@ -6,8 +6,7 @@ import walker
 
 
 def build_graph(graph: list) -> nx.Graph:
-    # G = nx.Graph()
-    G = nx.DiGraph()
+    G = nx.Graph()
     for triplet in graph:
         h, r, t = triplet
         G.add_edge(h, t, relation=r.strip())
@@ -204,12 +203,17 @@ def get_entity_edges(entities, graph: nx.Graph) -> list:
     given a set of entities, find all edges and corresponding neighbors (noted that each edge may has multiple neighbors)
     '''
     edges = []
+    neighbors = []
 
     for entity in entities:
         if graph.has_node(entity):
             for neighbor in graph.neighbors(entity):
-                edges.append(graph[entity][neighbor]['relation'])
-    return edges
+                relation = graph[entity][neighbor]['relation']
+                if relation not in edges or neighbor not in neighbors: # list(set(edges/neighbors)) to remove duplicates
+                    edges.append(relation)
+                    neighbors.append(neighbor)
+        
+    return edges, neighbors
     
 
 def get_mcq_paths(
