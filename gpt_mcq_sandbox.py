@@ -129,10 +129,9 @@ async def beam_search(data, session, args, prediction_table, final_table, save_l
                         # reasoning_path[k] = reasoning_path[k].append(stage_n_path_candidate)
                         reasoning_step = reasoning_path[k] + [stage_n_path_candidate]
                         temp_reasoning_paths.append("->".join(reasoning_step).replace(f"{i+1}: ", ""))
+            if args.shuffle:
+                random.shuffle(temp_reasoning_paths)
             temp_reasoning_paths = [f"{i+1}: {path}" for i, path in enumerate(temp_reasoning_paths)]
-            
-            if flags.count(True) == 0 or round == 4:
-                break
             
             # get the top-k reasoning paths for the next hop
             for k in range(args.top_k):
@@ -161,6 +160,8 @@ async def beam_search(data, session, args, prediction_table, final_table, save_l
                     break
             
             round += 1
+            if flags.count(True) == 0 or round == 4:
+                break
 
         for k in range(args.top_k):
             # answer the question based on the reasoning path
@@ -265,6 +266,8 @@ def prepare_dataset(sample):
     graph = utils.build_graph(sample["graph"])
     paths = utils.get_truth_paths(sample["q_entity"], sample["a_entity"], graph)
     if not paths:
+        sample["ground_paths"] = []
+        sample["hop"] = 0
         return sample
     ground_paths = set()
     for path in paths:
@@ -362,7 +365,7 @@ async def main(args):
         )
         
         dataset = dataset.filter(
-            lambda x: "ground_paths" in x.keys(), 
+            lambda x: x.get("hop") > 0, 
             num_proc=args.N_CPUS
         )
 
@@ -396,5 +399,6 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
     parser.add_argument("--top_k", type=int, default=5)
     parser.add_argument("--retrieval_type", type=str, default="vector_rag", choices=["vector_rag", "graph_rag", "graph_vector_rag", "NA"]) #TODO
+    parser.add_argument("--shuffle", type=bool, default=True)
     args = parser.parse_args()
     asyncio.run(main(args))

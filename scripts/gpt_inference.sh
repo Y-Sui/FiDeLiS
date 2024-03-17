@@ -9,7 +9,7 @@ RETRIEVAL_TYPE="vector_rag"
 
 for DATA_NAME in $DATASET_LIST; do
    python gpt_mcq_sandbox.py \
-      --sample 1 \
+      --sample -1 \
       --d ${DATA_NAME} \
       --model_name $MODEL_NAME \
       --retrieval_type $RETRIEVAL_TYPE
