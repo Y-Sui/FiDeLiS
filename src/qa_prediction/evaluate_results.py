@@ -87,7 +87,7 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
             print(line)
             continue
         id = data['id'] if 'id' in data else "null"
-        prediction = data['prediction']
+        prediction = data['prediction_llm']
         answer = data['ground_truth']
         question = data['question']
         prompt = data['prompt']
