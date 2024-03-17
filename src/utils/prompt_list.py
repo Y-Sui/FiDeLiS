@@ -27,7 +27,7 @@ Answer: [2, 3, 4]
 You goal is to find a reasoning path from a knowledge graph that is useful for answering the following question. 
 Question: {question}
 To proceed, the starting entity is {q_entity}
-Out of the following candidates for the next step, choose the best {topk} with the highest probability to lead to a useful reasoning path for answering the question.
+Out of the following candidates for the next step, choose the best {top_k} with the highest probability to lead to a useful reasoning path for answering the question.
 Path candidates: {path_candidates}
 Only return the index of the {top_k} selected reasoning path in a list.
 Answer:
