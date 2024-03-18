@@ -79,3 +79,15 @@ Out of the floowing candidates for reasoning paths, choose the best {beam_width}
 Candidates: {reasoning_paths}
 Only return the index of the {beam_width} selected reasoning paths in a list.
 """
+
+action_space = """
+SEARCH(entity): out of the following candidates for the next step, choose the best top-k with the highest probabilities to lead to a useful reasoning path for answering the questions.
+
+FORWARD(entity, relation): forward to the next entity with the given relation
+
+BACKWARD(cur_reasoning_path): backward to the previous entity if the current reasoning path is not useful
+
+EVALUATE[string]: answer whether it's sufficient for you to answer the question with the following reasoning path, return 'yes' if it is sufficient to answer the question, otherwise, respond with 'no'
+
+FINISH[string]: return the final entity from the reasoning path as the final answer
+"""
