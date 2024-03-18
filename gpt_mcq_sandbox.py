@@ -209,13 +209,23 @@ async def get_embedding(session, texts, model="text-embedding-3-small"):
         "model": model,
         "input": texts
     }
-
-    async with session.post(api_url, headers=headers, json=payload) as response:
-        if response.status == 200:
-            response_data = await response.json()
-            return [item['embedding'] for item in response_data['data']]
-        else:
-            return None
+    
+    attempt = 0
+    while attempt < 3: # retry 3 times if exception occurs
+        try:
+            async with session.post(api_url, headers=headers, json=payload) as response:
+                if response.status == 200:
+                    response_data = await response.json()
+                    return [item['embedding'] for item in response_data['data']]
+                else:
+                    attempt += 1
+        except Exception as e:
+            logging.error(f"Error occurred: {e}")
+            attempt += 1
+            await asyncio.sleep(1)
+            
+    logging.error(f"Failed to get embeddings for query {texts} after 3 attempts")
+    raise APIQueryError("Failed to get a valid embedding after all retries.")
 
 
 async def query_api(session, args, prompt):
