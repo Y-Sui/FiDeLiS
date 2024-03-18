@@ -275,14 +275,14 @@ def process_str(s):
 def prepare_dataset(sample):
     graph = utils.build_graph(sample["graph"])
     paths = utils.get_truth_paths(sample["q_entity"], sample["a_entity"], graph)
-    if not paths:
-        sample["ground_paths"] = []
+    if not paths or all(not path for path in paths): # if there is no path or all paths are empty
+        sample["ground_paths"] = [["NA"]] # do not accept null sequence type, use "NA" instead
         sample["hop"] = 0
         return sample
     ground_paths = set()
     for path in paths:
         ground_paths.add(tuple([p[1] for p in path]))  # extract relation path
-    sample["ground_paths"] = list(ground_paths)
+    sample["ground_paths"] = list(ground_paths) # [list(p) for p in ground_paths], [[], [], ...]
     sample["hop"] = len(list(ground_paths)[0])
     return sample
     
@@ -294,8 +294,6 @@ async def prepare_options_for_each_step(session, q_entity, reasoning_path, query
     if len(reasoning_path) == 0:
         raw_options, neighbors = utils.get_entity_edges([q_entity], graph)
     else:
-        # entire_path = apply_rules(graph, reasoning_path, [q_entity])
-        # next_entities = [p[-1][-1] for p in entire_path] # noted that E_t is an entity set as a head entity and a relation can usually derive multiple tail entities
         next_entity = reasoning_path[-1].split("->")[-1]
         raw_options, neighbors = utils.get_entity_edges([next_entity], graph) # get edges of the entities 
     
@@ -358,8 +356,28 @@ async def main(args):
             settings=settings,
             config=args,
         )
-        prediction_table = wandb.Table(columns=["id", "question", "starting_entity", "prompt", "completion"])
-        final_table = wandb.Table(columns=["id", "question", "hop", "q_entities", "reasoning_path", "ground_path", "prediction_llm", "prediction_direct", "ground_truth"])
+        prediction_table = wandb.Table(
+            columns=
+            ["id", 
+             "question", 
+             "starting_entity", 
+             "prompt", 
+             "completion"
+            ]
+        )
+        final_table = wandb.Table(
+            columns=[
+                "id",
+                "question",
+                "hop",
+                "q_entities", 
+                "reasoning_path", 
+                "ground_path", 
+                "prediction_llm", 
+                "prediction_direct", 
+                "ground_truth"
+            ]
+        )
         save_list = []
 
         if args.sample != -1:
