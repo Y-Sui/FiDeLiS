@@ -3,13 +3,13 @@ export HF_HOME=${SOURCE_PATH}/.cache/huggingface
 
 # MODEL_NAME="gpt-4-0125-preview"
 MODEL_NAME="gpt-3.5-turbo-0125"
-# DATASET_LIST="RoG-webqsp RoG-cwq"
-DATASET_LIST="RoG-webqsp"
+DATASET_LIST="RoG-webqsp RoG-cwq"
+# DATASET_LIST="RoG-webqsp"
 RETRIEVAL_TYPE="vector_rag"
 
 for DATA_NAME in $DATASET_LIST; do
-   python gpt_mcq_sandbox.py \
-      --sample 20 \
+   python mcq_sandbox.py \
+      --sample 500 \
       --d ${DATA_NAME} \
       --model_name $MODEL_NAME \
       --retrieval_type $RETRIEVAL_TYPE

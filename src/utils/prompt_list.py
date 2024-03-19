@@ -11,6 +11,7 @@ Question: Who is the coach of the team owned by Steve Bisciotti?
 Reasoning path: Steve Bisciotti->sports.professional_sports_team.owner_s->Baltimore Ravens->sports.sports_team_owner.teams_owned->Baltimore Ravens->organization.organization_founder.organizations_founded->Allegis Group
 Answer: Based on the given knowledge triplets, the coach of the team owned by Steve Bisciotti is not explicitly mentioned. However, it can be inferred that the team owned by Steve Bisciotti is the Baltimore Ravens, a professional sports team. Therefore, additional knowledge about the current coach of the Baltimore Ravens can be used to answer the question.
 
+Given a question and the associated retrieved reasoning path from a knowledge graph, you are asked to answer the following question based on the reasoning path and your knowledge.
 Question: {question}
 Reasoning path: {q_entity}->{reasoning_path}
 Only return the answer to the question.
@@ -55,6 +56,7 @@ Question: The country with the National Anthem of Bolivia borders which nations?
 Reasoning path: National Anthem of Bolivia->music.composition.lyricist->country->location.country.borders->South America
 Answer: Yes.
 
+Your goal is to answer whether it's sufficient for you to answer the question with the following reasoning path.
 Question: {question}
 Reasoning path: {q_entity}->{reasoning_path}
 If it is sufficient to answer the question, respond with 'Yes'; otherwise, respond with 'No'.
@@ -75,7 +77,7 @@ Answer: [2, 5, 1]
 
 You goal is to retrieve {beam_width} reasoning paths from the given reasoning paths that is useful for answering the following question. 
 Question: {question}
-Out of the floowing candidates for reasoning paths, choose the best {beam_width} with the highest probability to lead to a useful reasoning path for answering the question.
+Out of the following candidates for reasoning paths, choose the best {beam_width} with the highest probability to lead to a useful reasoning path for answering the question.
 Candidates: {reasoning_paths}
 Only return the index of the {beam_width} selected reasoning paths in a list.
 """
