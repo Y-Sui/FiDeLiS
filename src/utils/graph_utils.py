@@ -212,8 +212,10 @@ def get_entity_edges(entities, graph: nx.Graph) -> list:
                 if relation not in edges or neighbor not in neighbors: # list(set(edges/neighbors)) to remove duplicates
                     edges.append(relation)
                     neighbors.append(neighbor)
-        
-    return edges, neighbors
+    if len(edges) == 0 and len(neighbors) == 0:
+        return False
+    else:
+        return edges, neighbors
     
 
 def get_mcq_paths(

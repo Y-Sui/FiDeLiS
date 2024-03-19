@@ -152,11 +152,7 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
         eval_result_path = predict_file.replace('.jsonl', result_name)
         with open(eval_result_path, 'a') as f:
             f.write(result_str)
-    # f.close()
-    # f2.close()
-    # f3.close()
     
-
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
