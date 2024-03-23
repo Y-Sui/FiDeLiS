@@ -1,6 +1,6 @@
 import networkx as nx
 from collections import deque
-from typing import List as list
+# from typing import List as list
 from typing import Tuple as tuple
 import walker
 
@@ -159,20 +159,20 @@ def get_random_paths(q_entity: list, graph: nx.Graph, n=3, hop=2) -> tuple[list,
     return result_paths, rules
 
 
-def get_entity_edges_with_neighbors(entity: list, graph: nx.Graph) -> list:
-    '''
-    given an entity, find all edges and neighbors
-    '''
-    results = []
-    for h in entity:
-        neighbors = []
-        edges = []
-        if graph.has_node(h):
-            for neighbor in graph.neighbors(h):
-                neighbors.append(neighbor)
-                edges.append(graph[h][neighbor]['relation'])
-            results.append(h, neighbors, edges)
-    return results
+# def get_entity_edges_with_neighbors(entity: list, graph: nx.Graph) -> list:
+#     '''
+#     given an entity, find all edges and neighbors
+#     '''
+#     results = []
+#     for h in entity:
+#         neighbors = []
+#         edges = []
+#         if graph.has_node(h):
+#             for neighbor in graph.neighbors(h):
+#                 neighbors.append(neighbor)
+#                 edges.append(graph[h][neighbor]['relation'])
+#             results.append(h, neighbors, edges)
+#     return results
 
 
 def get_entity_edges_with_neighbors_single(entity: str, graph: nx.Graph) -> list:
@@ -212,10 +212,11 @@ def get_entity_edges(entities, graph: nx.Graph) -> list:
                 if relation not in edges or neighbor not in neighbors: # list(set(edges/neighbors)) to remove duplicates
                     edges.append(relation)
                     neighbors.append(neighbor)
-    if len(edges) == 0 and len(neighbors) == 0:
-        return False
-    else:
-        return edges, neighbors
+    return edges, neighbors
+    # if len(edges) == 0 and len(neighbors) == 0:
+    #     return False
+    # else:
+    #     return edges, neighbors
     
 
 def get_mcq_paths(
