@@ -12,6 +12,7 @@ import datetime
 import random
 import aiohttp
 import asyncio
+import copy
 from src.qa_prediction.evaluate_results import eval_result
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
@@ -19,7 +20,7 @@ from functools import partial
 from openai import OpenAI
 from datasets import load_dataset
 from src import utils
-from src.utils import prompt_list
+from src.utils import prompt_list_cwq, prompt_list_webqsp
 
 now = datetime.datetime.now()
 timestamp = now.strftime(f"%Y_%m_%d_%H_%M")
@@ -40,9 +41,17 @@ async def query_api(session, args, prompt):
         "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
         "Content-Type": "application/json",
     }
+    
+    #TODO modify the payload to consider system prompt and add examples here
+    messages = [
+        {"role": "system", "content": prompt["system"]},
+    ]
+    for item in prompt["examples"]:
+        messages.append(item)
+    messages.append({"role": "user", "content": prompt["prompt"]})
     payload = {
         "model": args.model_name,
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": messages,
         "temperature": 0,
     }
     
@@ -52,10 +61,10 @@ async def query_api(session, args, prompt):
             async with session.post(api_url, headers=headers, json=payload) as response:
                 response_data = await response.json()
                 response_content = response_data['choices'][0]['message']['content']
-                logging.info(f"PROMPT: {prompt}")
+                logging.info(f"PROMPT: {messages}")
                 logging.info("===" * 50)
                 logging.info(f"RECEIVED RESPONSE: {response_content}")
-                return {"prompt": prompt, "response": response_content}
+                return {"prompt": messages, "response": response_content}
         except Exception as e:
             logging.error(f"Error occurred: {e}")
             attempt += 1
@@ -179,17 +188,6 @@ def process_str(s):
             processed.append(item)
     return ' -> '.join(processed)
         
-        
-async def check_termination_concurrently(session, args, prompt_list, question, q_entity, reasoning_paths):
-    prompts = [
-        prompt_list.terminals_prune_prompt.format(
-            question=question,
-            q_entity=q_entity,
-            reasoning_path=process_str(reasoning_path)
-        ) for reasoning_path in reasoning_paths
-    ]
-    return await asyncio.gather(*[query_api(session, args, prompt) for prompt in prompts])
-
 
 async def prepare_options_concurrently(session, q_entity, reasoning_paths, question, graph, args):
     tasks = [
@@ -220,6 +218,18 @@ async def beam_search(data, session, args):
     
     logging.info(f"Processing ID: {id}")
     
+    if args.d == "RoG-webqsp":
+        prompt_list = prompt_list_webqsp
+    elif args.d == "RoG-cwq":
+        prompt_list = prompt_list_cwq
+    
+    plan_prompt = copy.copy(prompt_list.plan_prompt)
+    plan_prompt["prompt"] = plan_prompt["prompt"].format(
+        question=question
+    )
+    plan_res = await query_api(session, args, plan_prompt)
+    plan_res = plan_res['response'].strip()
+    
     for q_entity in data['q_entity']:
         # start MCQ reasoning
         reasoning_paths = {
@@ -235,52 +245,67 @@ async def beam_search(data, session, args):
             graph, 
             args.retrieval_type
         )
-        relation_prune_prompt = prompt_list.relation_prune_prompt.format(
+        
+        rel_pmt = copy.copy(prompt_list.relation_prune_prompt)
+        rel_pmt["prompt"] = rel_pmt["prompt"].format(
             top_k=args.top_k,
             question=question,
+            plan_context=plan_res,
             q_entity=q_entity,
             path_candidates=_new_line_char.join(stage_1_path_candidates)
         )
-        try:
-            res = await query_api(session, args, relation_prune_prompt)
-            stage_1_response = res['response'].strip()
-            # prediction_table.add_data(id, question, q_entity, relation_prune_prompt, stage_1_response)
-            stage_1_response = ast.literal_eval(stage_1_response) # use ast.literal_eval to convert string to list
-            if type(stage_1_response) == list:
-                stage_1_index = [int(re.findall(r"\b\d+\b", str(stage_1_res))[0]) - 1 for stage_1_res in stage_1_response] # get the index of the selected reasoning paths
-                for k in range(args.top_k):
-                    reasoning_paths[k].append(stage_1_path_candidates[stage_1_index[k]].replace(f"{stage_1_index[k]+1}: ", ""))
-            logging.info(
-                "Stage 1 Reasoning Path:\n {}".format(reasoning_paths.values())
-            )
-            
-        except Exception as e:
-            logging.error("Error response: {}".format(e))
-            logging.error(
-                f"Error occurred at stage 1"
-                f"Failed to get response for query {question} due to error {e}"
-                f"Error ID: {id}"
-            )
-            break
-        
-        round = 0
+
+        res = await query_api(session, args, rel_pmt)
+        res = res['response'].replace("Answer: ", "")
+        # prediction_table.add_data(id, question, q_entity, relation_prune_prompt, stage_1_response)
+        # stage_1_response = ast.literal_eval(stage_1_response) # use ast.literal_eval to convert string to list
+        # if type(stage_1_response) == list:
+        #     stage_1_index = [int(re.findall(r"\b\d+\b", str(stage_1_res))[0]) - 1 for stage_1_res in stage_1_response] # get the index of the selected reasoning paths
+        #     for k in range(args.top_k):
+        #         reasoning_paths[k].append(stage_1_path_candidates[stage_1_index[k]].replace(f"{stage_1_index[k]+1}: ", ""))
+
+        matching_indices = re.findall(r'\d+', res)
+        stage_1_index = [int(idx)-1 for idx in matching_indices]
+        # print("Stage 1 Index: ", stage_1_index)
+        for k in range(args.top_k):
+            reasoning_paths[k].append(stage_1_path_candidates[int(stage_1_index[k])-1].replace(f"{int(stage_1_index[k])+1}: ", ""))
+        logging.info(
+            "Stage 1 Reasoning Path:\n {}".format(reasoning_paths.values())
+        )
+                   
+        round = 1
         while True:
             temp_reasoning_paths = []
+        
+            rpths = [srpth for rpth in reasoning_paths.values() for srpth in rpth]
+            # print("Reasoning Paths: ", rpths)
             
-            # concurrent reasoning path termination check
-            termination_checks = await check_termination_concurrently(
-                session, 
-                args, 
-                prompt_list, 
-                question, 
-                q_entity, 
-                [rpth for rpth in reasoning_paths.values()]
+            termination_pmt = copy.copy(prompt_list.terminals_prune_prompt)
+            termination_pmt["prompt"] = termination_pmt["prompt"].format(
+                question=question,
+                q_entity=q_entity,
+                reasoning_path=_new_line_char.join(rpths),
+                num_paths=len(rpths)
             )
+            # print("Termination Prompt: ", termination_pmt)
+            
+            res = await query_api(session, args, termination_pmt)
+            res = res['response'].replace("Answer: ", "").strip("[]")
+            
+            # print("Termination Response: ", termination_res)
+            termination_checks = res.split(", ")
+            if type(termination_checks) == list:
+                logging.info(
+                    "Termination Checks:\n {}".format(termination_checks)
+                )
+                
+                # print("Termination Checks: ", termination_checks)
             
             to_extend, paths_to_extend = [], []
             for k, check in enumerate(termination_checks):
                 next_entity = reasoning_paths[k][-1].split("->")[-1]
-                if "No" in check.get('response') and not utils.get_entity_edges([next_entity], graph):
+                edges, neighbors = utils.get_entity_edges([next_entity], graph)
+                if "No" in check and edges is not None and neighbors is not None:
                     paths_to_extend.append(reasoning_paths[k]) # [...]
                     to_extend.append(k)
             
@@ -310,67 +335,59 @@ async def beam_search(data, session, args):
             # add index for the temp_reasoning_paths
             temp_reasoning_paths = [f"{i+1}: {rpth}" for i, rpth in enumerate(temp_reasoning_paths)]
             
-            
-            
             # from the new reasoning paths, select the beam_width valid reasoning paths
-            beam_search_prompt = prompt_list.beam_search_prompt.format(
+            beam_pmt = copy.copy(prompt_list.beam_search_prompt)
+            beam_pmt["prompt"] = beam_pmt["prompt"].format(
                 beam_width=args.top_k,
                 question=question,
+                plan_context=plan_res,
                 reasoning_paths=_new_line_char.join(temp_reasoning_paths)
             )
             
-            try:
-                res = await query_api(session, args, beam_search_prompt)
-                beam_search_response = res['response'].strip()
-                beam_search_response = ast.literal_eval(beam_search_response) # use ast.literal_eval to convert string to list
-                if type(beam_search_response) == list:
-                    beam_search_index = [int(re.findall(r"\b\d+\b", str(beam_search_res))[0]) - 1 for beam_search_res in beam_search_response] # [0, 1, 2, 4]
-                    
-                    # increment the round or any other termination logic
-                    round += 1
-                    beam_search_res = []
-                    for i in beam_search_index:
-                        temp_reasoning_paths[i] = temp_reasoning_paths[i].replace(f"{i+1}: ", "")
-                        beam_search_res.append(temp_reasoning_paths[i])
-                    for i, j in enumerate(to_extend):
-                        reasoning_paths[j] = [beam_search_res[i]] # fix a bug here, since reasoning_paths[j] is a list, we need to assign a list to it
-                
-                logging.info(
-                    "Stage {} Reasoning Path:\n {}".format(round, (r + '\n' for _, r in reasoning_paths.items()))
-                )
-                        
-            except Exception as e:
-                logging.error("Error response: {}".format(e))
-                logging.error(
-                    f"Error occurred at stage {round}"
-                    f"Failed to get response for query {question} due to error {e}"
-                    f"Error ID: {id}"
-                )
-                break
+            res = await query_api(session, args, beam_pmt)
+            res = res['response'].strip().replace("Answer: ", "")
+            # beam_search_response = ast.literal_eval(beam_search_response) # use ast.literal_eval to convert string to list
+            # if type(beam_search_response) == list:
+            #     beam_search_index = [int(re.findall(r"\b\d+\b", str(beam_search_res))[0]) - 1 for beam_search_res in beam_search_response] # [0, 1, 2, 4]
             
+            matching_indices = re.findall(r'\d+', res)
+            beam_search_index = [int(idx)-1 for idx in matching_indices]
+            
+            # increment the round or any other termination logic
+            round += 1
+            beam_search_res = []
+            for i in beam_search_index:
+                temp_reasoning_paths[i] = temp_reasoning_paths[i].replace(f"{i+1}: ", "")
+                beam_search_res.append(temp_reasoning_paths[i])
+            for i, j in enumerate(to_extend):
+                reasoning_paths[j] = [beam_search_res[i]] # fix a bug here, since reasoning_paths[j] is a list, we need to assign a list to it
+            
+            logging.info(
+                "Stage {} Reasoning Path:\n {}".format(round, reasoning_paths.values())
+            )
+                        
             if round == 4:
                 break
         
-        # print("question: ", question)    
-        # print("reasoning paths: ", reasoning_paths)
-
-        for k in range(args.top_k):
-            # answer the question based on the reasoning path
-            reasoning_paths[k] = process_str(reasoning_paths[k])
-            # reasoning based on the final MCQ reasoning path
-            reasoning_prompt = prompt_list.reasoning_prompt.format(
-                question=question,
-                q_entity=q_entity,
-                reasoning_path=reasoning_paths[k]
-            )
-            # collect both reasoning path and direct answer
-            res = await query_api(session, args, reasoning_prompt)
-            pred_list_llm_reasoning.append(res['response'].strip())
-            if len(reasoning_paths[k]) > 0:
-                pred_list_direct_answer.append(reasoning_paths[k].split("->")[-1])
+        
+        reasoning_pmt = copy.copy(prompt_list.reasoning_prompt)
+        reasoning_pmt["prompt"] = reasoning_pmt["prompt"].format(
+            question=question,
+            q_entity=q_entity,
+            reasoning_path = _new_line_char.join([process_str(rpth) for rpth in reasoning_paths.values()])
+        )
+        res = await query_api(session, args, reasoning_pmt)
+        res = res["response"].replace("Answer: ", "").strip()
+        logging.info("Reasoning Response: {}".format(res))
+        for item in res.split(", "):
+            pred_list_llm_reasoning.append(item)
             
+        for k in range(args.top_k):
+            if len(reasoning_paths[k]) > 0:
+                pred_list_direct_answer.append(reasoning_paths[k][-1].split("->")[-1])
+
         reasoning_path_list.append(reasoning_paths)
-    
+        
     # save the results to a jsonl file
     res =  {
             "id": id,
@@ -422,7 +439,6 @@ async def main(args):
                 "ground_truth"
             ]
         )
-        save_list = []
 
         if args.sample != -1:
             dataset = load_dataset(input_file, split=args.split)
@@ -442,24 +458,10 @@ async def main(args):
         )
 
 
-        for data in tqdm(dataset):
+        for data in tqdm(dataset, desc="Processing data", delay=0.5):
             try:
                 res = await beam_search(data, session, args) # run the beam search for each sample
-                f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
-                json_str = json.dumps(res)
-                f.write(json_str + "\n")
                 
-                final_table.add_data(
-                    res['id'],
-                    res['question'],
-                    res['hop'],
-                    res['q_entities'],
-                    res['reasoning_path'],
-                    res['ground_path'],
-                    res['prediction_llm'],
-                    res['prediction_direct_answer'],
-                    res['ground_truth']
-                )
             except Exception as e:
                 logging.error("Error occurred: {}".format(e))
                 f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
@@ -467,11 +469,31 @@ async def main(args):
                 f.write(json_str + "\n")
                 continue
             
+            # res = await beam_search(data, session, args) # run the beam search for each sample
+            
+            f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
+            json_str = json.dumps(res)
+            f.write(json_str + "\n")
+            
+            final_table.add_data(
+                res['id'],
+                res['question'],
+                res['hop'],
+                res['q_entities'],
+                res['reasoning_path'],
+                res['ground_path'],
+                res['prediction_llm'],
+                res['prediction_direct_answer'],
+                res['ground_truth']
+            )
+            
         # evaluate
-        eval_result(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), cal_f1=True)
+        llm_res, direct_ans_res = eval_result(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), cal_f1=True)
         
         wandb.log(
             {
+                "llm_result": llm_res,
+                "direct_ans_result": direct_ans_res,
                 "reasoning_paths": final_table
             }
         )

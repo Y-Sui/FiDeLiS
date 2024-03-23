@@ -68,16 +68,16 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
     eval_name = "_detailed_eval_result_top_{topk}.jsonl" if topk > 0 else '_detailed_eval_result.jsonl'
     detailed_eval_file = predict_file.replace('.jsonl', eval_name)
     error_file = predict_file.replace('.jsonl', '_error.jsonl')
-    
-    print(f"Predict file: {predict_file}")
-    # Load results
-    acc_list = []
-    hit_list = []
-    f1_list = []
-    precission_list = []
-    recall_list = []
-    error_list = []
+
+    llm_result, direct_ans_result = {}, {}
     for item in ["prediction_llm", "prediction_direct_answer"]:
+        # Load results
+        acc_list = []
+        hit_list = []
+        f1_list = []
+        precission_list = []
+        recall_list = []
+        error_list = []
         f = open(predict_file, 'r')
         f2 = open(detailed_eval_file, 'a')
         f3 = open(error_file, 'a')
@@ -147,11 +147,32 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
             result_str = str(item) + " Accuracy: " + str(sum(acc_list) * 100 / len(acc_list)) + " Hit: " + str(sum(hit_list) * 100 / len(hit_list)) + " F1: " + str(sum(f1_list) * 100 / len(f1_list)) + " Precision: " + str(sum(precission_list) * 100 / len(precission_list)) + " Recall: " + str(sum(recall_list) * 100 / len(recall_list)) + " Error Number: " + str(len(error_list))
         else:
             result_str = str(item) + " Accuracy: " + str(sum(acc_list) * 100 / len(acc_list)) + " Hit: " + str(sum(hit_list) * 100 / len(hit_list)) + " Error Number: " + str(len(error_list))
+        
+        if item == "prediction_llm":
+            llm_result = {
+                "Accuracy": sum(acc_list) * 100 / len(acc_list),
+                "Hit": sum(hit_list) * 100 / len(hit_list),
+                "F1": sum(f1_list) * 100 / len(f1_list) if len(f1_list) > 0 else 0,
+                "Precision": sum(precission_list) * 100 / len(precission_list) if len(precission_list) > 0 else 0,
+                "Recall": sum(recall_list) * 100 / len(recall_list) if len(recall_list) > 0 else 0,
+                "Error Number": len(error_list)
+            }
+        else:
+            direct_ans_result = {
+                "Accuracy": sum(acc_list) * 100 / len(acc_list),
+                "Hit": sum(hit_list) * 100 / len(hit_list),
+                "F1": sum(f1_list) * 100 / len(f1_list) if len(f1_list) > 0 else 0,
+                "Precision": sum(precission_list) * 100 / len(precission_list) if len(precission_list) > 0 else 0,
+                "Recall": sum(recall_list) * 100 / len(recall_list) if len(recall_list) > 0 else 0,
+                "Error Number": len(error_list)
+            }
+        
         print(result_str)
         result_name = "_eval_result_top_{topk}.txt" if topk > 0 else '_eval_result.txt'
         eval_result_path = predict_file.replace('.jsonl', result_name)
         with open(eval_result_path, 'a') as f:
             f.write(result_str)
+    return llm_result, direct_ans_result
     
 
 if __name__ == "__main__":

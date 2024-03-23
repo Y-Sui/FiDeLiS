@@ -20,7 +20,7 @@ from functools import partial
 from openai import OpenAI
 from datasets import load_dataset
 from src import utils
-from src.utils import prompt_list
+from src.utils import prompt_list_webqsp
 
 # supported by langchain
 from langchain import hub
