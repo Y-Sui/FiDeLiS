@@ -2,23 +2,21 @@ import os
 import argparse
 import os
 import json
-import ast
-import re
 import logging
 import multiprocessing as mp
 import wandb
 import numpy as np
 import datetime
-import random
-import aiohttp
-import asyncio
 import copy
+import time
+import litellm
+import networkx as nx
 from src.qa_prediction.evaluate_results import eval_result
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
-from functools import partial
 from openai import OpenAI
-from datasets import load_dataset
+from litellm import completion, embedding, batch_completion # import litellm for calling multiple llms using the same input/output format 
+from datasets import load_dataset, load_from_disk
 from src import utils
 from src.utils import prompt_list_cwq, prompt_list_webqsp
 
@@ -27,77 +25,172 @@ timestamp = now.strftime(f"%Y_%m_%d_%H_%M")
 
 with open("config.json", "r") as f:
     config = json.load(f)
+os.environ["OPENAI_API_KEY"] = config["OPENAI_API_KEY"]    
 
-
-class APIQueryError(Exception):
-    """Exception raised when API queries fail after all retries."""
-    def __init__(self, message="Failed to get a valid response after all retries"):
-        self.message = message
-        super().__init__(self.message)
-        
-async def query_api(session, args, prompt):
-    api_url = f"https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
-        "Content-Type": "application/json",
-    }
     
-    #TODO modify the payload to consider system prompt and add examples here
+def get_embeddings(texts: list, model="text-embedding-3-small"):
+    attempt = 0
+    while attempt < 5:
+        try:
+            _ = embedding(model=model, input=texts)
+            return [item['embedding'] for item in _['data']]
+        except Exception as e:
+            logging.error(f"Error occurred: {e}")
+            attempt += 1
+            time.sleep(1)
+            
+
+def get_completion(args, prompt: dict):
+    model = args.model_name
     messages = [
         {"role": "system", "content": prompt["system"]},
+        *prompt["examples"],
+        {"role": "user", "content": prompt["prompt"]}
     ]
-    for item in prompt["examples"]:
-        messages.append(item)
-    messages.append({"role": "user", "content": prompt["prompt"]})
-    payload = {
-        "model": args.model_name,
-        "messages": messages,
-        "temperature": 0,
-    }
-    
+        
     attempt = 0
-    while attempt < 5: # retry 3 times if exception occurs
-        try: 
-            async with session.post(api_url, headers=headers, json=payload) as response:
-                response_data = await response.json()
-                response_content = response_data['choices'][0]['message']['content']
-                logging.info(f"PROMPT: {messages}")
-                logging.info("===" * 50)
-                logging.info(f"RECEIVED RESPONSE: {response_content}")
-                return {"prompt": messages, "response": response_content}
-        except Exception as e:
-            logging.error(f"Error occurred: {e}")
-            attempt += 1
-            await asyncio.sleep(1)
-    
-    logging.error(f"Failed to get response for query {prompt} after 3 attempts")
-    raise APIQueryError("Failed to get a valid response after all retries.")
-
-
-async def get_embedding(session, texts, model="text-embedding-3-small"):
-    api_url = f"https://api.openai.com/v1/embeddings"
-    headers = {
-        "Authorization": f"Bearer {config['OPENAI_API_KEY']}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": model,
-        "input": texts
-    }
-    
-    attempt = 0
-    while attempt < 5: # retry 3 times if exception occurs
+    while attempt < 5:
         try:
-            async with session.post(api_url, headers=headers, json=payload) as response:
-                response_data = await response.json()
-                return [item['embedding'] for item in response_data['data']]
+            _ = completion(model=model, messages=messages, temperature=0, top_p=0, logprobs=False)
+            return _['choices'][0]['message']['content']
         except Exception as e:
             logging.error(f"Error occurred: {e}")
             attempt += 1
-            await asyncio.sleep(1)
+            time.sleep(1)
+
+
+def get_log_probs(log_probs: list):
+    scores = []
+    for item in log_probs:
+        top_logprobs = item[0]["top_logprobs"]
+        match = False
+        for i in range(len(top_logprobs)):
+            if top_logprobs[i]["token"] in [" A", "A", "A "]:
+                scores.append(top_logprobs[i]["logprob"])
+                match = True
+                break
+        if not match:
+            scores.append(-10000.0)
+    return scores
+
+
+def get_batch_completion(args, prompt: dict, input_batch: list):
+    """
+    for item in log_probs:
+        if item["token"] == "A":
+            print(item['logprob'])
+    """
+    
+    model = args.model_name
+    messages = []
+    for item in input_batch:
+        messages.append(
+            [
+                {"role": "system", "content": prompt["system"]},
+                *prompt["examples"],
+                {"role": "user", "content": item}
+            ]
+        )
+    attempt = 0
+    while attempt < 5: 
+        try:
+            _ = batch_completion(
+                model=model, 
+                messages=messages, 
+                temperature=0, 
+                top_p=0, 
+                logprobs=True,
+                top_logprobs=5
+                )
+            contents = [_[i]['choices'][0]['message']['content'] for i in range(len(_))]
+            log_probs = [_[i]['choices'][0]['logprobs']['content'] for i in range(len(_))]
+            return contents, log_probs
             
-    logging.error(f"Failed to get embeddings for query {texts} after 3 attempts")
-    raise APIQueryError("Failed to get a valid embedding after all retries.")
+        except Exception as e:
+            logging.error(f"Error occurred: {e}")
+            attempt += 1
+            time.sleep(1)
+
+
+def prepare_options_for_each_step(
+    args,
+    starting_node: str, 
+    reasoning_path: str, 
+    query: str, 
+    graph: nx.Graph, 
+    prompt_list: object
+    ) -> list:
+    """
+    prepare options for each step of the reasoning path propagation
+    """
+    if reasoning_path:
+        raw_options, neighbors = utils.get_entity_edges([starting_node], graph)
+    else:
+        next_entity = reasoning_path.split("->")[-1]
+        raw_options, neighbors = utils.get_entity_edges([next_entity], graph) # get edges of the entities 
+    
+    texts = [query] + [opt + "->" + neighbor for opt, neighbor in zip(raw_options, neighbors)]
+    embeddings = get_embeddings(texts)
+    query_embedding = np.array(embeddings[0])
+    option_embeddings = np.array(embeddings[1:])
+    similarities = cosine_similarity([query_embedding], option_embeddings)
+    top_n_indices = np.argsort(similarities[0])[-args.top_n:][::-1] # index of the top-n similar options
+
+    retrieved_options = [raw_options[i] for i in top_n_indices]
+    corresponding_neighbors = [neighbors[i] for i in top_n_indices]
+    processed_path_candidates = [f"{option}->{neighbor}" for option, neighbor in zip(retrieved_options, corresponding_neighbors)]
+    
+    deductive_prompts, self_confidence_prompts = [], []
+    for candidate in processed_path_candidates:
+        deductive_prompts.append(
+            prompt_list.deductive_verifier_prompt["prompt"].format(
+                question=query,
+                reasoning_path=reasoning_path if reasoning_path else starting_node,
+                reasoning_step=candidate
+            )
+        )
+        self_confidence_prompts.append(
+            prompt_list.self_confidence_prompt["prompt"].format(
+                question=query,
+                reasoning_path=reasoning_path + "->" + candidate if reasoning_path else starting_node + "->" + candidate,
+            )
+        )
+        
+    # call the batch completion function to get the log probabilities of the reasoning paths
+    _, log_probs_deductive_scores = get_batch_completion(
+        args=args,
+        prompt=prompt_list.deductive_verifier_prompt,
+        input_batch=deductive_prompts
+    )
+    
+    _, log_probs_self_confidence_scores = get_batch_completion(
+        args=args,
+        prompt=prompt_list.self_confidence_prompt,
+        input_batch=self_confidence_prompts
+    )
+    
+    deductive_scores = get_log_probs(log_probs_deductive_scores)
+    self_confidence_scores = get_log_probs(log_probs_self_confidence_scores)
+    
+    processed_path_candidates = [reasoning_path + "->" + candidate if reasoning_path else starting_node + "->" + candidate for candidate in processed_path_candidates]
+    
+    return processed_path_candidates, deductive_scores, self_confidence_scores
+
+
+def find_top_k_candidates(args, next_step_candidates: list):
+    # Combine the scores by averaging
+    combined_scores = [0.5 * (item[1] + item[2]) for item in next_step_candidates]
+
+    # Pair each candidate with its combined score
+    candidates_with_scores = list(zip([candidates[0] for candidates in next_step_candidates], combined_scores))
+    
+    # Sort the list of tuples by the combined score, in descending order
+    sorted_candidates = sorted(candidates_with_scores, key=lambda x: x[1], reverse=True)
+    
+    # Select the top-k candidates
+    top_k_candidates = sorted_candidates[:args.top_k]
+    
+    return top_k_candidates
 
 
 def prepare_dataset(sample):
@@ -113,103 +206,34 @@ def prepare_dataset(sample):
     sample["ground_paths"] = list(ground_paths) # [list(p) for p in ground_paths], [[], [], ...]
     sample["hop"] = len(list(ground_paths)[0])
     return sample
-    
 
-async def prepare_options_for_each_step(
-    session, 
-    q_entity, 
-    reasoning_path, 
-    query, 
-    graph, 
-    retrieval_type = "vector_rag"
-    ) -> list:
-    """
-    prepare options for each step of the reasoning path
-    """
-    if len(reasoning_path) == 0:
-        raw_options, neighbors = utils.get_entity_edges([q_entity], graph)
-    else:
-        if type(reasoning_path) == str:
-            next_entity = reasoning_path.split("->")[-1]
-        elif type(reasoning_path) == list:
-            next_entity = reasoning_path[-1].split("->")[-1]
-        raw_options, neighbors = utils.get_entity_edges([next_entity], graph) # get edges of the entities 
-    
-    async def vector_rag_engine(session, query, options, neighbors, top_k=30) -> list:
-        """
-        return the top-k similar options' index based on the query simalirity
-        """
-        try:
-            texts = [query] + [opt + "->" + neighbor for opt, neighbor in zip(options, neighbors)]
-            embeddings = await get_embedding(session, texts)
-            query_embedding = np.array(embeddings[0])
-            option_embeddings = np.array(embeddings[1:])
-            similarities = cosine_similarity([query_embedding], option_embeddings)
-            top_k_indices = np.argsort(similarities[0])[-top_k:][::-1] # index of the top-k similar options
-            return top_k_indices
-        except Exception as e:
-            logging.error(f"Error occurred: {e}")
-    
-    if retrieval_type == "vector_rag":
-        """
-        create embedding of query and options; semantic search top-k related options; select the next step reasoning path based on the top-k options
-        """
-        retrieved_options_index = await vector_rag_engine(session, query, raw_options, neighbors) 
-        retrieved_options = [raw_options[i] for i in retrieved_options_index]
-        corresponding_neighbors = [neighbors[i] for i in retrieved_options_index]
+
+def data_processing(args):
+    input_file = os.path.join(args.data_path, args.d)
+    output_file = os.path.join(args.save_cache, f"{args.d}_processed")
+    dataset = load_dataset(input_file, split=args.split, cache_dir=args.save_cache)
+    dataset = dataset.map(
+            prepare_dataset,
+            num_proc=args.N_CPUS,
+        )
+    dataset = dataset.filter(
+            lambda x: x.get("hop") > 0, 
+            num_proc=args.N_CPUS
+        )
+    if os.path.exists(output_file) == False:
+        os.makedirs(output_file)
         
-    elif retrieval_type == "graph_rag":
-        """
-        get n-depth subgraphs of q_entity from KG; select the next step reasoning path based on the related subgraphs
-        """
-        pass
-    
-    elif retrieval_type == "graph_vector_rag":
-        """
-        do retrieval as Vector and Graph RAG; select the next step reasoning path based on both subgraphs and top-k related options 
-        """
-        pass
-    
-    processed_path_candidates = [f"{i+1}: {option}->{neighbor}" for i, (option, neighbor) in enumerate(zip(retrieved_options, corresponding_neighbors))]
-
-    return processed_path_candidates
-        
-
-def process_str(s):
-    processed = []
-
-    for item in s:
-        if " -> " in item:
-            parts = item.split(" -> ")
-            for part in parts:
-                if not processed or (processed and processed[-1] != part):
-                    processed.append(part)
-        else:
-            processed.append(item)
-    return ' -> '.join(processed)
-        
-
-async def prepare_options_concurrently(session, q_entity, reasoning_paths, question, graph, args):
-    tasks = [
-        prepare_options_for_each_step(
-            session,
-            q_entity,
-            reasoning_path,
-            question,
-            graph,
-            args.retrieval_type
-        ) for reasoning_path in reasoning_paths
-    ]
-    
-    return await asyncio.gather(*tasks)
+    dataset.save_to_disk(output_file)
+    return dataset
 
 
-async def beam_search(data, session, args):
+def beam_search(data, args):
     id = data['id']
     question = data['question']
     hop = data['hop']
-    graph = utils.build_graph(data['graph'])
+    graph = utils.build_graph(data["graph"])
     answer = data['a_entity']
+    starting_nodes = data['q_entity']
     pred_list_direct_answer = []
     pred_list_llm_reasoning = []
     reasoning_path_list = []
@@ -223,177 +247,75 @@ async def beam_search(data, session, args):
     elif args.d == "RoG-cwq":
         prompt_list = prompt_list_cwq
     
-    plan_prompt = copy.copy(prompt_list.plan_prompt)
-    plan_prompt["prompt"] = plan_prompt["prompt"].format(
-        question=question
-    )
-    plan_res = await query_api(session, args, plan_prompt)
-    plan_res = plan_res['response'].strip()
+    # --------------
+    # PLANNING FIRST
+    # --------------
+    # plan_prompt = copy.copy(prompt_list.plan_prompt)
+    # plan_prompt["prompt"] = plan_prompt["prompt"].format(
+    #     question=question
+    # )
+    # plan_res = get_completion(args, plan_prompt)
     
-    for q_entity in data['q_entity']:
-        # start MCQ reasoning
-        reasoning_paths = {
-            k: [] for k in range(args.top_k) # for each q_entity, we retrieve top-k reasoning paths
-        }
-        
-        # get the top-k reasoning paths for the first hop
-        stage_1_path_candidates = await prepare_options_for_each_step(
-            session,
-            q_entity, 
-            [], 
-            question, 
-            graph, 
-            args.retrieval_type
-        )
-        
-        rel_pmt = copy.copy(prompt_list.relation_prune_prompt)
-        rel_pmt["prompt"] = rel_pmt["prompt"].format(
-            top_k=args.top_k,
-            question=question,
-            plan_context=plan_res,
-            q_entity=q_entity,
-            path_candidates=_new_line_char.join(stage_1_path_candidates)
-        )
-
-        res = await query_api(session, args, rel_pmt)
-        res = res['response'].replace("Answer: ", "")
-        # prediction_table.add_data(id, question, q_entity, relation_prune_prompt, stage_1_response)
-        # stage_1_response = ast.literal_eval(stage_1_response) # use ast.literal_eval to convert string to list
-        # if type(stage_1_response) == list:
-        #     stage_1_index = [int(re.findall(r"\b\d+\b", str(stage_1_res))[0]) - 1 for stage_1_res in stage_1_response] # get the index of the selected reasoning paths
-        #     for k in range(args.top_k):
-        #         reasoning_paths[k].append(stage_1_path_candidates[stage_1_index[k]].replace(f"{stage_1_index[k]+1}: ", ""))
-
-        matching_indices = re.findall(r'\d+', res)
-        stage_1_index = [int(idx)-1 for idx in matching_indices]
-        # print("Stage 1 Index: ", stage_1_index)
-        for k in range(args.top_k):
-            reasoning_paths[k].append(stage_1_path_candidates[int(stage_1_index[k])-1].replace(f"{int(stage_1_index[k])+1}: ", ""))
-        logging.info(
-            "Stage 1 Reasoning Path:\n {}".format(reasoning_paths.values())
-        )
-                   
-        round = 1
-        while True:
-            temp_reasoning_paths = []
-        
-            rpths = [srpth for rpth in reasoning_paths.values() for srpth in rpth]
-            # print("Reasoning Paths: ", rpths)
-            
-            termination_pmt = copy.copy(prompt_list.terminals_prune_prompt)
-            termination_pmt["prompt"] = termination_pmt["prompt"].format(
-                question=question,
-                q_entity=q_entity,
-                reasoning_path=_new_line_char.join(rpths),
-                num_paths=len(rpths)
-            )
-            # print("Termination Prompt: ", termination_pmt)
-            
-            res = await query_api(session, args, termination_pmt)
-            res = res['response'].replace("Answer: ", "").strip("[]")
-            
-            # print("Termination Response: ", termination_res)
-            termination_checks = res.split(", ")
-            if type(termination_checks) == list:
-                logging.info(
-                    "Termination Checks:\n {}".format(termination_checks)
+    
+    # --------------
+    # BEAM SEARCH
+    # --------------
+    for node in starting_nodes:                   
+        reasoning_paths = [[node, 1.0]] # store the reasoning paths for each step, the length of the list is equal to the number of top-k
+        for step in tqdm(range(args.max_length), desc="Beam searching...", delay=0.5, leave=False):
+            all_candidates = []
+            for rpth in reasoning_paths:
+                next_step_candidates, deductive_scores, self_confidence_scores = prepare_options_for_each_step(
+                    args=args,
+                    starting_node=node,
+                    reasoning_path=rpth[0],
+                    query=question,
+                    graph=graph,
+                    prompt_list=prompt_list
                 )
                 
-                # print("Termination Checks: ", termination_checks)
+                self_confidence_probs = np.exp(np.array(self_confidence_scores)) 
+                normalized_self_confidence_probs = self_confidence_probs / np.sum(self_confidence_probs)
+                for i, candidate in enumerate(next_step_candidates):
+                    # only consider the candidates with self-confidence score > 0.5
+                    if normalized_self_confidence_probs[i] > 0.5:
+                        all_candidates.append([candidate, deductive_scores[i], self_confidence_scores[i]])
             
-            to_extend, paths_to_extend = [], []
-            for k, check in enumerate(termination_checks):
-                next_entity = reasoning_paths[k][-1].split("->")[-1]
-                edges, neighbors = utils.get_entity_edges([next_entity], graph)
-                if "No" in check and edges is not None and neighbors is not None:
-                    paths_to_extend.append(reasoning_paths[k]) # [...]
-                    to_extend.append(k)
+            # if there are no candidates fit the criteria, break the loop
+            if not all_candidates:
+                print("beam search stopped at step {}".format(step))
+                break
             
-            logging.info(
-                "Paths to extend: {}".format(paths_to_extend)
-            )
-            
-            if paths_to_extend:
-                # prepare options for each path concurrently
-                path_candidates = await prepare_options_concurrently(
-                    session, 
-                    q_entity, 
-                    paths_to_extend, 
-                    question, 
-                    graph, 
-                    args
+            reasoning_paths = find_top_k_candidates(
+                    args=args,
+                    next_step_candidates=all_candidates,
                 )
-                
-                # construct new reasoning paths (path_to_extend + path_candidates)
-                for i in range(len(paths_to_extend)):
-                    for j in range(len(path_candidates[i])):
-                        path_candidates[i][j] = path_candidates[i][j].replace(f"{j+1}: ", "")
-                        temp_reasoning_paths.append(paths_to_extend[i][0] + "->" + path_candidates[i][j])
-            else:
-                break
-            
-            # add index for the temp_reasoning_paths
-            temp_reasoning_paths = [f"{i+1}: {rpth}" for i, rpth in enumerate(temp_reasoning_paths)]
-            
-            # from the new reasoning paths, select the beam_width valid reasoning paths
-            beam_pmt = copy.copy(prompt_list.beam_search_prompt)
-            beam_pmt["prompt"] = beam_pmt["prompt"].format(
-                beam_width=args.top_k,
-                question=question,
-                plan_context=plan_res,
-                reasoning_paths=_new_line_char.join(temp_reasoning_paths)
-            )
-            
-            res = await query_api(session, args, beam_pmt)
-            res = res['response'].strip().replace("Answer: ", "")
-            # beam_search_response = ast.literal_eval(beam_search_response) # use ast.literal_eval to convert string to list
-            # if type(beam_search_response) == list:
-            #     beam_search_index = [int(re.findall(r"\b\d+\b", str(beam_search_res))[0]) - 1 for beam_search_res in beam_search_response] # [0, 1, 2, 4]
-            
-            matching_indices = re.findall(r'\d+', res)
-            beam_search_index = [int(idx)-1 for idx in matching_indices]
-            
-            # increment the round or any other termination logic
-            round += 1
-            beam_search_res = []
-            for i in beam_search_index:
-                temp_reasoning_paths[i] = temp_reasoning_paths[i].replace(f"{i+1}: ", "")
-                beam_search_res.append(temp_reasoning_paths[i])
-            for i, j in enumerate(to_extend):
-                reasoning_paths[j] = [beam_search_res[i]] # fix a bug here, since reasoning_paths[j] is a list, we need to assign a list to it
-            
-            logging.info(
-                "Stage {} Reasoning Path:\n {}".format(round, reasoning_paths.values())
-            )
-                        
-            if round == 4:
-                break
         
-        
+        # --------------
+        # LLM REASONING
+        # --------------
         reasoning_pmt = copy.copy(prompt_list.reasoning_prompt)
         reasoning_pmt["prompt"] = reasoning_pmt["prompt"].format(
             question=question,
-            q_entity=q_entity,
-            reasoning_path = _new_line_char.join([process_str(rpth) for rpth in reasoning_paths.values()])
+            reasoning_path = _new_line_char.join([item[0] for item in reasoning_paths])
         )
-        res = await query_api(session, args, reasoning_pmt)
-        res = res["response"].replace("Answer: ", "").strip()
-        logging.info("Reasoning Response: {}".format(res))
+        res = get_completion(args, reasoning_pmt).replace("Answer: ", "").strip()
+        # logging.info("Reasoning Response: {}".format(res))
+        # print("Reasoning Response: {}".format(res))
+
         for item in res.split(", "):
             pred_list_llm_reasoning.append(item)
-            
-        for k in range(args.top_k):
-            if len(reasoning_paths[k]) > 0:
-                pred_list_direct_answer.append(reasoning_paths[k][-1].split("->")[-1])
-
-        reasoning_path_list.append(reasoning_paths)
+        
+        for item in reasoning_paths:
+            pred_list_direct_answer.append(item[0].split("->")[-1])
+            reasoning_path_list.append(item[0])      
         
     # save the results to a jsonl file
     res =  {
             "id": id,
             "question": question,
             "hop": hop,
-            "q_entities": data['q_entity'],
+            "q_entities": starting_nodes,
             "reasoning_path": reasoning_path_list,
             "ground_path": ground_reasoning_path_list,
             "prediction_llm": "\n".join(set(pred_list_llm_reasoning)), # remove duplicate predictions
@@ -403,101 +325,99 @@ async def beam_search(data, session, args):
     return res
 
 
-async def main(args):
-    async with aiohttp.ClientSession() as session:
-        input_file = os.path.join(args.data_path, args.d)
-        output_dir = os.path.join(args.output_path, args.model_name, timestamp)
-        if os.path.exists(output_dir) == False:
-            os.makedirs(output_dir)
+def main(args):
+    output_dir = os.path.join(args.output_path, args.model_name, timestamp)
+    if os.path.exists(output_dir) == False:
+        os.makedirs(output_dir)
+    
+    # logging.basicConfig(
+    #     level=logging.ERROR,
+    #     format='%(asctime)s - %(levelname)s - %(message)s',
+    #     filename=os.path.join(output_dir,'webq.log'),
+    #     filemode='w',
+    # )
+
+    settings = wandb.Settings(job_name=f"{args.d}-{args.model_name}-{args.sample}")
+    wandb.init(
+        project="rog-mcq",
+        notes="modifying the prompt to be more informative",
+        tags=["zero-shot"],
+        settings=settings,
+        config=args,
+    )
+    
+    final_table = wandb.Table(
+        columns=[
+            "id",
+            "question",
+            "hop",
+            "q_entities", 
+            "reasoning_path", 
+            "ground_path", 
+            "prediction_llm", 
+            "prediction_direct", 
+            "ground_truth"
+        ]
+    )
+    
+    # load the dataset
+    cached_dataset_path = os.path.join(args.save_cache, f"{args.d}_processed")
+    if os.path.exists(cached_dataset_path):
+        dataset = load_from_disk(cached_dataset_path)
+    else:
+        print("Processing data...")
+        dataset = data_processing(args)
+        print("Data processing completed!")
         
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            filename=os.path.join(output_dir,'webq.log'),
-            filemode='w',
-        )
-
-        settings = wandb.Settings(job_name=f"{args.d}-{args.model_name}-{args.sample}")
-        wandb.init(
-            project="rog-mcq",
-            notes="modifying the prompt to be more informative",
-            tags=["zero-shot"],
-            settings=settings,
-            config=args,
-        )
+    # if args.sample != -1:
+    #     dataset = dataset.select(range(args.sample))
+       
+    # error analysis (case study)    
+    small_dataset = dataset.select([11, 12, 13])
+    for data in small_dataset:
+        res = beam_search(data, args)
+    
         
-        final_table = wandb.Table(
-            columns=[
-                "id",
-                "question",
-                "hop",
-                "q_entities", 
-                "reasoning_path", 
-                "ground_path", 
-                "prediction_llm", 
-                "prediction_direct", 
-                "ground_truth"
-            ]
-        )
-
-        if args.sample != -1:
-            dataset = load_dataset(input_file, split=args.split)
-            # dataset = load_dataset(input_file, split=args.split).select(random.sample(range(len(dataset)), args.sample))
-            dataset = load_dataset(input_file, split=args.split).select(range(args.sample))            
-        else:
-            dataset = load_dataset(input_file, split=args.split)
-
-        dataset = dataset.map(
-            prepare_dataset,
-            num_proc=args.N_CPUS,
-        )
+    # for data in tqdm(dataset, desc="Data Processing...", delay=0.5):
+    #     try:
+    #         res = beam_search(data, args) # run the beam search for each sample
+            
+    #     except Exception as e:
+    #         logging.error("Error occurred: {}".format(e))
+    #         f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
+    #         json_str = json.dumps({"id": data['id'], "error": str(e)})
+    #         f.write(json_str + "\n")
+    #         continue
         
-        dataset = dataset.filter(
-            lambda x: x.get("hop") > 0, 
-            num_proc=args.N_CPUS
-        )
-
-
-        for data in tqdm(dataset, desc="Processing data", delay=0.5):
-            try:
-                res = await beam_search(data, session, args) # run the beam search for each sample
-                
-            except Exception as e:
-                logging.error("Error occurred: {}".format(e))
-                f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
-                json_str = json.dumps({"id": data['id'], "error": str(e)})
-                f.write(json_str + "\n")
-                continue
-            
-            # res = await beam_search(data, session, args) # run the beam search for each sample
-            
-            f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
-            json_str = json.dumps(res)
-            f.write(json_str + "\n")
-            
-            final_table.add_data(
-                res['id'],
-                res['question'],
-                res['hop'],
-                res['q_entities'],
-                res['reasoning_path'],
-                res['ground_path'],
-                res['prediction_llm'],
-                res['prediction_direct_answer'],
-                res['ground_truth']
-            )
-            
-        # evaluate
-        llm_res, direct_ans_res = eval_result(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), cal_f1=True)
+        # res = beam_search(data, args) # run the beam search for each sample
         
-        wandb.log(
-            {
-                "llm_result": llm_res,
-                "direct_ans_result": direct_ans_res,
-                "reasoning_paths": final_table
-            }
-        )
-        wandb.finish()
+    #     f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
+    #     json_str = json.dumps(res)
+    #     f.write(json_str + "\n")
+        
+    #     final_table.add_data(
+    #         res['id'],
+    #         res['question'],
+    #         res['hop'],
+    #         res['q_entities'],
+    #         res['reasoning_path'],
+    #         res['ground_path'],
+    #         res['prediction_llm'],
+    #         res['prediction_direct_answer'],
+    #         res['ground_truth']
+    #     )
+        
+    # # evaluate
+    # llm_res, direct_ans_res = eval_result(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), cal_f1=True)
+    
+    # wandb.log(
+    #     {
+    #         "llm_result": llm_res,
+    #         "direct_ans_result": direct_ans_res,
+    #         "reasoning_paths": final_table
+    #     }
+    # )
+    # wandb.finish()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -505,11 +425,12 @@ if __name__ == "__main__":
     parser.add_argument("--sample", type=int, default=-1)
     parser.add_argument("--data_path", type=str, default="rmanluo")
     parser.add_argument("--d", "-d", type=str, default="RoG-webqsp")
+    parser.add_argument("--save_cache", type=str, default="/data/shared/yuansui/rog/.cache/huggingface/datasets")
     parser.add_argument("--split", type=str, default="test")
     parser.add_argument("--output_path", type=str, default="results")
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
-    parser.add_argument("--top_k", type=int, default=5)
-    parser.add_argument("--retrieval_type", type=str, default="vector_rag", choices=["vector_rag", "graph_rag", "graph_vector_rag", "NA"]) #TODO
-    parser.add_argument("--shuffle", type=bool, default=True)
+    parser.add_argument("--top_n", type=int, default=30)
+    parser.add_argument("--top_k", type=int, default=3)
+    parser.add_argument("--max_length", type=int, default=3)
     args = parser.parse_args()
-    asyncio.run(main(args))
+    main(args)
