@@ -51,3 +51,16 @@ plan_prompt = {
    "examples": [],
    "prompt": "Your goal is to find a reasoning path from a knowledge graph that is useful for answering the following question. {question} \nPlease generate one sentence plan to find the reasoning path."
 }
+
+
+deductive_verifier_prompt = {
+   "system": "Given a question and the reasoning path constructed so far from a knowledge graph, you are asked to verify whether the following reasoning step can be deductive based on the query and the current reasoning path. \n A: Yes, the reasoning step is deductive. \n B: No, the reasoning step is not deductive.\n C: I don't know.\n Only return the answer as A, B, or C.",
+   "examples": [],
+   "prompt": "Given a question and the reasoning path constructed so far from a knowledge graph, you are asked to verify whether the following reasoning step can be deductive based on the query and the current reasoning path. \nQuestion: {question} \nReasoning path: {reasoning_path} \nReasoning step: {reasoning_step} \nIs the reasoning step deductive? \nA: Yes, the reasoning step is deductive. \nB: No, the reasoning step is not deductive. \nC: I don't know. \nOnly return the answer as A, B, or C."
+}
+
+self_confidence_prompt = {
+   "system": "Given a question and the reasoning path constructed so far from a knowledge graph, you are asked to evaluate your confidence in the reasoning path constructed so far. \n A: I am confident in the reasoning path. \n B: I am not confident in the reasoning path. The path should be extended \n C: I don't know. \n Only return the answer as A, B, or C.",
+   "examples": [],
+   "prompt": "Given a question and the reasoning path constructed so far from a knowledge graph, you are asked to evaluate your confidence in the reasoning path constructed so far. \nQuestion: {question} \nReasoning path: {reasoning_path} \nAre you confident in the reasoning path? \nA: I am confident in the reasoning path. \nB: I am not confident in the reasoning path. The path should be extended \nC: I don't know. \nOnly return the answer as A, B, or C."
+}
