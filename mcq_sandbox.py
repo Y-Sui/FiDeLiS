@@ -25,9 +25,14 @@ timestamp = now.strftime(f"%Y_%m_%d_%H_%M")
 
 with open("config.json", "r") as f:
     config = json.load(f)
-os.environ["OPENAI_API_KEY"] = config["OPENAI_API_KEY"]    
-
     
+os.environ["OPENAI_API_KEY"] = config["OPENAI_API_KEY"]
+# os.environ["LANGFUSE_SECRET_KEY"]= config["LANGFUSE_SECRET_KEY"]
+# os.environ["LANGFUSE_PUBLIC_KEY"] = config["LANGFUSE_PUBLIC_KEY"]
+# os.environ["LANGFUSE_HOST"] = config["LANGFUSE_HOST"] # default: LANGFUSE_HOST="https://cloud.langfuse.com" 
+
+# litellm.success_callback = ["langfuse"] # use langfuse for llm logging & observability
+
 def get_embeddings(texts: list, model="text-embedding-3-small"):
     attempt = 0
     while attempt < 5:
@@ -129,16 +134,18 @@ def prepare_options_for_each_step(
         next_entity = reasoning_path.split("->")[-1]
         raw_options, neighbors = utils.get_entity_edges([next_entity], graph) # get edges of the entities 
     
-    texts = [query] + [opt + "->" + neighbor for opt, neighbor in zip(raw_options, neighbors)]
-    embeddings = get_embeddings(texts)
-    query_embedding = np.array(embeddings[0])
-    option_embeddings = np.array(embeddings[1:])
-    similarities = cosine_similarity([query_embedding], option_embeddings)
-    top_n_indices = np.argsort(similarities[0])[-args.top_n:][::-1] # index of the top-n similar options
+    # texts = [query] + [opt + "->" + neighbor for opt, neighbor in zip(raw_options, neighbors)]
+    # embeddings = get_embeddings(texts)
+    # query_embedding = np.array(embeddings[0])
+    # option_embeddings = np.array(embeddings[1:])
+    # similarities = cosine_similarity([query_embedding], option_embeddings)
+    # top_n_indices = np.argsort(similarities[0])[-args.top_n:][::-1] # index of the top-n similar options
 
-    retrieved_options = [raw_options[i] for i in top_n_indices]
-    corresponding_neighbors = [neighbors[i] for i in top_n_indices]
-    processed_path_candidates = [f"{option}->{neighbor}" for option, neighbor in zip(retrieved_options, corresponding_neighbors)]
+    # retrieved_options = [raw_options[i] for i in top_n_indices]
+    # corresponding_neighbors = [neighbors[i] for i in top_n_indices]
+    # processed_path_candidates = [f"{option}->{neighbor}" for option, neighbor in zip(retrieved_options, corresponding_neighbors)]
+    
+    processed_path_candidates = [f"{option}->{neighbor}" for option, neighbor in zip(raw_options, neighbors)]
     
     deductive_prompts, self_confidence_prompts = [], []
     for candidate in processed_path_candidates:
@@ -178,16 +185,10 @@ def prepare_options_for_each_step(
 
 
 def find_top_k_candidates(args, next_step_candidates: list):
-    # Combine the scores by averaging
     combined_scores = [0.5 * (item[1] + item[2]) for item in next_step_candidates]
-
-    # Pair each candidate with its combined score
     candidates_with_scores = list(zip([candidates[0] for candidates in next_step_candidates], combined_scores))
-    
-    # Sort the list of tuples by the combined score, in descending order
     sorted_candidates = sorted(candidates_with_scores, key=lambda x: x[1], reverse=True)
     
-    # Select the top-k candidates
     top_k_candidates = sorted_candidates[:args.top_k]
     
     return top_k_candidates
@@ -278,7 +279,7 @@ def beam_search(data, args):
                 normalized_self_confidence_probs = self_confidence_probs / np.sum(self_confidence_probs)
                 for i, candidate in enumerate(next_step_candidates):
                     # only consider the candidates with self-confidence score > 0.5
-                    if normalized_self_confidence_probs[i] > 0.5:
+                    if normalized_self_confidence_probs[i] > 0.5 or step == 0:
                         all_candidates.append([candidate, deductive_scores[i], self_confidence_scores[i]])
             
             # if there are no candidates fit the criteria, break the loop
@@ -373,51 +374,48 @@ def main(args):
     #     dataset = dataset.select(range(args.sample))
        
     # error analysis (case study)    
-    small_dataset = dataset.select([11, 12, 13])
-    for data in small_dataset:
-        res = beam_search(data, args)
-    
+    dataset = dataset.select([11, 12, 13])
         
-    # for data in tqdm(dataset, desc="Data Processing...", delay=0.5):
-    #     try:
-    #         res = beam_search(data, args) # run the beam search for each sample
+    for data in tqdm(dataset, desc="Data Processing...", delay=0.5):
+        try:
+            res = beam_search(data, args) # run the beam search for each sample
             
-    #     except Exception as e:
-    #         logging.error("Error occurred: {}".format(e))
-    #         f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
-    #         json_str = json.dumps({"id": data['id'], "error": str(e)})
-    #         f.write(json_str + "\n")
-    #         continue
+        except Exception as e:
+            logging.error("Error occurred: {}".format(e))
+            f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
+            json_str = json.dumps({"id": data['id'], "error": str(e)})
+            f.write(json_str + "\n")
+            continue
         
         # res = beam_search(data, args) # run the beam search for each sample
         
-    #     f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
-    #     json_str = json.dumps(res)
-    #     f.write(json_str + "\n")
+        f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
+        json_str = json.dumps(res)
+        f.write(json_str + "\n")
         
-    #     final_table.add_data(
-    #         res['id'],
-    #         res['question'],
-    #         res['hop'],
-    #         res['q_entities'],
-    #         res['reasoning_path'],
-    #         res['ground_path'],
-    #         res['prediction_llm'],
-    #         res['prediction_direct_answer'],
-    #         res['ground_truth']
-    #     )
+        final_table.add_data(
+            res['id'],
+            res['question'],
+            res['hop'],
+            res['q_entities'],
+            res['reasoning_path'],
+            res['ground_path'],
+            res['prediction_llm'],
+            res['prediction_direct_answer'],
+            res['ground_truth']
+        )
         
-    # # evaluate
-    # llm_res, direct_ans_res = eval_result(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), cal_f1=True)
+    # evaluate
+    llm_res, direct_ans_res = eval_result(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), cal_f1=True)
     
-    # wandb.log(
-    #     {
-    #         "llm_result": llm_res,
-    #         "direct_ans_result": direct_ans_res,
-    #         "reasoning_paths": final_table
-    #     }
-    # )
-    # wandb.finish()
+    wandb.log(
+        {
+            "llm_result": llm_res,
+            "direct_ans_result": direct_ans_res,
+            "reasoning_paths": final_table
+        }
+    )
+    wandb.finish()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -429,7 +427,7 @@ if __name__ == "__main__":
     parser.add_argument("--split", type=str, default="test")
     parser.add_argument("--output_path", type=str, default="results")
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
-    parser.add_argument("--top_n", type=int, default=30)
+    parser.add_argument("--top_n", type=int, default=100)
     parser.add_argument("--top_k", type=int, default=3)
     parser.add_argument("--max_length", type=int, default=3)
     args = parser.parse_args()
