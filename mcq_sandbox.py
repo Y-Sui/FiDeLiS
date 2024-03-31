@@ -8,6 +8,7 @@ import wandb
 import numpy as np
 import datetime
 import copy
+import re
 import time
 import litellm
 import networkx as nx
@@ -134,62 +135,92 @@ def prepare_options_for_each_step(
         next_entity = reasoning_path.split("->")[-1]
         raw_options, neighbors = utils.get_entity_edges([next_entity], graph) # get edges of the entities 
     
-    # texts = [query] + [opt + "->" + neighbor for opt, neighbor in zip(raw_options, neighbors)]
-    # embeddings = get_embeddings(texts)
-    # query_embedding = np.array(embeddings[0])
-    # option_embeddings = np.array(embeddings[1:])
-    # similarities = cosine_similarity([query_embedding], option_embeddings)
-    # top_n_indices = np.argsort(similarities[0])[-args.top_n:][::-1] # index of the top-n similar options
+    if args.squeeze:
+        texts = [query] + [opt + "->" + neighbor for opt, neighbor in zip(raw_options, neighbors)]
+        embeddings = get_embeddings(texts)
+        query_embedding = np.array(embeddings[0])
+        option_embeddings = np.array(embeddings[1:])
+        similarities = cosine_similarity([query_embedding], option_embeddings)
+        top_n_indices = np.argsort(similarities[0])[-args.top_n:][::-1] # index of the top-n similar options
 
-    # retrieved_options = [raw_options[i] for i in top_n_indices]
-    # corresponding_neighbors = [neighbors[i] for i in top_n_indices]
-    # processed_path_candidates = [f"{option}->{neighbor}" for option, neighbor in zip(retrieved_options, corresponding_neighbors)]
+        retrieved_options = [raw_options[i] for i in top_n_indices]
+        corresponding_neighbors = [neighbors[i] for i in top_n_indices]
+        processed_path_candidates = [f"{option}->{neighbor}" for option, neighbor in zip(retrieved_options, corresponding_neighbors)]
+        processed_path_candidates = [reasoning_path + "->" + candidate if reasoning_path else starting_node + "->" + candidate for candidate in processed_path_candidates]
     
-    processed_path_candidates = [f"{option}->{neighbor}" for option, neighbor in zip(raw_options, neighbors)]
+    else:
+        processed_path_candidates = [f"{option}->{neighbor}" for option, neighbor in zip(raw_options, neighbors)]
+        processed_path_candidates = [reasoning_path + "->" + candidate if reasoning_path else starting_node + "->" + candidate for candidate in processed_path_candidates]
     
-    deductive_prompts, self_confidence_prompts = [], []
-    for candidate in processed_path_candidates:
-        deductive_prompts.append(
-            prompt_list.deductive_verifier_prompt["prompt"].format(
-                question=query,
-                reasoning_path=reasoning_path if reasoning_path else starting_node,
-                reasoning_step=candidate
+    if args.strategy == "continuous_rating":
+        deductive_prompts, self_confidence_prompts = [], []
+        for candidate in processed_path_candidates:
+            deductive_prompts.append(
+                prompt_list.deductive_verifier_prompt["prompt"].format(
+                    question=query,
+                    reasoning_path=reasoning_path if reasoning_path else starting_node,
+                    reasoning_step=candidate
+                )
             )
-        )
-        self_confidence_prompts.append(
-            prompt_list.self_confidence_prompt["prompt"].format(
-                question=query,
-                reasoning_path=reasoning_path + "->" + candidate if reasoning_path else starting_node + "->" + candidate,
+            self_confidence_prompts.append(
+                prompt_list.self_confidence_prompt["prompt"].format(
+                    question=query,
+                    reasoning_path=reasoning_path + "->" + candidate if reasoning_path else starting_node + "->" + candidate,
+                )
             )
+            
+        # call the batch completion function to get the log probabilities of the reasoning paths
+        _, log_probs_deductive_scores = get_batch_completion(
+            args=args,
+            prompt=prompt_list.deductive_verifier_prompt,
+            input_batch=deductive_prompts
         )
         
-    # call the batch completion function to get the log probabilities of the reasoning paths
-    _, log_probs_deductive_scores = get_batch_completion(
-        args=args,
-        prompt=prompt_list.deductive_verifier_prompt,
-        input_batch=deductive_prompts
-    )
+        _, log_probs_self_confidence_scores = get_batch_completion(
+            args=args,
+            prompt=prompt_list.self_confidence_prompt,
+            input_batch=self_confidence_prompts
+        )
+        
+        deductive_scores = get_log_probs(log_probs_deductive_scores)
+        self_confidence_scores = get_log_probs(log_probs_self_confidence_scores)
+        
+        return processed_path_candidates, deductive_scores, self_confidence_scores
+
+    elif args.strategy == "discrete_rating":
+        return processed_path_candidates
     
-    _, log_probs_self_confidence_scores = get_batch_completion(
-        args=args,
-        prompt=prompt_list.self_confidence_prompt,
-        input_batch=self_confidence_prompts
-    )
-    
-    deductive_scores = get_log_probs(log_probs_deductive_scores)
-    self_confidence_scores = get_log_probs(log_probs_self_confidence_scores)
-    
-    processed_path_candidates = [reasoning_path + "->" + candidate if reasoning_path else starting_node + "->" + candidate for candidate in processed_path_candidates]
-    
-    return processed_path_candidates, deductive_scores, self_confidence_scores
 
 
-def find_top_k_candidates(args, next_step_candidates: list):
-    combined_scores = [0.5 * (item[1] + item[2]) for item in next_step_candidates]
-    candidates_with_scores = list(zip([candidates[0] for candidates in next_step_candidates], combined_scores))
-    sorted_candidates = sorted(candidates_with_scores, key=lambda x: x[1], reverse=True)
-    
-    top_k_candidates = sorted_candidates[:args.top_k]
+def find_top_k_candidates(args, next_step_candidates: list, question: str = "", plan_context: str = ""):
+    if args.strategy == "continuous_rating":
+        combined_scores = [0.5 * (item[1] + item[2]) for item in next_step_candidates]
+        candidates_with_scores = list(zip([candidates[0] for candidates in next_step_candidates], combined_scores))
+        sorted_candidates = sorted(candidates_with_scores, key=lambda x: x[1], reverse=True)
+        top_k_candidates = sorted_candidates[:args.top_k]
+        
+    elif args.strategy == "discrete_rating":
+        if args.d == "RoG-webqsp":
+            prompt_list = prompt_list_webqsp
+        elif args.d == "RoG-cwq":
+            prompt_list = prompt_list_cwq
+            
+        _new_line_char = "\n" # for formatting the prompt
+        formatted_next_step_candidates = [f"{i+1}: {item}" for i, item in enumerate(next_step_candidates)]
+        rating_prompt = copy.copy(prompt_list.beam_search_prompt)
+        rating_prompt["prompt"] = prompt_list.beam_search_prompt["prompt"].format(
+            beam_width=args.top_k,
+            plan_context=plan_context,
+            question=question,
+            reasoning_paths=_new_line_char.join(formatted_next_step_candidates)
+        )
+        
+        rating_index = get_completion(args, rating_prompt)
+        rating_index = rating_index.replace("Answer: ", "").strip()
+        _ = re.findall(r'\d+', rating_index)
+        matched_indices = [int(i)-1 for i in _]
+        
+        top_k_candidates = [next_step_candidates[i] for i in matched_indices]
     
     return top_k_candidates
 
@@ -251,46 +282,69 @@ def beam_search(data, args):
     # --------------
     # PLANNING FIRST
     # --------------
-    # plan_prompt = copy.copy(prompt_list.plan_prompt)
-    # plan_prompt["prompt"] = plan_prompt["prompt"].format(
-    #     question=question
-    # )
-    # plan_res = get_completion(args, plan_prompt)
+    plan_prompt = copy.copy(prompt_list.plan_prompt)
+    plan_prompt["prompt"] = plan_prompt["prompt"].format(
+        question=question
+    )
+    plan_res = get_completion(args, plan_prompt)
     
     
     # --------------
     # BEAM SEARCH
     # --------------
-    for node in starting_nodes:                   
-        reasoning_paths = [[node, 1.0]] # store the reasoning paths for each step, the length of the list is equal to the number of top-k
-        for step in tqdm(range(args.max_length), desc="Beam searching...", delay=0.5, leave=False):
-            all_candidates = []
-            for rpth in reasoning_paths:
-                next_step_candidates, deductive_scores, self_confidence_scores = prepare_options_for_each_step(
-                    args=args,
-                    starting_node=node,
-                    reasoning_path=rpth[0],
-                    query=question,
-                    graph=graph,
-                    prompt_list=prompt_list
-                )
+    for node in starting_nodes:          
+        if args.strategy == "continuous_rating":         
+            reasoning_paths = [[node, 1.0]] # store the reasoning paths for each step, the length of the list is equal to the number of top-k
+            for step in tqdm(range(args.max_length), desc="Beam searching...", delay=0.5, leave=False):
+                all_candidates = []
+                for rpth in reasoning_paths:
+                    next_step_candidates, deductive_scores, self_confidence_scores = prepare_options_for_each_step(
+                        args=args,
+                        starting_node=node,
+                        reasoning_path=rpth[0],
+                        query=question,
+                        graph=graph,
+                        prompt_list=prompt_list
+                    )
+                    
+                    self_confidence_probs = np.exp(np.array(self_confidence_scores)) 
+                    normalized_self_confidence_probs = self_confidence_probs / np.sum(self_confidence_probs)
+                    for i, candidate in enumerate(next_step_candidates):
+                        # only consider the candidates with self-confidence score > 0.5
+                        if normalized_self_confidence_probs[i] > 0.5 or step == 0:
+                            all_candidates.append([candidate, deductive_scores[i], self_confidence_scores[i]])
                 
-                self_confidence_probs = np.exp(np.array(self_confidence_scores)) 
-                normalized_self_confidence_probs = self_confidence_probs / np.sum(self_confidence_probs)
-                for i, candidate in enumerate(next_step_candidates):
-                    # only consider the candidates with self-confidence score > 0.5
-                    if normalized_self_confidence_probs[i] > 0.5 or step == 0:
-                        all_candidates.append([candidate, deductive_scores[i], self_confidence_scores[i]])
-            
-            # if there are no candidates fit the criteria, break the loop
-            if not all_candidates:
-                print("beam search stopped at step {}".format(step))
-                break
-            
-            reasoning_paths = find_top_k_candidates(
-                    args=args,
-                    next_step_candidates=all_candidates,
-                )
+                # if there are no candidates fit the criteria, break the loop
+                if not all_candidates:
+                    print("beam search stopped at step {}".format(step))
+                    break
+                
+                reasoning_paths = find_top_k_candidates(
+                        args=args,
+                        next_step_candidates=all_candidates,
+                    )
+                
+        elif args.strategy == "discrete_rating":
+            reasoning_paths = [[node]] # store the reasoning paths for each step, the length of the list is equal to the number of top-k
+            for step in tqdm(range(args.max_length), desc="Beam searching...", delay=0.5, leave=False):
+                all_candidates = []
+                for rpth in reasoning_paths:
+                    next_step_candidates = prepare_options_for_each_step(
+                        args=args,
+                        starting_node=node,
+                        reasoning_path=rpth[0],
+                        query=question,
+                        graph=graph,
+                        prompt_list=prompt_list
+                    )
+                    all_candidates.extend(next_step_candidates)
+                
+                reasoning_paths = find_top_k_candidates(
+                        args=args,
+                        next_step_candidates=all_candidates,
+                        question=question,
+                        plan_context=plan_res
+                    )
         
         # --------------
         # LLM REASONING
@@ -298,7 +352,7 @@ def beam_search(data, args):
         reasoning_pmt = copy.copy(prompt_list.reasoning_prompt)
         reasoning_pmt["prompt"] = reasoning_pmt["prompt"].format(
             question=question,
-            reasoning_path = _new_line_char.join([item[0] for item in reasoning_paths])
+            reasoning_path = _new_line_char.join([item[0] for item in reasoning_paths] if args.strategy == "continuous_rating" else reasoning_paths)
         )
         res = get_completion(args, reasoning_pmt).replace("Answer: ", "").strip()
         # logging.info("Reasoning Response: {}".format(res))
@@ -308,8 +362,12 @@ def beam_search(data, args):
             pred_list_llm_reasoning.append(item)
         
         for item in reasoning_paths:
-            pred_list_direct_answer.append(item[0].split("->")[-1])
-            reasoning_path_list.append(item[0])      
+            if args.strategy == "continuous_rating":
+                pred_list_direct_answer.append(item[0].split("->")[-1])
+                reasoning_path_list.append(item[0])     
+            else:
+                pred_list_direct_answer.append(item)
+                reasoning_path_list.append(item) 
         
     # save the results to a jsonl file
     res =  {
@@ -370,24 +428,24 @@ def main(args):
         dataset = data_processing(args)
         print("Data processing completed!")
         
-    # if args.sample != -1:
-    #     dataset = dataset.select(range(args.sample))
+    if args.sample != -1:
+        dataset = dataset.select(range(args.sample))
        
     # error analysis (case study)    
-    dataset = dataset.select([11, 12, 13])
+    # dataset = dataset.select([11, 12, 13])
         
     for data in tqdm(dataset, desc="Data Processing...", delay=0.5):
-        try:
-            res = beam_search(data, args) # run the beam search for each sample
+        # try:
+        #     res = beam_search(data, args) # run the beam search for each sample
             
-        except Exception as e:
-            logging.error("Error occurred: {}".format(e))
-            f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
-            json_str = json.dumps({"id": data['id'], "error": str(e)})
-            f.write(json_str + "\n")
-            continue
+        # except Exception as e:
+        #     logging.error("Error occurred: {}".format(e))
+        #     f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
+        #     json_str = json.dumps({"id": data['id'], "error": str(e)})
+        #     f.write(json_str + "\n")
+        #     continue
         
-        # res = beam_search(data, args) # run the beam search for each sample
+        res = beam_search(data, args) # run the beam search for each sample
         
         f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
         json_str = json.dumps(res)
@@ -430,5 +488,7 @@ if __name__ == "__main__":
     parser.add_argument("--top_n", type=int, default=100)
     parser.add_argument("--top_k", type=int, default=3)
     parser.add_argument("--max_length", type=int, default=3)
+    parser.add_argument("--strategy", type=str, default="discrete_rating")
+    parser.add_argument("--squeeze", type=bool, default=True)
     args = parser.parse_args()
     main(args)
