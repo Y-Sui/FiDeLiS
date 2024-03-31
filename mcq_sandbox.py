@@ -121,7 +121,6 @@ async def prepare_options_for_each_step(
     reasoning_path, 
     query, 
     graph, 
-    retrieval_type = "vector_rag"
     ) -> list:
     """
     prepare options for each step of the reasoning path
@@ -135,7 +134,7 @@ async def prepare_options_for_each_step(
             next_entity = reasoning_path[-1].split("->")[-1]
         raw_options, neighbors = utils.get_entity_edges([next_entity], graph) # get edges of the entities 
     
-    async def vector_rag_engine(session, query, options, neighbors, top_k=30) -> list:
+    async def vector_rag_engine(session, query, options, neighbors, top_k=50) -> list:
         """
         return the top-k similar options' index based on the query simalirity
         """
@@ -150,26 +149,10 @@ async def prepare_options_for_each_step(
         except Exception as e:
             logging.error(f"Error occurred: {e}")
     
-    if retrieval_type == "vector_rag":
-        """
-        create embedding of query and options; semantic search top-k related options; select the next step reasoning path based on the top-k options
-        """
-        retrieved_options_index = await vector_rag_engine(session, query, raw_options, neighbors) 
-        retrieved_options = [raw_options[i] for i in retrieved_options_index]
-        corresponding_neighbors = [neighbors[i] for i in retrieved_options_index]
-        
-    elif retrieval_type == "graph_rag":
-        """
-        get n-depth subgraphs of q_entity from KG; select the next step reasoning path based on the related subgraphs
-        """
-        pass
-    
-    elif retrieval_type == "graph_vector_rag":
-        """
-        do retrieval as Vector and Graph RAG; select the next step reasoning path based on both subgraphs and top-k related options 
-        """
-        pass
-    
+    retrieved_options_index = await vector_rag_engine(session, query, raw_options, neighbors) 
+    retrieved_options = [raw_options[i] for i in retrieved_options_index]
+    corresponding_neighbors = [neighbors[i] for i in retrieved_options_index]
+
     processed_path_candidates = [f"{i+1}: {option}->{neighbor}" for i, (option, neighbor) in enumerate(zip(retrieved_options, corresponding_neighbors))]
 
     return processed_path_candidates
@@ -197,7 +180,6 @@ async def prepare_options_concurrently(session, q_entity, reasoning_paths, quest
             reasoning_path,
             question,
             graph,
-            args.retrieval_type
         ) for reasoning_path in reasoning_paths
     ]
     
@@ -464,7 +446,7 @@ async def main(args):
                 
             except Exception as e:
                 logging.error("Error occurred: {}".format(e))
-                f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
+                f = open(os.path.join(output_dir, "run_error_sample.jsonl"), "a")
                 json_str = json.dumps({"id": data['id'], "error": str(e)})
                 f.write(json_str + "\n")
                 continue
@@ -509,7 +491,6 @@ if __name__ == "__main__":
     parser.add_argument("--output_path", type=str, default="results")
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
     parser.add_argument("--top_k", type=int, default=5)
-    parser.add_argument("--retrieval_type", type=str, default="vector_rag", choices=["vector_rag", "graph_rag", "graph_vector_rag", "NA"]) #TODO
     parser.add_argument("--shuffle", type=bool, default=True)
     args = parser.parse_args()
     asyncio.run(main(args))
