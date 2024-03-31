@@ -21,6 +21,8 @@ from datasets import load_dataset, load_from_disk
 from src import utils
 from src.utils import prompt_list_cwq, prompt_list_webqsp
 
+litellm.set_verbose=False
+set_verbose = False
 now = datetime.datetime.now()
 timestamp = now.strftime(f"%Y_%m_%d_%H_%M")
 
@@ -34,12 +36,15 @@ os.environ["OPENAI_API_KEY"] = config["OPENAI_API_KEY"]
 
 # litellm.success_callback = ["langfuse"] # use langfuse for llm logging & observability
 
+client = OpenAI()
+
 def get_embeddings(texts: list, model="text-embedding-3-small"):
     attempt = 0
     while attempt < 5:
         try:
-            _ = embedding(model=model, input=texts)
-            return [item['embedding'] for item in _['data']]
+            _ = client.embeddings.create(model=model, input=texts)
+            # return [item['embedding'] for item in _['data']]
+            return [item.embedding for item in _.data]
         except Exception as e:
             logging.error(f"Error occurred: {e}")
             attempt += 1
@@ -57,8 +62,9 @@ def get_completion(args, prompt: dict):
     attempt = 0
     while attempt < 5:
         try:
-            _ = completion(model=model, messages=messages, temperature=0, top_p=0, logprobs=False)
-            return _['choices'][0]['message']['content']
+            _ = client.chat.completions.create(model=model, messages=messages, temperature=0, top_p=0, logprobs=False)
+            # return _['choices'][0]['message']['content']
+            return _.choices[0].message.content
         except Exception as e:
             logging.error(f"Error occurred: {e}")
             attempt += 1
@@ -192,12 +198,20 @@ def prepare_options_for_each_step(
     
 
 
-def find_top_k_candidates(args, next_step_candidates: list, question: str = "", plan_context: str = ""):
+def find_top_k_candidates(
+    args,
+    next_step_candidates: list, 
+    question: str = "", 
+    plan_context: str = "",
+    cur_rpth: str = ""
+):
     if args.strategy == "continuous_rating":
         combined_scores = [0.5 * (item[1] + item[2]) for item in next_step_candidates]
         candidates_with_scores = list(zip([candidates[0] for candidates in next_step_candidates], combined_scores))
         sorted_candidates = sorted(candidates_with_scores, key=lambda x: x[1], reverse=True)
         top_k_candidates = sorted_candidates[:args.top_k]
+        
+        return top_k_candidates
         
     elif args.strategy == "discrete_rating":
         if args.d == "RoG-webqsp":
@@ -211,18 +225,68 @@ def find_top_k_candidates(args, next_step_candidates: list, question: str = "", 
         rating_prompt["prompt"] = prompt_list.beam_search_prompt["prompt"].format(
             beam_width=args.top_k,
             plan_context=plan_context,
+            current_reasoning_path=cur_rpth,
             question=question,
             reasoning_paths=_new_line_char.join(formatted_next_step_candidates)
         )
         
-        rating_index = get_completion(args, rating_prompt)
-        rating_index = rating_index.replace("Answer: ", "").strip()
-        _ = re.findall(r'\d+', rating_index)
-        matched_indices = [int(i)-1 for i in _]
+        logging.info("<<<<<<<<")
+        logging.info("Beam Search Prompt: {}".format(rating_prompt["prompt"]))
+        logging.info(">>>>>>>>")
         
-        top_k_candidates = [next_step_candidates[i] for i in matched_indices]
+        attempt = 0
+        while attempt < 5:
+            try:
+                rating_index = get_completion(args, rating_prompt)
+                rating_index = rating_index.replace("Answer: ", "").strip()
+                _ = re.findall(r'\d+', rating_index)
+                matched_indices = [int(i)-1 for i in _]
+                
+                logging.info("<<<<<<<<")
+                logging.info("Top-k Indices: {}".format(matched_indices))
+                logging.info(">>>>>>>>")
+                top_k_candidates = [[next_step_candidates[i]] for i in matched_indices]
+                return top_k_candidates
     
-    return top_k_candidates
+            except Exception as e:
+                logging.error(f"Error occurred: {e}")
+                attempt += 1
+                time.sleep(1)
+
+
+def meets_condition(
+    args, 
+    reasoning_path: str, 
+    question: str, 
+    planning_context: str = ""
+):
+    if args.d == "RoG-webqsp":
+        prompt_list = prompt_list_webqsp
+    elif args.d == "RoG-cwq":
+        prompt_list = prompt_list_cwq
+    
+    if args.verifier == "enough":    
+        condition_prompt = copy.copy(prompt_list.terminals_prune_single_prompt)
+        condition_prompt["prompt"] = condition_prompt["prompt"].format(
+            question=question,
+            reasoning_path=reasoning_path,
+            plan_context=planning_context
+        )
+    #TODO: add more verifiers
+    elif args.verifier == "enough+planning": 
+        pass
+    elif args.verifier == "enough+planning+confidence":
+        pass
+    elif args.verifier == "deductive+planning":   
+        pass
+        
+    res = get_completion(args, condition_prompt).replace("Answer: ", "").strip()
+    if "Yes" in res:
+        return True
+    elif "No" in res:
+        return False
+    else:
+        return False
 
 
 def prepare_dataset(sample):
@@ -252,6 +316,10 @@ def data_processing(args):
             lambda x: x.get("hop") > 0, 
             num_proc=args.N_CPUS
         )
+    dataset = dataset.filter(
+            lambda x: x.get("q_entity") != None, 
+            num_proc=args.N_CPUS
+        )
     if os.path.exists(output_file) == False:
         os.makedirs(output_file)
         
@@ -273,6 +341,9 @@ def beam_search(data, args):
     _new_line_char = "\n" # for formatting the prompt
     
     logging.info(f"Processing ID: {id}")
+    logging.info(f"Question: {question}")
+    logging.info(f"Ground Truth: {answer}")
+    logging.info(f"Starting Nodes: {starting_nodes}")
     
     if args.d == "RoG-webqsp":
         prompt_list = prompt_list_webqsp
@@ -280,23 +351,28 @@ def beam_search(data, args):
         prompt_list = prompt_list_cwq
     
     # --------------
-    # PLANNING FIRST
-    # --------------
-    plan_prompt = copy.copy(prompt_list.plan_prompt)
-    plan_prompt["prompt"] = plan_prompt["prompt"].format(
-        question=question
-    )
-    plan_res = get_completion(args, plan_prompt)
-    
-    
-    # --------------
     # BEAM SEARCH
     # --------------
-    for node in starting_nodes:          
+    for node in starting_nodes:    
+        
+        # --------------
+        # PLANNING FIRST
+        # --------------
+        plan_prompt = copy.copy(prompt_list.plan_prompt)
+        plan_prompt["prompt"] = plan_prompt["prompt"].format(
+            question=question,
+            starting_node=node
+        )
+        plan_res = get_completion(args, plan_prompt)
+        
+        logging.info("Plan Prompt: {}".format(plan_prompt["prompt"]))
+        logging.info("Plan Response: {}".format(plan_res))
+                
         if args.strategy == "continuous_rating":         
             reasoning_paths = [[node, 1.0]] # store the reasoning paths for each step, the length of the list is equal to the number of top-k
             for step in tqdm(range(args.max_length), desc="Beam searching...", delay=0.5, leave=False):
                 all_candidates = []
+        
                 for rpth in reasoning_paths:
                     next_step_candidates, deductive_scores, self_confidence_scores = prepare_options_for_each_step(
                         args=args,
@@ -325,10 +401,20 @@ def beam_search(data, args):
                     )
                 
         elif args.strategy == "discrete_rating":
-            reasoning_paths = [[node]] # store the reasoning paths for each step, the length of the list is equal to the number of top-k
+            reasoning_paths = [] # final reasoning paths 
+            active_beam_raesoning_paths = [[node]] # store the reasoning paths for each step, the length of the list is equal to the number of top-k
             for step in tqdm(range(args.max_length), desc="Beam searching...", delay=0.5, leave=False):
                 all_candidates = []
-                for rpth in reasoning_paths:
+                
+                for rpth in active_beam_raesoning_paths:
+                
+                    # if meet the condition, skip the current step
+                    if step != 0:
+                        flag = meets_condition(args, reasoning_path=rpth[0], question=question, planning_context=plan_res)
+                        if flag:
+                            reasoning_paths.append(rpth)
+                            continue
+                    
                     next_step_candidates = prepare_options_for_each_step(
                         args=args,
                         starting_node=node,
@@ -338,13 +424,28 @@ def beam_search(data, args):
                         prompt_list=prompt_list
                     )
                     all_candidates.extend(next_step_candidates)
+                    
+                    if not all_candidates:
+                        break
                 
-                reasoning_paths = find_top_k_candidates(
+                # logging.info("<<<<<<<<")
+                # logging.info("Step: {}, Avaiable Candidates: \n{}".format(step, _new_line_char.join(all_candidates)))
+                # logging.info(">>>>>>>>")
+                
+                active_beam_raesoning_paths = find_top_k_candidates(
                         args=args,
                         next_step_candidates=all_candidates,
                         question=question,
                         plan_context=plan_res
                     )
+                
+                logging.info("<<<<<<<<")
+                logging.info("Active Beam Reasoning Paths: {}".format(active_beam_raesoning_paths))
+                logging.info(">>>>>>>>")
+            
+            # if there are no candidates fit the criteria, return the active_beam_raesoning_paths
+            if not reasoning_paths:
+                reasoning_paths = active_beam_raesoning_paths
         
         # --------------
         # LLM REASONING
@@ -352,22 +453,24 @@ def beam_search(data, args):
         reasoning_pmt = copy.copy(prompt_list.reasoning_prompt)
         reasoning_pmt["prompt"] = reasoning_pmt["prompt"].format(
             question=question,
-            reasoning_path = _new_line_char.join([item[0] for item in reasoning_paths] if args.strategy == "continuous_rating" else reasoning_paths)
+            reasoning_path = _new_line_char.join([item[0] for item in reasoning_paths])
         )
         res = get_completion(args, reasoning_pmt).replace("Answer: ", "").strip()
         # logging.info("Reasoning Response: {}".format(res))
         # print("Reasoning Response: {}".format(res))
+        
+        logging.info("<<<<<<<<")
+        logging.info("Reasoning Prompt: {}".format(reasoning_pmt["prompt"]))
+        logging.info("Reasoning Paths: \n{}".format(reasoning_paths))
+        logging.info("Prediction: \n{}".format(res))
+        logging.info(">>>>>>>>")
 
         for item in res.split(", "):
             pred_list_llm_reasoning.append(item)
         
         for item in reasoning_paths:
-            if args.strategy == "continuous_rating":
-                pred_list_direct_answer.append(item[0].split("->")[-1])
-                reasoning_path_list.append(item[0])     
-            else:
-                pred_list_direct_answer.append(item)
-                reasoning_path_list.append(item) 
+            pred_list_direct_answer.append(item[0].split("->")[-1])
+            reasoning_path_list.append(item[0])     
         
     # save the results to a jsonl file
     res =  {
@@ -389,12 +492,12 @@ def main(args):
     if os.path.exists(output_dir) == False:
         os.makedirs(output_dir)
     
-    # logging.basicConfig(
-    #     level=logging.ERROR,
-    #     format='%(asctime)s - %(levelname)s - %(message)s',
-    #     filename=os.path.join(output_dir,'webq.log'),
-    #     filemode='w',
-    # )
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        filename=os.path.join(output_dir,'webq.log'),
+        filemode='w',
+    )
 
     settings = wandb.Settings(job_name=f"{args.d}-{args.model_name}-{args.sample}")
     wandb.init(
@@ -435,17 +538,17 @@ def main(args):
     # dataset = dataset.select([11, 12, 13])
         
     for data in tqdm(dataset, desc="Data Processing...", delay=0.5):
-        # try:
-        #     res = beam_search(data, args) # run the beam search for each sample
+        try:
+            res = beam_search(data, args) # run the beam search for each sample
             
-        # except Exception as e:
-        #     logging.error("Error occurred: {}".format(e))
-        #     f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
-        #     json_str = json.dumps({"id": data['id'], "error": str(e)})
-        #     f.write(json_str + "\n")
-        #     continue
+        except Exception as e:
+            logging.error("Error occurred: {}".format(e))
+            f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
+            json_str = json.dumps({"id": data['id'], "error": str(e)})
+            f.write(json_str + "\n")
+            continue
         
-        res = beam_search(data, args) # run the beam search for each sample
+        # res = beam_search(data, args) # run the beam search for each sample
         
         f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
         json_str = json.dumps(res)
@@ -485,10 +588,11 @@ if __name__ == "__main__":
     parser.add_argument("--split", type=str, default="test")
     parser.add_argument("--output_path", type=str, default="results")
     parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")
-    parser.add_argument("--top_n", type=int, default=100)
+    parser.add_argument("--top_n", type=int, default=30)
     parser.add_argument("--top_k", type=int, default=3)
     parser.add_argument("--max_length", type=int, default=3)
     parser.add_argument("--strategy", type=str, default="discrete_rating")
     parser.add_argument("--squeeze", type=bool, default=True)
+    parser.add_argument("--verifier", type=str, default="enough")
     args = parser.parse_args()
     main(args)
