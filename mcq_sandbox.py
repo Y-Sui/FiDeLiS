@@ -30,12 +30,6 @@ with open("config.json", "r") as f:
     config = json.load(f)
     
 os.environ["OPENAI_API_KEY"] = config["OPENAI_API_KEY"]
-# os.environ["LANGFUSE_SECRET_KEY"]= config["LANGFUSE_SECRET_KEY"]
-# os.environ["LANGFUSE_PUBLIC_KEY"] = config["LANGFUSE_PUBLIC_KEY"]
-# os.environ["LANGFUSE_HOST"] = config["LANGFUSE_HOST"] # default: LANGFUSE_HOST="https://cloud.langfuse.com" 
-
-# litellm.success_callback = ["langfuse"] # use langfuse for llm logging & observability
-
 client = OpenAI()
 
 def get_embeddings(texts: list, model="text-embedding-3-small"):
@@ -594,5 +588,7 @@ if __name__ == "__main__":
     parser.add_argument("--strategy", type=str, default="discrete_rating")
     parser.add_argument("--squeeze", type=bool, default=True)
     parser.add_argument("--verifier", type=str, default="enough")
+    parser.add_argument("--embedding_model", type=str, default="text-embedding-3-small")
+    parser.add_argument("--add_hop_information", type=bool, default=True)
     args = parser.parse_args()
     main(args)
