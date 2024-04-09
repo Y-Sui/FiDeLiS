@@ -165,12 +165,14 @@ class LLM_Navigator():
          question=question,
          starting_node=entity
       )
-      plan_res = self.llm_backbone.get_completion(plan_prompt)
+
+      logging.info("Plan Prompt: {}".format(plan_prompt))
+      plan_res = self.llm_backbone.get_completion(plan_prompt).replace("json", "").replace("```", "")
+      logging.info("Plan Response: {}".format(plan_res))
       key_words = ", ".join(json.loads(plan_res)["keywords"])
       planning_steps = ", ".join(json.loads(plan_res)["planning_steps"])
       declarative_statement = json.loads(plan_res)["declarative_statement"]
       
-      logging.info("Plan Prompt: {}".format(plan_prompt["prompt"]))
       logging.info("Planning Keywords: {}".format(key_words))
       logging.info("Planning Steps: {}".format(planning_steps))
       logging.info("Declarative Statement: {}".format(declarative_statement))
@@ -232,7 +234,7 @@ class LLM_Navigator():
                   if flag:
                      reasoning_paths.append(rpth)
                      continue
-               
+                  
                next_step_candidates = self.path_rag_engine.get_path(
                   state=llm_states
                )
