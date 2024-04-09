@@ -38,21 +38,6 @@ reasoning_prompt = {
 # }
 
 
-terminals_prune_single_prompt = {
-   "system": "Given a question and the starting entity from a knowledge graph, you are asked to answer whether it's sufficient for you to answer the question with the following reasoning path. For each reasoning path, respond with 'Yes' if it is sufficient, and 'No' if it is not. Your response should be either 'Yes' or 'No', corresponding to reasoning path.",
-   "examples": [
-      {"role": "user", "content": "Question: what art movements was henri matisse involved in?\n Reasoning path: \nHenri Matisse->book.written_work.subjects->Matisse, Picasso"},
-      {"role": "assistant", "content": "Answer: No"},
-      {"role": "user", "content": "Question: what team did tim tebow play for in college?\nReasoning path: \nTim Tebow->people.sibling_relationship.sibling->m.05v4ns_"},
-      {"role": "assistant", "content": "Answer: No"},
-      {"role": "user", "content": "Question: where does selena gomez live right now 2010?\nReasoning Path: \nSelena Gomez->people.person.places_lived->m.04hmnxs->people.place_lived.location->New York City"},
-      {"role": "assistant", "content": "Answer: Yes"},
-   ],
-   # "examples": [],
-   "prompt": "Considering the planning context {plan_context} and the given question {question}, you are asked to answer whether it's sufficient for you to answer the question with the following reasoning path. {reasoning_path}. Verify if it is sufficient to answer the question with each of the provided reasoning path. Your response should either 'Yes' or 'No', corresponding to reasoning path. \nAnswer:"
-}
-
-
 beam_search_prompt = {
    "system": "Given a question and the starting entity from a knowledge graph, you are asked to retrieve reasoning paths from the given reasoning paths that are useful for answering the question.",
    "examples": [
@@ -63,16 +48,37 @@ beam_search_prompt = {
    "prompt": "Considering the planning context {plan_context} and the given question {question}, \nyou are asked to choose the best {beam_width} reasoning paths from the following candidates with the highest probability to lead to a useful reasoning path for answering the question. {reasoning_paths}. \n\nOnly return the index of the {beam_width} selected reasoning paths in a list."
 }
 
+# planning + keywords detection
 plan_prompt = {
-   "system": "Given a question, you are asked to generate a plan to find a reasoning path from a knowledge graph that is useful for answering the question.",
+   "system": "You are a helpful assistant designed to output JSON that aids in navigating a knowledge graph to answer a provided question. The response should include the following keys: (1) 'keywords': an exhaustive list of keywords or relation names that you would use to find the reasoning path from the knowledge graph to answer the question. Aim for maximum coverage to ensure no potential reasoning paths will be overlooked; (2) 'planning_steps': a list of detailed steps required to trace the reasoning path with. (3) 'declarative_statement': a string of declarative statement that can be transformed from the given query, For example, convert the question 'What do Jamaican people speak?' into the statement 'Jamaican people speak *placeholder*.' leave the *placeholder* unchanged; Ensure the JSON object clearly separates these components.",
    "examples": [],
-   "prompt": "Your goal is to find a reasoning path from a knowledge graph that is useful for answering the following question. {question} The topic entity for the question is {starting_node}. Please generate step-wise plan to find the reasoning path. Only return the step-wise plan without any other information."
+   "prompt": "{question}?"
+}
+
+reasoning_path_parser_prompt = {
+   "system": "You are asked to transfer the reasoning path to a statment, for example, convet the reasoning path 'Henri Matisse->book.written_work.subjects->Matisse, Picasso' to 'Henri Matisse wrote a book about Matisse and Picasso'.",
+   "examples": [],
+   "prompt": "{reasoning_path}",
+}
+
+terminals_prune_single_prompt = {
+   "system": "Given a question and the starting entity from a knowledge graph, you are asked to answer whether it's sufficient for you to answer the question with the following reasoning path. For each reasoning path, respond with 'Yes' if it is sufficient, and 'No' if it is not. Your response should be either 'Yes' or 'No', corresponding to reasoning path.",
+   "examples": [
+      {"role": "user", "content": "Question: what art movements was henri matisse involved in?\n Reasoning path: \nHenri Matisse->book.written_work.subjects->Matisse, Picasso"},
+      {"role": "assistant", "content": "Answer: No"},
+      {"role": "user", "content": "Question: what team did tim tebow play for in college?\nReasoning path: \nTim Tebow->people.sibling_relationship.sibling->m.05v4ns_"},
+      {"role": "assistant", "content": "Answer: No"},
+      {"role": "user", "content": "Question: where does selena gomez live right now 2010?\nReasoning Path: \nSelena Gomez->people.person.places_lived->m.04hmnxs->people.place_lived.location->New York City"},
+      {"role": "assistant", "content": "Answer: Yes"},
+   ],
+   "examples": [],
+   "prompt": "Considering the planning context {plan_context} and the given question {question}, you are asked to answer whether it's sufficient for you to answer the question with the following reasoning path. {reasoning_path}. Verify if it is sufficient to answer the question with each of the provided reasoning path. Your response should either 'Yes' or 'No', corresponding to reasoning path. \nAnswer:"
 }
 
 deductive_verifier_prompt = {
-   "system": "Your task is to assess a reasoning step in the context of a specific question and its associated reasoning path, which has been developed from a knowledge graph. You will be provided with: \n *The question at hand.\n *The constructured reasoning path up to this point\n *A proposed next step for the reasoning process\n You need to determine whether this next step logically follows from the question and the current reasoning path in deductive manner\n Please respond with: \n A: Yes, if the reasoning step follows deductively.\n B: No, the step does not follow deductively.\n C: I'm uncertain.\n Only return the answer as A, B, or C for clarity.",
+   "system": "You are asked to verify whether the reasoning step follows deductively from the question and the current reasoning path in a deductive manner. If yes return yes, if no, return no",
    "examples": [],
-   "prompt": "Your task is to assess a reasoning step in the context of a specific question and its associated reasoning path, which has been developed from a knowledge graph. \n *The question at hand is '{question}'.\n *The constructured reasoning path up to this point is '{reasoning_path}' \n *A proposed next step for the reasoning process is '{reasoning_step} which follows the 'relation->entity' format'\n You need to determine whether this next step logically follows from the question and the current reasoning path in deductive manner\n Please respond with: \n A: Yes, if the reasoning step follows deductively.\n B: No, the step does not follow deductively.\n C: I'm uncertain.\n Only return the answer as A, B, or C for clarity."
+   "prompt": "Whether the conclusion \'{declarative_statement}\' can be deduced from \'{parsed_reasoning_path}\', if yes, return yes, if no, return no."
 }
 
 self_confidence_prompt = {
