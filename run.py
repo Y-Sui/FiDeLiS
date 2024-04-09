@@ -47,7 +47,7 @@ def data_processing(args):
          num_proc=args.N_CPUS,
       )
    dataset = dataset.filter(
-         lambda x: x.get("hop") > 0, 
+         lambda x: x.get("hop") > 0 and x.get("question") != "" and len(x.get("q_entity")) > 0 and len(x.get("a_entity")) > 0 and len(x.get("ground_paths")) > 0, 
          num_proc=args.N_CPUS
       )
    dataset = dataset.filter(
@@ -115,18 +115,18 @@ def main(args):
    llm_navigator = LLM_Navigator(args)
    
    for data in tqdm(dataset, desc="Data Processing...", delay=0.5):
-      try:
-         res = llm_navigator.beam_search(data) # run the beam search for each sample
+      # try:
+      #    res = llm_navigator.beam_search(data) # run the beam search for each sample
          
-      except Exception as e:
-         logging.error("Error occurred: {}".format(e))
-         print("Error occurred: {}".format(e))
-         f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
-         json_str = json.dumps({"id": data['id'], "error": str(e)})
-         f.write(json_str + "\n")
-         continue
+      # except Exception as e:
+      #    logging.error("Error occurred: {}".format(e))
+      #    print("Error occurred: {}".format(e))
+      #    f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
+      #    json_str = json.dumps({"id": data['id'], "error": str(e)})
+      #    f.write(json_str + "\n")
+      #    continue
       
-      # res = llm_navigator.beam_search(data)
+      res = llm_navigator.beam_search(data)
       
       f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
       json_str = json.dumps(res)
