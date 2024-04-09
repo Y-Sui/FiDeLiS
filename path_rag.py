@@ -1,24 +1,12 @@
 import os
-import argparse
-import os
-import json
 import logging
 import multiprocessing as mp
-import wandb
 import numpy as np
-import datetime
-import copy
-import re
 import time
-import litellm
 import networkx as nx
-from src.qa_prediction.evaluate_results import eval_result
 from tqdm import tqdm
 from openai import OpenAI
 from litellm import completion, embedding, batch_completion # import litellm for calling multiple llms using the same input/output format 
-from datasets import load_dataset, load_from_disk
-from src import utils
-from src.utils import prompt_list_cwq, prompt_list_webqsp
 
 
 class LLM_Backbone():
@@ -29,14 +17,20 @@ class LLM_Backbone():
       self.max_attempt = 5 # number of attempts to get the completion
       
    def get_embeddings(self, texts: list):
+      embeddings = []
+      texts_per_batch = 2000
+      text_chunks = [texts[i:i + texts_per_batch] for i in range(0, len(texts), texts_per_batch)]
+      
       attempt = 0
       while attempt < self.max_attempt:
          try:
-            embeddings = self.client.create(
-               model=self.embedding_model, 
-               inputs=texts
-               ) # return [item['embedding'] for item in _['data']]
-            return [item.embedding for item in _.data]
+            for chunk in text_chunks:
+               chunk_embeddings = self.client.embeddings.create(
+                  model=self.embedding_model, 
+                  input=chunk
+                  ) # return [item['embedding'] for item in _['data']]
+               embeddings.extend([item.embedding for item in chunk_embeddings.data])
+            return embeddings
          except Exception as e:
             logging.error(f"Error occurred: {e}")
             attempt += 1
@@ -186,8 +180,6 @@ class Path_RAG():
       relations_embeddings = np.array(embeddings[1:len(relations)+1])
       neighbors_embeddings = np.array(embeddings[len(relations)+1:])
       
-      print(query_embedding.shape, relations_embeddings.shape, neighbors_embeddings.shape)
-      
       # calculate cosine similarity
       query_relation_similarity = self.cos_simiarlity(query_embedding, relations_embeddings)
       query_neighbor_similarity = self.cos_simiarlity(query_embedding, neighbors_embeddings)
@@ -198,64 +190,82 @@ class Path_RAG():
       
       return relations, neighbors
    
-   
    def scoring_path(
       self,
-      entity: str,
-      graph: nx.Graph,
+      keywords: str,
       rated_relations: list,
       rated_neighbors: list,
+      hub_node: str,
+      reasoning_path: str,
+      graph: nx.Graph
    ) -> list:
       """
       given a list of relations and neighbors with ratings, return top-k relations and neighbors with the corresponding ratings
       """
-      paths = []
-      for relation, relation_rating in rated_relations:
-         for neighbor, neighbor_rating in rated_neighbors:
-            score = relation_rating + neighbor_rating
+      # concatenate the relations and neighbors
+      rated_paths = [] # [(path, score)]
+      seen_paths = [] # store the seen paths [path, path]
+      for relation, relation_score in rated_relations:
+         for neighbor, neighbor_score in rated_neighbors:
+            new_rpth = f"{reasoning_path} -> {relation} -> {neighbor}"
             if self.has_relation(
                graph=graph, 
-               entity=entity, 
+               entity=hub_node, 
                relation=relation,
                neighbor=neighbor
-            ):
-               paths.append((relation+neighbor, score))
+            ) and new_rpth not in seen_paths:            
                
-      paths = sorted(paths, key=lambda x: x[1], reverse=True)[:self.args.top_n]
+               if self.args.add_hop_information:
+                  #TODO using vectorspace to store the embeddings, otherwise the efficiency is pretty low
+                  # 1-hop neighbors = relation + neighbor
+                  one_hop_relations, one_hop_neighbors = self.get_entity_edges(neighbor, graph)
+                  texts = [keywords] + one_hop_relations + one_hop_neighbors
+                  embeddings = self.llm_backbone.get_embeddings(texts)
+                  one_hop_rated_relations, one_hop_rated_neighbors = self.get_relations_neighbors_set_with_ratings(one_hop_relations, one_hop_neighbors, embeddings)
+                  
+                  # score function for path_rag
+                  rpth_score = relation_score + neighbor_score + self.args.alpha * (one_hop_rated_relations[0][1] + one_hop_rated_neighbors[0][1])
+                  
+               else:
+                  rpth_score = relation_score + neighbor_score
+                  
+               rated_paths.append((new_rpth, rpth_score))
+               seen_paths.append(new_rpth)
+               
+      rated_paths = sorted(rated_paths, key=lambda x: x[1], reverse=True)[:self.args.top_n]
+      
+      # only return the path
+      paths = [path[0] for path in rated_paths]
             
       return paths
    
-   
    def get_path(
       self, 
-      entity: str,
-      graph: nx.Graph,
-      query: str
+      state: dict
    ) -> list:
       """
-      given a starting entity, find top-k one-step path to the query
+      given a starting entity, find top-k one-step path to the query (keywords)
       """
-      relations, neighbors = self.get_entity_edges(entity, graph)
+      graph = state.get("graph", nx.Graph())
+      keywords = state.get("key_words", "") # using the keywords generated from llm to represent the query
+      reasoning_path = state.get("rpth", "")
+      
+      hub_node = reasoning_path.split(" -> ")[-1]
+      
+      relations, neighbors = self.get_entity_edges(hub_node, graph)
       
       # get embeddings
-      texts = [query] + relations + neighbors
+      texts = [keywords] + relations + neighbors
       embeddings = self.llm_backbone.get_embeddings(texts)
       
       # get relations and neighbors with the corresponding ratings
       rated_relations, rated_neighbors = self.get_relations_neighbors_set_with_ratings(relations, neighbors, embeddings)
-      
-      # if self.args.hop_information:
-      #    for neighbor in neighbors:
-      #       one_hop_relations, one_hop_neighbors = self.get_entity_edges(neighbor, graph)
-      #       texts = [query] + one_hop_relations + one_hop_neighbors
-      #       embeddings = self.llm_backbone.get_embeddings(texts)
-      #       rated__one_hop_relations, rated_one_hop_neighbors = self.get_relations_neighbors_set_with_ratings(one_hop_relations, one_hop_neighbors, embeddings)
-         
-      # top-k scoring paths
-      paths = self.scoring_path(entity, graph, rated_relations, rated_neighbors)
+               
+      # top-n scoring paths
+      paths = self.scoring_path(keywords=keywords, reasoning_path=reasoning_path, rated_relations=rated_relations, rated_neighbors=rated_neighbors, hub_node=hub_node, graph=graph)
       
       return paths
-   
+
    
 # import unittest
 # import networkx as nx
