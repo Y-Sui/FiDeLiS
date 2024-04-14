@@ -6,7 +6,7 @@ import time
 import networkx as nx
 from tqdm import tqdm
 from openai import OpenAI
-from litellm import completion, embedding, batch_completion # import litellm for calling multiple llms using the same input/output format 
+from litellm import completion, embedding, batch_completion # import litellm for calling multiple llms using the same input/output format
 
 
 class LLM_Backbone():
@@ -254,6 +254,7 @@ class Path_RAG():
       
       relations, neighbors = self.get_entity_edges(hub_node, graph)
       
+      #TODO load the embeddings from the vectorspace
       # get embeddings
       texts = [keywords] + relations + neighbors
       embeddings = self.llm_backbone.get_embeddings(texts)

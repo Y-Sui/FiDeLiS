@@ -199,7 +199,7 @@ class LLM_Navigator():
       pred_list_llm_reasoning = []
       reasoning_path_list = []
       ground_reasoning_path_list = data['ground_paths'] # shortest reasoning paths from q_entity to a_entity
-      llm_states = {} #TODO modify the agentstate to store the states of the llm
+      llm_states = {}
       llm_states["question"] = question
       llm_states["hop"] = hop
       llm_states["graph"] = graph
