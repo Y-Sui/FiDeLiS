@@ -35,6 +35,7 @@ def prepare_dataset(sample):
       ground_paths.add(tuple([p[1] for p in path]))  # extract relation path
    sample["ground_paths"] = list(ground_paths) # [list(p) for p in ground_paths], [[], [], ...]
    sample["hop"] = len(list(ground_paths)[0])
+
    return sample
 
 
