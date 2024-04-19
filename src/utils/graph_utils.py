@@ -6,10 +6,10 @@ import walker
 
 
 def build_graph(graph: list) -> nx.Graph:
-    G = nx.Graph()
+    G = nx.DiGraph()
     for triplet in graph:
         h, r, t = triplet
-        G.add_edge(h, t, relation=r.strip())
+        G.add_edge(h.strip(), t.strip(), relation=r.strip())
     return G
 
 

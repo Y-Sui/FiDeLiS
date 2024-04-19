@@ -1,2 +1,0 @@
-Starting job on 2 A100 GPUs in the Conda environment
-Save results to:  results/gen_rule_path/RoG-webqsp/RoG/test
