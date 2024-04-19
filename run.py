@@ -107,6 +107,7 @@ def main(args):
          # Using list to consume the results as they come in for tqdm to track
          executor.map(init_embedding, dataset)
       print("Embedding completed!")
+      return
    
    # sample the dataset
    if args.sample != -1:
