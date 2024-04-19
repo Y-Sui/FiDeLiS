@@ -1,0 +1,3974 @@
+[
+  {
+    "id": "C1",
+    "query": "Naďa Hejná spent all her life as a single bachelor.",
+    "answer": false,
+    "KG Entities": {
+      "Naďa Hejná": "Q12772348"
+    },
+    "Inference Rule": "There must be no evidence of Naďa Hejná's marriage if she lived as a bachelor her whole life.",
+    "KG Triples": "1- (Naďa Hejná, spouse, Vít Hejný)",
+    "Reasoning Steps": [
+      {
+        "Step": "BNaďa Hejná was married to Vít Hejnýe.",
+        "facts used in this step": [
+          "1- (Naďa Hejná, spouse, Vít Hejný)"
+        ]
+      },
+      {
+        "step": "Since Naďa Hejná was married, she did not live as a single bachelor her whole life, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "definition"
+    ]
+  },
+  {
+    "id": "C2",
+    "query": "No voice actors or actresses sang in the Summer of Old Times.",
+    "answer": false,
+    "KG Entities": {
+      "Summer of Old Times": "Q1475856"
+    },
+    "Inference Rule": "Summer of Old Times must have not been a musical film to have no actors or actresses singning in it.",
+    "KG Triples": "1- (Summer of Old Times, instance of, musical film)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Summer of Old Times was a musical film.",
+        "facts used in this step": [
+          "(Summer of Old Times, instance of, musical film)"
+        ]
+      },
+      {
+        "step": "Since Summer of Old Times was a musical film, there were voice actors or actresses singing in it, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "entertainment",
+      "definition"
+    ]
+  },
+  {
+    "id": "C3",
+    "query": "Daniel Rapant became a police officer that shot and killed a man.",
+    "answer": false,
+    "KG Entities": {
+      "Daniel Rapant": "Q11774234"
+    },
+    "Inference Rule": "There must be an evidence of Daniel Rapant being a killer to make the claim true.",
+    "KG Triples": "1- (Daniel Rapant, occuption, archivist), 2- (Daniel Rapant, occuption, pedagogue), 3- (Daniel Rapant, occuption, historian)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on triples 1, 2 and 3, Daniel Rapant was an archivist, pedagogue and historian.",
+        "facts used in this step": [
+          "(Daniel Rapant, occuption, archivist)",
+          "(Daniel Rapant, occuption, pedagogue)",
+          "(Daniel Rapant, occuption, historian)"
+        ]
+      },
+      {
+        "step": "There are no evidence of Daniel Rapant being a police officer or a killer, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C4",
+    "query": "Zionism emerged before William Edward Collinson was born.",
+    "answer": true,
+    "KG Entities": {
+      "William Edward Collinson": "Q20723"
+    },
+    "Inference Rule": "The time of inception for Zionism must be earlier than the date of birth of William Edward Collinson to make the claim true.",
+    "KG Triples": "1- (Zionism, description, political movement for the establishment of a Jewish nation-state in the area of Palestine, since 1860), 2- (William Edward Collinson, date of birth, 4 January 1889)",
+    "Reasoning Steps": [
+      {
+        "Step": "Bsed on fact 1, Zionism emerged in 1860",
+        "facts used in this step": [
+          "(Zionism, description, political movement for the establishment of a Jewish nation-state in the area of Palestine, since 1860)"
+        ]
+      },
+      {
+        "step": "Based on fact 2, William Edward Collinson was born in 1889.",
+        "facts used in this step": [
+          "(William Edward Collinson, date of birth, 4 January 1889)"
+        ]
+      },
+      {
+        "step": "Since the date of birth of William Edward Collinson is after the time of inception for Zionism, the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning",
+      "historical"
+    ]
+  },
+  {
+    "id": "C5",
+    "query": "Nelson Dock Retaining Wall no longer exists.",
+    "answer": false,
+    "KG Entities": {
+      "Nelson Dock Retaining Wall": "Q26504580"
+    },
+    "Inference Rule": "There must be evidence of Nelson Dock Retaining Wall being dissolved or demolished to make the claim true.",
+    "KG Triples": "1- (Nelson Dock Retaining Wall, heritage designation, Grade II listed building{start time, 19 June 1985})",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Nelson Dock Retaining Wall is a Grade II listed building.",
+        "facts used in this step": [
+          "(Nelson Dock Retaining Wall, heritage designation, Grade II listed building{start time, 19 June 1985})"
+        ]
+      },
+      {
+        "step": "Since Nelson Dock Retaining Wall is a Grade II listed building and there is no evidence of it being dissolved or demolished, it still exists, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "definition",
+      "historical"
+    ]
+  },
+  {
+    "id": "C6",
+    "query": "Salvador Novo published books that focused on evolutionary biology.",
+    "answer": false,
+    "KG Entities": {
+      "Salvador Novo": "Q63667"
+    },
+    "Inference Rule": "Salvador Novo must have been active in the field of biology to make the claim true.",
+    "KG Triples": "1- (Salvador Novo, fields of work, poetry), 2- (Salvador Novo, fields of work, history of Mexico City), 3- (Salvador Novo, fields of work, satire), 4- (Salvador Novo, fields of work, theatre)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, 2, 3 and 4, Salvador Novo was active in the fields of poetry, history of Mexico City, satire and theatre.",
+        "facts used in this step": [
+          "(Salvador Novo, fields of work, poetry)",
+          "(Salvador Novo, fields of work, history of Mexico City)",
+          "(Salvador Novo, fields of work, satire)",
+          "(Salvador Novo, fields of work, theatre)"
+        ]
+      },
+      {
+        "step": "There are no evidence of Salvador Novo being active in the field of evolutionary biology, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "literature"
+    ]
+  },
+  {
+    "id": "C7",
+    "query": "One can watch Pamiętnik Chrumasa on the television.",
+    "answer": true,
+    "KG Entities": {
+      "Pamiętnik Chrumasa": "Q107379583"
+    },
+    "Inference Rule": "Pamiętnik Chrumasa must have been a television series or a program that is typically shown on television to make the claim true.",
+    "KG Triples": "1- (Pamiętnik Chrumasa, instance of, animated television series)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Pamiętnik Chrumasa is an animated television series.",
+        "facts used in this step": [
+          "(Pamiętnik Chrumasa, instance of, animated television series)"
+        ]
+      },
+      {
+        "step": "Since Aanimated television series are typically shown on television, the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "entertainment",
+      "definition"
+    ]
+  },
+  {
+    "id": "C8",
+    "query": "Some people study books about Xuanxue.",
+    "answer": true,
+    "KG Entities": {
+      "Xuanxue": "Q599057"
+    },
+    "Inference Rule": "Xuanxue must be a significant event, person, or concept for people to be likely to write books about it.",
+    "KG Triples": "1- (Xuanxue, instance of, philosophical movement)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Xuanxue is a philosophical movement.",
+        "facts used in this step": [
+          "(Xuanxue, instance of, philosophical movement)"
+        ]
+      },
+      {
+        "Step": "Since Xuanxue is a philosophical movement, it is a significant concept, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical",
+      "definition"
+    ]
+  },
+  {
+    "id": "C9",
+    "query": "Florencia Labat took a career in acting.",
+    "answer": false,
+    "KG Entities": {
+      "Florencia Labat": "Q455165"
+    },
+    "Inference Rule": "Florencia Labat's occupation must be an actor to make the claim true.",
+    "KG Triples": "1-(Florencia Labat, occupation, tennis player)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Florencia Labat was a tennis player.",
+        "facts used in this step": [
+          "(Florencia Labat, occupation, tennis player)"
+        ]
+      },
+      {
+        "Step": "There are no evidence of Florencia Labat being an actor, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C10",
+    "query": "Gurvansaikhan has many beaches to swim at.",
+    "answer": false,
+    "KG Entities": {
+      "Gurvansaikhan": "Q3404406"
+    },
+    "Inference Rule": "Gurvansaikhan must be located near a sea or a large body of water to have multiple beaches.",
+    "KG Triples": "1- (Gurvansaikhan, country, Mongolia)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Gurvansaikhan is located in Mongolia.",
+        "facts used in this step": [
+          "(Gurvansaikhan, country, Mongolia)"
+        ]
+      },
+      {
+        "Step": "Mongolia is a landlocked country, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "geographical"
+    ]
+  },
+  {
+    "id": "C11",
+    "query": "Jordan Motor Car Company no longer exists.",
+    "answer": true,
+    "KG Entities": {
+      "Jordan Motor Car Company": "Q1703639"
+    },
+    "Inference Rule": "There must be evidence of Jordan Motor Car Company being dissolved or demolished to make the claim true.",
+    "KG Triples": "1- (Jordan Motor Car Company, dissolved, abolished or demolished date, April 1931)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Jordan Motor Car Company was dissolved in April 1931, so the claim is true.",
+        "facts used in this step": [
+          "(Jordan Motor Car Company, dissolved, abolished or demolished date, April 1931)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical"
+    ]
+  },
+  {
+    "id": "C12",
+    "query": "The Laotian Civil War ended before Ahn Jung-hwan's birth.",
+    "answer": true,
+    "KG Entities": {
+      "Laotian Civil War": "Q877450",
+      "Ahn Jung-hwan": "Q313968"
+    },
+    "Inference Rule": "The end time of the Laotian Civil War must be earlier than the date of birth of Ahn Jung Hwan to make the claim true.",
+    "KG Triples": "1- (Laotian Civil War, end time, 2 December 1975), 2- (Ahn Jung-hwan, date of birth, 27 January 1976)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, the Laotian Civil War ended on 2 December 1975.",
+        "facts used in this step": [
+          "(Laotian Civil War, end time, 2 December 1975)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Ahn Jung-hwan was born on 27 January 1976.",
+        "facts used in this step": [
+          "(Ahn Jung-hwan, date of birth, 27 January 1976)"
+        ]
+      },
+      {
+        "Step": "Since the end time of the Laotian Civil War is earlier than the date of birth of Ahn Jung Hwan, the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "number comparison",
+      "historical"
+    ]
+  },
+  {
+    "id": "C13",
+    "query": "Vahdat hall and Roudaki hall are the same thing.",
+    "answer": true,
+    "KG Entities": {
+      "Vahdat Hall": "Q2389872",
+      "Roudaki Hall": "Q2389872"
+    },
+    "Inference Rule": "Vahdat Hall and Roudaki Hall must be two names of a same Hall to make the claim correct.",
+    "KG Triples": "1- (Vahdat Hall, also known as, Roudaki Hall)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Vahdat Hall is also known as Roudaki Hall, so the claim is true.",
+        "facts used in this step": [
+          "(Vahdat Hall, also known as, Roudaki Hall)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C14",
+    "query": "A boulevard is likely to be found in Aruppukkottai.",
+    "answer": true,
+    "KG Entities": {
+      "Aruppukkottai": "Q584327"
+    },
+    "Inference Rule": "Aruppukkottai must be an urban area to be likely to include a boulevard.",
+    "KG Triples": "1- (Aruppukkottai, instance of, town)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Aruppukkottai is a town.",
+        "facts used in this step": [
+          "(Aruppukkottai, instance of, town)"
+        ]
+      },
+      {
+        "Step": "Towns are urban areas, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "geographical",
+      "physical"
+    ]
+  },
+  {
+    "id": "C15",
+    "query": "Sanaa Atabrour has proved that girls are unable to participate in martial arts.",
+    "answer": false,
+    "KG Entities": {
+      "Sanaa Atabrour": "Q541735"
+    },
+    "Inference Rule": "Sanaa Atabrour must have not been a female martial artist herself and have taked a specific action to prove that girls are unable to participate in martial arts.",
+    "KG Triples": "1- (Sanaa Atabrour, occupation, taekwondo athlete), 2- (Sanaa Atabrour, sex or gender, female)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Sanaa Atabrour was a taekwondo athlete.",
+        "facts used in this step": [
+          "(Sanaa Atabrour, occupation, taekwondo athlete)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Sanaa Atabrour was a female.",
+        "facts used in this step": [
+          "(Sanaa Atabrour, sex or gender, female)"
+        ]
+      },
+      {
+        "Step": "Taekwondo is a martial art."
+      },
+      {
+        "step": "Since Sanaa Atabrour herself was a female martial artist, she disproved that girls are unable to participate in martial arts, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "sports"
+    ]
+  },
+  {
+    "id": "C16",
+    "query": "Anita Reniers plays hockey for the French national team.",
+    "answer": false,
+    "KG Entities": {
+      "Anita Reniers": "Q19950535"
+    },
+    "Inference Rule": "Anita Reniers must have been a professional hockey player and have French nationality to be able to play in French ice hockey team.",
+    "KG Triples": "1- (Anita Reniers, sport, taekwondo)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Anita Reniers was a taekwondo athlete.",
+        "facts used in this step": [
+          "(Anita Reniers, sport, taekwondo)"
+        ]
+      },
+      {
+        "Step": "Since Anita Reniers was not a hockey player, she could not play for the French national hockey team, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "sports"
+    ]
+  },
+  {
+    "id": "C17",
+    "query": "Guido Tarlati released a best-selling song in 2015.",
+    "answer": false,
+    "KG Entities": {
+      "Guido Tarlati": "Q378128"
+    },
+    "Inference Rule": "Guido Tarlati must have been alive in 2015 and be a professional singer for him to be likely to release a best selling song then.",
+    "KG Triples": "1- (Guido Tarlati, date of death, 21 October 1327)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Guido Tarlati died in 1327.",
+        "facts used in this step": [
+          "(Guido Tarlati, date of death, 21 October 1327)"
+        ]
+      },
+      {
+        "step": "Since Guido Tarlati was not alive in 2015, he couldn't release a best-selling song then, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning",
+      "music"
+    ]
+  },
+  {
+    "id": "C18",
+    "query": "Ya'qub ibn al-Layth al-Saffar ruled over Afghanistan during a part of the 9th century.",
+    "answer": true,
+    "KG Entities": {
+      "Ya'qub ibn al-Layth al-Saffar": "Q45261"
+    },
+    "Inference Rule": "Ya'qub ibn al-Layth al-Saffar must have been the king of Afghanistan during a part of the 9th century to make the claim correct.",
+    "KG Triples": "1- (Ya'qub ibn al-Layth al-Saffar, description, Founder of the Saffarid dynasty at Zaranj in what is now Afghanistan)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Ya'qub ibn al-Layth al-Saffar was the founder of the Saffarid dynasty at Zaranj in what is now Afghanistan, so the claim is true.",
+        "facts used in this step": [
+          "(Ya'qub ibn al-Layth al-Saffar, description, Founder of the Saffarid dynasty at Zaranj in what is now Afghanistan)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical",
+      "geographical"
+    ]
+  },
+  {
+    "id": "C19",
+    "query": "Carmelo Buonocore spent most of his career in Milan.",
+    "answer": true,
+    "KG Entities": {
+      "Carmelo Buonocore": "Q1487652"
+    },
+    "Inference Rule": "Carmelo Buonocore must have been a member of a team based in Milan during a majority of his career to make the claim correct.",
+    "KG Triples": "1- (Carmelo Buonocore, member of sports team, Inter Milan {start time: 1936, end time: 1945}), 2- (Carmelo Buonocore, member of sports team, U.S. Palmese 1912 {start time: 1933, end time: 1934}]), 3- (Carmelo Buonocore, member of sports team, A.C.R. Messina {start time: 1934, end time: 1936}), 4- (Carmelo Buonocore, member of sports team, Calcio Lecco 1912 {start time: 1945, end time: 1947}), 5- (Carmelo Buonocore, member of sports team, Unione Sportiva Peloro {start time: 1929, end time: 1933}), 6- (Inter Milan, description, association football club in Milan, Italy)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on triple 1, Carmelo Buonocore was a member of Inter Milan from 1936 to 1945.",
+        "facts used in this step": [
+          "(Carmelo Buonocore, member of sports team, Inter Milan {start time: 1936, end time: 1945})"
+        ]
+      },
+      {
+        "Step": "Based on triple 2, Carmelo Buonocore was a member of U.S. Palmese 1912 from 1933 to 1934.",
+        "facts used in this step": [
+          "(Carmelo Buonocore, member of sports team, U.S. Palmese 1912 {start time: 1933, end time: 1934})"
+        ]
+      },
+      {
+        "Step": "Based on triple 3, Carmelo Buonocore was a member of A.C.R. Messina from 1934 to 1936.",
+        "facts used in this step": [
+          "(Carmelo Buonocore, member of sports team, A.C.R. Messina {start time: 1934, end time: 1936})"
+        ]
+      },
+      {
+        "Step": "Based on triple 4, Carmelo Buonocore was a member of Calcio Lecco 1912 from 1945 to 1947.",
+        "facts used in this step": [
+          "(Carmelo Buonocore, member of sports team, Calcio Lecco 1912 {start time: 1945, end time: 1947})"
+        ]
+      },
+      {
+        "Step": "Based on triple 5, Carmelo Buonocore was a member of Unione Sportiva Peloro from 1929 to 1933.",
+        "facts used in this step": [
+          "(Carmelo Buonocore, member of sports team, Unione Sportiva Peloro {start time: 1929, end time: 1933})"
+        ]
+      },
+      {
+        "Step": "The longest time Carmelo Buonocore was a member of a team was when he was a member of Inter Milan."
+      },
+      {
+        "Step": "Based on the tiple 6, Inter Milan is an association football club in Milan, Italy, so the claim is true.",
+        "facts used in this step": [
+          "(Inter Milan, description, association football club in Milan, Italy)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "geographical",
+      "sports"
+    ]
+  },
+  {
+    "id": "C20",
+    "query": "Renzo Burini wrote a great number of exceptional poems.",
+    "answer": false,
+    "KG Entities": {
+      "Renzo Burini": "Q1487896"
+    },
+    "Inference Rule": "Renzo Burini must have been a poet to make the claim correct.",
+    "KG Triples": "1- (Renzo Burini, occupation, association football player), 2- (Renzo Burini, occupation, association football manager)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, 2, Renzo Burini was a football player and a football manager.",
+        "facts used in this step": [
+          "(Renzo Burini, occupation, association football player)",
+          "(Renzo Burini, occupation, association football manager)"
+        ]
+      },
+      {
+        "Step": "There are no evidence of Renzo Burini being a poet, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "literature"
+    ]
+  },
+  {
+    "id": "C21",
+    "query": "Giovanni Battista Casti's works may be influenced by Maria Grazia Lenisa's poems.",
+    "answer": false,
+    "KG Entities": {
+      "Giovanni Battista Casti": "Q251926",
+      "Maria Grazia Lenisa": "Q105393510"
+    },
+    "Inference Rule": "Giovanni Battista Casti must have written her poems after Maria Grazia Lenisa to be possible to be influenced by her poems.",
+    "KG Triples": "1- (Giovanni Battista Casti, date of death, 5 February 1803), 2- (Maria Grazia Lenisa, date of birth, 1935)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Giovanni Battista Casti died in 1803.",
+        "facts used in this step": [
+          "(Giovanni Battista Casti, date of death, 5 February 1803)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Maria Grazia Lenisa was born in 1935.",
+        "facts used in this step": [
+          "(Maria Grazia Lenisa, date of birth, 1935)"
+        ]
+      },
+      {
+        "Step": "Giovanni Battista Casti before Maria Grazia Lenisa was born, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning",
+      "literature"
+    ]
+  },
+  {
+    "id": "C22",
+    "query": "It is likely for people to to watch Chez le prof. Pierre in a movie theater.",
+    "answer": false,
+    "KG Entities": {
+      "Chez le prof. Pierre": "Q2963183"
+    },
+    "Inference Rule": "Chez le prof. Pierre must have been a movie for people to be likely to watch it in a movie theater.",
+    "KG Triples": "1- (Chez le prof. Pierre, instance of, album)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Chez le prof. Pierre is an album.",
+        "facts used in this step": [
+          "(Chez le prof. Pierre, instance of, album)"
+        ]
+      },
+      {
+        "Step": "Albums are not movies, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "entertainment",
+      "music"
+    ]
+  },
+  {
+    "id": "C23",
+    "query": "William Jaya Kusli practiced Islam fervently and has partaken in various jihads.",
+    "answer": false,
+    "KG Entities": {
+      "William Jaya Kusli": "Q108896582"
+    },
+    "Inference Rule": "William Jaya Kusli's religion must have been Islam and there must be evidence of him participating in Jihads to make the claim correct.",
+    "KG Triples": "1- (William Jaya Kusli, religion or worldview, Buddhism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, William Jaya Kusli's religion was Buddhism.",
+        "facts used in this step": [
+          "(William Jaya Kusli, religion or worldview, Buddhism)"
+        ]
+      },
+      {
+        "Step": "There are no evidence of William Jaya Kusli being Muslim or participating in Jihads, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "religious"
+    ]
+  },
+  {
+    "id": "C24",
+    "query": "Volker Zotz has a lot of popular songs he sings.",
+    "answer": false,
+    "KG Entities": {
+      "Volker Zotz": "Q84207"
+    },
+    "Inference Rule": "Volker Zotz must have been a popular singer to make the claim correct.",
+    "KG Triples": "1- (Volker Zotz, occupation, philosopher), 2- (Volker Zotz, occupation, lecturer) , 3- (Volker Zotz, occupation, writer) , 4- (Volker Zotz, occupation, university teacher) , 5- (Volker Zotz, occupation, historian of religion)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, 2, 3, 4, 5, Volker Zotz was a philosopher, lecturer, writer, university teacher and historian of religion.",
+        "facts used in this step": [
+          "(Volker Zotz, occupation, philosopher)",
+          "(Volker Zotz, occupation, lecturer)",
+          "(Volker Zotz, occupation, writer)",
+          "(Volker Zotz, occupation, university teacher)",
+          "(Volker Zotz, occupation, historian of religion)"
+        ]
+      },
+      {
+        "Step": "There are no evidence of Volker Zotz being a singer, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "music",
+      "literature"
+    ]
+  },
+  {
+    "id": "C25",
+    "query": "Alfons T'Kint played football during his career.",
+    "answer": true,
+    "KG Entities": {
+      "Alfons T'Kint": "Q2915977"
+    },
+    "Inference Rule": "Alfons T'Kint must have been a professional football player in part of his professional life to make the claim correct.",
+    "KG Triples": "1- (Alfons T'Kint, occupation, association football player)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Alfons T'Kint was a professional football player, so the claim is true.",
+        "facts used in this step": [
+          "(Alfons T'Kint, occupation, association football player)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "sports"
+    ]
+  },
+  {
+    "id": "C26",
+    "query": "Nights grow longer during the season in which Nika Shakarami was born.",
+    "answer": true,
+    "KG Entities": {
+      "Nika Shakarami": "Q114357437"
+    },
+    "Inference Rule": "Nika Shakarami's date of birth must have been after the Summer solstice and before the Winter solstice to make the claim correct.",
+    "KG Triples": "1- (Nika Shakarami, date of birth, 2 October 2005)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Nika Shakarami was born on 2 October 2005.",
+        "facts used in this step": [
+          "(Nika Shakarami, date of birth, 2 October 2005)"
+        ]
+      },
+      {
+        "step": "2 October is after the Summer solstice and before the Winter solstice, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning"
+    ]
+  },
+  {
+    "id": "C27",
+    "query": "Pavlo Khazan is a member of the parliament of his homeland country.",
+    "answer": true,
+    "KG Entities": {
+      "Pavlo Khazan": "Q45088"
+    },
+    "Inference Rule": "Pavlo Khazan must be a member of a legislative organization in the same place that he was born in to make the claim correct.",
+    "KG Triples": "1- (Pavlo Khazan, place of birth, Dnipro), 2- (Pavlo Khazan, occupation, deputy {employer, Dnipropetrovsk Oblast Council}), 3- (Dnipropetrovsk Oblast Council, description, legislature of Dnipropetrovsk Oblast, Ukraine), 4- (Dnipro, instance of, centre of oblast)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Pavlo Khazan was born in Dnipro.",
+        "facts used in this step": [
+          "(Pavlo Khazan, place of birth, Dnipro)"
+        ]
+      },
+      {
+        "step": "Based on the triple 4, Dnipro is the centre of oblast.",
+        "facts used in this step": [
+          "(Dnipro, instance of, centre of oblast)"
+        ]
+      },
+      {
+        "step": "Based on the triple 2, Pavlo Khazan was a deputy of the Dnipropetrovsk Oblast Council",
+        "facts used in this step": [
+          "(Pavlo Khazan, occupation, deputy {employer, Dnipropetrovsk Oblast Council})"
+        ]
+      },
+      {
+        "step": "Based on the triple 3, Dnipropetrovsk Oblast Council is a legislature organization in Dnipropetrovsk Oblast, and since Pavlo Khazan was born in Oblast, Ukranie, he is a member of the parliament of his homeland country.",
+        "facts used in this step": [
+          "(Dnipropetrovsk Oblast Council, description, legislature of Dnipropetrovsk Oblast, Ukraine)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "geographical",
+      "political"
+    ]
+  },
+  {
+    "id": "C28",
+    "query": "Benedetta Maroni is likely to have experienced menopause by the year 2060.",
+    "answer": true,
+    "KG Entities": {
+      "Benedetta Maroni": "Q105721810"
+    },
+    "Inference Rule": "Benedetta Maroni must be a woman and be older than 45 to be likely to have experienced menopause by 2060.",
+    "KG Triples": "1- (Benedetta Maroni, sex or gender, female), 2- (Benedetta Maroni, date of birth, 21 April 2002)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Benedetta Maroni is a female person",
+        "facts used in this step": [
+          "(Benedetta Maroni, sex or gender, female)"
+        ]
+      },
+      {
+        "step": "Based on the tiple 2, Benedetta Maroni was born on 21 April 2002.",
+        "facts used in this step": [
+          "(Benedetta Maroni, date of birth, 21 April 2002)"
+        ]
+      },
+      {
+        "step": "Benedetta Maroni will be 58 years old in 2060, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning",
+      "medical",
+      "number comparison"
+    ]
+  },
+  {
+    "id": "C29",
+    "query": "IKCO Samand uses friction to brake or slow down to come to a stop.",
+    "answer": true,
+    "KG Entities": {
+      "IKCO Samand": "Q677378"
+    },
+    "Inference Rule": "IKCO Samand must be a vehicle to make the claim correct.",
+    "KG Triples": "1- (IKCO Samand, instance of, automobile model)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, IKCO Samand is an automobile model.",
+        "facts used in this step": [
+          "(IKCO Samand, instance of, automobile model)"
+        ]
+      },
+      {
+        "step": "Automobiles are vehicles so the claim is correct."
+      }
+    ],
+    "Reasoning Strategy": [
+      "physical"
+    ]
+  },
+  {
+    "id": "C30",
+    "query": "Tibor Bártfay descended from a Scottish physicist.",
+    "answer": false,
+    "KG Entities": {
+      "Tibor Bártfay": "Q12058940"
+    },
+    "Inference Rule": "Tibor Bártfay's father must have been a Scottish physicist to make the claim true.",
+    "KG Triples": "1- (Tibor Bártfay, father, Július Bártfay), 2- (Július Bártfay, country of citizenship, Hungary)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Tibor Bártfay's father was Július Bártfay}",
+        "facts used in this step": [
+          "(Tibor Bártfay, father, Július Bártfay)"
+        ]
+      },
+      {
+        "step": "Based on the tiple 2, Július Bártfay was a Hungarian citizen, so the claim is false.",
+        "facts used in this step": [
+          "(Július Bártfay, country of citizenship, Hungary)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical",
+      "definition",
+      "geographical"
+    ]
+  },
+  {
+    "id": "C31",
+    "query": "It is very likely that Arnold Lazarus was aware of who Sigmund Freud was.",
+    "answer": true,
+    "KG Entities": {
+      "Arnold Lazarus": "Q694785",
+      "Sigmund Freud": "Q9215"
+    },
+    "Inference Rule": "Arnold Lazarus must have been familiar with the field that Sigmond Freud is a significant person in it to make the claim correct.",
+    "KG Triples": "1- (Arnold Lazarus, occupation, psychologist), 2- (Sigmund Freud, description, Austrian neurologist and founder of psychoanalysis (1856–1939))",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Arnold Lazarus was a psychologist",
+        "facts used in this step": [
+          "(Arnold Lazarus, occupation, psychologist)"
+        ]
+      },
+      {
+        "step": "Based on the tiple 2, Sigmund Freud was the founder of psychoanalysis.",
+        "facts used in this step": [
+          "(Sigmund Freud, description, Austrian neurologist and founder of psychoanalysis (1856–1939))"
+        ]
+      },
+      {
+        "step": "Since Arnold Lazarus was a psychologist, it is very likely that he was aware of who Sigmund Freud was, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "historical"
+    ]
+  },
+  {
+    "id": "C32",
+    "query": "Lake Urmia ceases to exist because of drought.",
+    "answer": false,
+    "KG Entities": {
+      "Urmia Lake": "Q199551"
+    },
+    "Inference Rule": "There must be evidence of Urmia Lake being completely dried to make the claim correct.",
+    "KG Triples": "1- (Urmia Lake, area, 5,200 square kilometre)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Urmia Lake has an area of 5,200 square kilometre, so it has not dried yet and the claim is false.",
+        "facts used in this step": [
+          "(Urmia Lake, area, 5,200 square kilometre)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "geographical",
+      "physical"
+    ]
+  },
+  {
+    "id": "C33",
+    "query": "Nancy Chodorow acted in many movies and won an Oscar.",
+    "answer": false,
+    "KG Entities": {
+      "Nancy Chodorow": "Q598648"
+    },
+    "Inference Rule": "Nancy Chodorow must have been an actress to make the claim correct.",
+    "KG Triples": "1- (Nancy Chodorow, occupation, psychologist), 2- (Nancy Chodorow, occupation, writer), 3- (Nancy Chodorow, occupation, sociologist)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, 2, 3, Nancy Chodorow was a psychologist, writer and sociologist.",
+        "facts used in this step": [
+          "(Nancy Chodorow, occupation, psychologist)",
+          "(Nancy Chodorow, occupation, writer)",
+          "(Nancy Chodorow, occupation, sociologist)"
+        ]
+      },
+      {
+        "step": "There are no evidence of Nancy Chodorow being an actress, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entertainment"
+    ]
+  },
+  {
+    "id": "C34",
+    "query": "The political ideologies of the Fuerza Nacional and the Tudeh Party of Iran go hand in hand.",
+    "answer": false,
+    "KG Entities": {
+      "Fuerza Nacional": "Q80685471",
+      "Tudeh Party of Iran": "Q1339294"
+    },
+    "Inference Rule": "The political ideologies of Fuerza Nacional and the Tudeh party of Iran must be the same to make the claim correct.",
+    "KG Triples": "1- (Fuerza Nacional, political ideology, anti-communism), 2- (Tudeh Party of Iran, political ideology, communism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, Fuerza Nacional's political ideology is anti-communism.",
+        "facts used in this step": [
+          "(Fuerza Nacional, political ideology, anti-communism)"
+        ]
+      },
+      {
+        "Step": "Based on the tiples 2, Tudeh Party of Iran's political ideology is communism.",
+        "facts used in this step": [
+          "(Tudeh Party of Iran, political ideology, communism)"
+        ]
+      },
+      {
+        "step": "The political ideology of Fuerza Nacional and the Tudeh Party of Iran are not the same, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C35",
+    "query": "Michael Seymour could have taken part in Moba Wars.",
+    "answer": false,
+    "KG Entities": {
+      "Michael Seymour": "Q338366",
+      "Moba Wars": "Q68718107"
+    },
+    "Inference Rule": "Michael Seymour must have been alive in the year Moba Wars took place to be able to have participated in it.",
+    "KG Triples": "1- (Michael Seymour, date of death, 23 February 1887), 2- (Moba Wars, start time, 1984)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Michael Seymour died in 1887.",
+        "facts used in this step": [
+          "(Michael Seymour, date of death, 23 February 1887)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Moba Wars started in 1984.",
+        "facts used in this step": [
+          "(Moba Wars, start time, 1984)"
+        ]
+      },
+      {
+        "step": "Since Moba wars began after Michael Seymour's death, he couldn't participate in it, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning",
+      "historical"
+    ]
+  },
+  {
+    "id": "C36",
+    "query": "Martin Slobodník is likely to contest in the next presidential elections in Alajos Mészáros's homeland.",
+    "answer": false,
+    "KG Entities": {
+      "Martin Slobodník": "Q13441443",
+      "Alajos Mészáros": "Q11684841"
+    },
+    "Inference Rule": "Martin Slobodník must be alive and have the same nationality as Alajos Mészáros to make the claim correct.",
+    "KG Triples": "1- (Martin Slobodník, date of death, 14 April 2019)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Martin Slobodník died in 2019, so the claim is false.",
+        "facts used in this step": [
+          "(Martin Slobodník, date of death, 14 April 2019)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning",
+      "political"
+    ]
+  },
+  {
+    "id": "C37",
+    "query": "Nodar Khashba and Margaret Thatcher held the same position but in different times and locations.",
+    "answer": true,
+    "KG Entities": {
+      "Nodar Khashba": "Q4496777",
+      "Margaret Thatcher": "Q7416"
+    },
+    "Inference Rule": "The positions that Nodar Khashba and Margaret Thatcher held must have been the same, but be located in different countries to make the claim correct.",
+    "KG Triples": "1- (Nodar Khashba, position held, Prime Minister of Abkhazia), 2- (Margaret Thatcher, position held, Prime Minister of the United Kingdom)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Nodar Khashba was the Prime Minister of Abkhazia",
+        "facts used in this step": [
+          "(Nodar Khashba, position held, Prime Minister of Abkhazia)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Margaret Thatcher was the Prime Minister of the United Kingdom",
+        "facts used in this step": [
+          "(Margaret Thatcher, position held, Prime Minister of the United Kingdom)"
+        ]
+      },
+      {
+        "step": "The positions that Nodar Khashba and Margaret Thatcher held were the same, but they were located in different countries, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "geographical",
+      "entity comparison",
+      "temporal reasoning"
+    ]
+  },
+  {
+    "id": "C38",
+    "query": "Martina Di Bari mostly uses her foot when doing her job.",
+    "answer": true,
+    "KG Entities": {
+      "Martina Di Bari": "Q63248967"
+    },
+    "Inference Rule": "Martina Di Bari's occupation must involve extensive use of foot to make the claim correct.",
+    "KG Triples": "1- (Martina Di Bari, occupation, association football player)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Martina Di Bari was an association football player.",
+        "facts used in this step": [
+          "(Martina Di Bari, occupation, association football player)"
+        ]
+      },
+      {
+        "step": "Association football is a sport that involves extensive use of foot, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "sports"
+    ]
+  },
+  {
+    "id": "C39",
+    "query": "Elizabeth Kaeton typically had to go to work on Sundays.",
+    "answer": true,
+    "KG Entities": {
+      "Elizabeth Kaeton": "Q1331240"
+    },
+    "Inference Rule": "Elizabeth Kaeton must have an occupation that is required to work on Sundays to make the claim correct.",
+    "KG Triples": "1- (Elizabeth Kaeton, occupation, priest)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Elizabeth Kaeton was a priest.",
+        "facts used in this step": [
+          "(Elizabeth Kaeton, occupation, priest)"
+        ]
+      },
+      {
+        "step": "Priests typically have to work on Sundays, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "religious"
+    ]
+  },
+  {
+    "id": "C40",
+    "query": "Maria Adeodata Pisani's life spanned two centuries.",
+    "answer": false,
+    "KG Entities": {
+      "Adeodata Pisani": "Q281427"
+    },
+    "Inference Rule": "The dates of birth and death of Maria Adeodata Pisani must be in different centuries to make the claim correct.",
+    "KG Triples": "1- (Maria Adeodata Pisani, date of birth, 29 December 1806), 2- (Maria Adeodata Pisani, date of death, 25 February 1855)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Maria Adeodata Pisani was born on 29 December 1806",
+        "facts used in this step": [
+          "(Maria Adeodata Pisani, date of birth, 29 December 1806)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Maria Adeodata Pisani died on 25 February 1855.",
+        "facts used in this step": [
+          "(Maria Adeodata Pisani, date of death, 25 February 1855)"
+        ]
+      },
+      {
+        "step": "The dates of birth and death of Maria Adeodata Pisani were in the same century, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning"
+    ]
+  },
+  {
+    "id": "C41",
+    "query": "Francesco Totti and Ilary Blasi are experiencing a successful marriage.",
+    "answer": false,
+    "KG Entities": {
+      "Francesco Totti": "Q20110",
+      "Ilary Blasi": "Q287186"
+    },
+    "Inference Rule": "There must be no evidence of Francesco Totti and Ilary Blasi's romantic relationship to have ended to make the claim correct.",
+    "KG Triples": "1- (Francesco Totti, spouse, Ilary Blasi {end time, 2022})",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Francesco Totti and Ilary Blasi's romantic relationship ended in 2022, so the claim is false.",
+        "facts used in this step": [
+          "(Francesco Totti, spouse, Ilary Blasi {end time, 2022})"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "cultural"
+    ]
+  },
+  {
+    "id": "C42",
+    "query": "Emmanuel Paman has likely participated in the Río de la Plata Challenger.",
+    "answer": false,
+    "KG Entities": {
+      "Emmanuel Paman": "Q18747786",
+      "Río de la Plata Challenger": "Q3936244"
+    },
+    "Inference Rule": "Emmanuel Paman must be involved in the same sport as Río de la Plata Challenger for the claim to be likely true. ",
+    "KG Triples": "1- (Emmanuel Paman, sport, taekwondo), 2- (Río de la Plata Challenger, instance of, recurring tennis tournament)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Emmanuel Paman was a taekwondo athlete.",
+        "facts used in this step": [
+          "(Emmanuel Paman, sport, taekwondo)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Río de la Plata Challenger is a recurring tennis tournament.",
+        "facts used in this step": [
+          "(Río de la Plata Challenger, instance of, recurring tennis tournament)"
+        ]
+      },
+      {
+        "step": "Emmanuel Paman was a taekwondo athlete, and Río de la Plata Challenger is a recurring tennis tournament, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "sports",
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C43",
+    "query": "One can see the Alaviyan Dome and the Dome of Soltaniyeh at the same time.",
+    "answer": false,
+    "KG Entities": {
+      "Alaviyan Dome": "Q5910145",
+      "Dome of Soltaniyeh": "Q20645774"
+    },
+    "Inference Rule": "Alaviyan Dome and the Dome of Soltaniyeh must be located close to each other to make the claim correct.",
+    "KG Triples": "1- (Alaviyan Dome, location, Hamadan), 2- (Dome of Soltaniyeh, location, Soltaniyeh)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Alaviyan Dome is located in Hamadan.",
+        "facts used in this step": [
+          "(Alaviyan Dome, location, Hamadan)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Dome of Soltaniyeh is located in Soltaniyeh.",
+        "facts used in this step": [
+          "(Dome of Soltaniyeh, location, Soltaniyeh)"
+        ]
+      },
+      {
+        "step": "The locations of the Alaviyan Dome and the Dome of Soltaniyeh are different, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "geographical",
+      "physical"
+    ]
+  },
+  {
+    "id": "C44",
+    "query": "Iryna Antypenko may be the next president of Sergey Ryazansky's homeland.",
+    "answer": false,
+    "KG Entities": {
+      "Iryna Antypenko": "Q12078566",
+      "Sergey Ryazansky": "Q3329196"
+    },
+    "Inference Rule": "Iryna Antypenko must be alive and have the same country of citizenship as Sergey Ryazansky to make the claim correct.",
+    "KG Triples": "1- (Iryna Antypenko, country of citizenship, Ukraine), 2- (Sergey Ryazansky, country of citizenship, Russia)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Iryna Antypenko is a citizen of Ukraine.",
+        "facts used in this step": [
+          "(Iryna Antypenko, country of citizenship, Ukraine)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Sergey Ryazansky is a citizen of Russia.",
+        "facts used in this step": [
+          "(Sergey Ryazansky, country of citizenship, Russia)"
+        ]
+      },
+      {
+        "step": "The county of citizenship of Iryna Antypenko is different from the country of citizenship of Sergey Ryazansky, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "geographical"
+    ]
+  },
+  {
+    "id": "C45",
+    "query": "Rahi Mo'ayyeri died with no children.",
+    "answer": true,
+    "KG Entities": {
+      "Rahi Mo'ayyeri": "Q1533736"
+    },
+    "Inference Rule": "There must be no evidence of Rahi Mo'ayyeri having a child to make the claim correct.",
+    "KG Triples": "",
+    "Reasoning Steps": [
+      {
+        "Step": "There is no evidence of Rahi Mo'ayyeri having a child, so the claim is true.",
+        "facts used in this step": []
+      }
+    ],
+    "Reasoning Strategy": [
+      "cultural",
+      "historical"
+    ]
+  },
+  {
+    "id": "C46",
+    "query": "Park Hon-young didn't care about the Catholic Commandments.",
+    "answer": true,
+    "KG Entities": {
+      "Park Hon-young": "Q334297"
+    },
+    "Inference Rule": "Park Hon-young must have a religous belief other than Catholic christianity to make the claim correct.",
+    "KG Triples": "1- (Park Hon-young, religion or worldview, atheism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Park Hon-young was an atheist.",
+        "facts used in this step": [
+          "(Park Hon-young, religion or worldview, atheism)"
+        ]
+      },
+      {
+        "step": "Atheists do not care about the Catholic Commandments, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "religious",
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C47",
+    "query": "The only thing required to play Ahmed-Hasan Khokhar's favourite sport is a raquet.",
+    "answer": false,
+    "KG Entities": {
+      "Ahmed-Hasan Khokhar": "Q4695687"
+    },
+    "Inference Rule": "Ahmed-Hasan Khokhar's sport must not require any other equipment beyond a raquet.",
+    "KG Triples": "1- (Ahmed-Hasan Khokhar, occupation, tennis player)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Ahmed-Hasan Khokhar was a tennis player",
+        "facts used in this step": [
+          "(Ahmed-Hasan Khokhar, occupation, tennis player)"
+        ]
+      },
+      {
+        "step": "Tennis requires a ball and a court in addition to a raquet, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "sports",
+      "physical",
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C48",
+    "query": "Winning the US Open was likely one of the greatest professional achievments that Ankita Bhambri could dream of.",
+    "answer": true,
+    "KG Entities": {
+      "US Open": "Q123577",
+      "Ankita Bhambri": "Q4766071"
+    },
+    "Inference Rule": "US Open must be a notable tournament in the sport that Ankita Bhambri plays to make the claim correct.",
+    "KG Triples": "1- (US Open, description, annual Grand Slam tennis tournament in New York, United States), 2- (Ankita Bhambri, sport, tennis)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, US Open is a notable tennis tournament.",
+        "facts used in this step": [
+          "(US Open, description, annual Grand Slam tennis tournament in New York, United States)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Ankita Bhambri was a tennis player",
+        "facts used in this step": [
+          "(Ankita Bhambri, sport, tennis)"
+        ]
+      },
+      {
+        "step": "US Open is a notable tennis tournament, and Ankita Bhambri was a tennis player, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "sports",
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C49",
+    "query": "Hussein Ali Shido's party supported anti-capitalism.",
+    "answer": false,
+    "KG Entities": {
+      "Hussein Ali Shido": "Q5949730"
+    },
+    "Inference Rule": "The political ideology of Hussein Ali Shido's party must be in close alignment with communism and socialism.",
+    "KG Triples": "1- (Hussein Ali Shido, member of political party, United Somali Congress), 2- (United Somali Congress, political ideology, anti-communism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Hussein Ali Shido was a member of the United Somali Congress",
+        "facts used in this step": [
+          "(Hussein Ali Shido, member of political party, United Somali Congress)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, the political ideology of the United Somali Congress was anti-communism",
+        "facts used in this step": [
+          "(United Somali Congress, political ideology, anti-communism)"
+        ]
+      },
+      {
+        "step": "anti-communism is agains anti-capitalism, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "entity comparison",
+      "historical"
+    ]
+  },
+  {
+    "id": "C50",
+    "query": "Pindale Min's death was related to a pandemic disease.",
+    "answer": false,
+    "KG Entities": {
+      "Pindale Min": "Q3388649"
+    },
+    "Inference Rule": "There must be evidence showing that Pindale Min died due to a pandemic disease to make the claim correct.",
+    "KG Triples": "1- (Pindale Min, manner of death, homicide)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Pindale Min was killed, so the claim is false.",
+        "facts used in this step": [
+          "(Pindale Min, manner of death, homicide)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "medical",
+      "historical"
+    ]
+  },
+  {
+    "id": "C51",
+    "query": "It is logical to ask for cooking advice from María Mestayer.",
+    "answer": true,
+    "KG Entities": {
+      "María Mestayer": "Q11691157"
+    },
+    "Inference Rule": "María Mestayer must be a specialist in food or cooking to make the claim correct.",
+    "KG Triples": "1- (María Mestayer, occupation, cook)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, María Mestayer was a cook, so the claim is correct.",
+        "facts used in this step": [
+          "(María Mestayer, occupation, cook)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C52",
+    "query": "Oh Seong-ok's country is split to two East and West sovereign states.",
+    "answer": false,
+    "KG Entities": {
+      "Oh Seong-ok": "Q179633"
+    },
+    "Inference Rule": "Oh Seong-ok's country of citizenship must be widely known to be divided into eastern and western parts.",
+    "KG Triples": "1- (Oh Seong-ok, country of citizenship, South Korea)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Oh Seong-ok was a citizen of South Korea",
+        "facts used in this step": [
+          "(Oh Seong-ok, country of citizenship, South Korea)"
+        ]
+      },
+      {
+        "step": "Korean peninsula is split to North and South sovereign states, and South Korea is not divided into eastern and western parts, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "geographical",
+      "political"
+    ]
+  },
+  {
+    "id": "C53",
+    "query": "Yaroslav Fedoryshyn ceases to act in movies.",
+    "answer": true,
+    "KG Entities": {
+      "Yaroslav Fedoryshyn": "Q65211093"
+    },
+    "Inference Rule": "Yaroslav Fedoryshyn must have ended his career as an actor or have died to make the claim correct.",
+    "KG Triples": "1- (Yaroslav Fedoryshyn, date of death, 20 March 2020)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Yaroslav Fedoryshyn died in 2020, so the claim is true.",
+        "facts used in this step": [
+          "(Yaroslav Fedoryshyn, date of death, 20 March 2020)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning"
+    ]
+  },
+  {
+    "id": "C54",
+    "query": "Władysław Folkierski had likely learned the knowledge required to design suspension bridges.",
+    "answer": true,
+    "KG Entities": {
+      "Władysław Folkierski": "Q3215942"
+    },
+    "Inference Rule": "Władysław Folkierski must have studied civil engineering to learn the knowledge required for making suspension bridges.",
+    "KG Triples": "1- (Władysław Folkierski, occupation, engineer), 2- (Władysław Folkierski, occupation, engineer of the French Corps of Bridges and Roads)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, 2, Władysław Folkierski was an engineer, specifically an engineer of the French Corps of Bridges and Roads.",
+        "facts used in this step": [
+          "(Władysław Folkierski, occupation, engineer)",
+          "(Władysław Folkierski, occupation, engineer of the French Corps of Bridges and Roads)"
+        ]
+      },
+      {
+        "step": "Engineers of the French Corps of Bridges and Roads are likely to have learned the knowledge required to design suspension bridges, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "education"
+    ]
+  },
+  {
+    "id": "C55",
+    "query": "Konrad Banaszek made a living by fixing a lot of cars.",
+    "answer": false,
+    "KG Entities": {
+      "Konrad Banaszek": "Q52012532"
+    },
+    "Inference Rule": "Konrad Banaszek must have been a mechanic to make the claim correct.",
+    "KG Triples": "1- (Konrad Banaszek, occupation, physicist), 2- (Konrad Banaszek, occupation, university teacher)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, 2, Konrad Banaszek was a physicist and a university teacher.",
+        "facts used in this step": [
+          "(Konrad Banaszek, occupation, physicist)",
+          "(Konrad Banaszek, occupation, university teacher)"
+        ]
+      },
+      {
+        "step": "There is no evidence of Konrad Banaszek being a mechanic, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C56",
+    "query": "Nancy Makri performs in various concerts around the world.",
+    "answer": false,
+    "KG Entities": {
+      "Nancy Makri": "Q20675585"
+    },
+    "Inference Rule": "Nancy Makri must be a famous singer to make the claim correct.",
+    "KG Triples": "1- (Nancy Makri, occupation, physicist), 2- (Nancy Makri, occupation, chemist), 3- (Nancy Makri, occupation, university teacher)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, 2, 3, Nancy Makri was a physicist, chemist and a university teacher.",
+        "facts used in this step": [
+          "(Nancy Makri, occupation, physicist)",
+          "(Nancy Makri, occupation, chemist)",
+          "(Nancy Makri, occupation, university teacher)"
+        ]
+      },
+      {
+        "step": "There is no evidence of Nancy Makri being a singer, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "music"
+    ]
+  },
+  {
+    "id": "C57",
+    "query": "Peter Brimelow would support the \"black lives matter\".",
+    "answer": false,
+    "KG Entities": {
+      "Peter Brimelow": "Q7172964"
+    },
+    "Inference Rule": "Peter Brimelow must be a supporter of the black people's rights for him to be likely to support \"black lives matter\".",
+    "KG Triples": "1- (Peter Brimelow, political ideology, white supremacy)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Peter Brimelow's political ideology was white supremacy.",
+        "facts used in this step": [
+          "(Peter Brimelow, political ideology, white supremacy)"
+        ]
+      },
+      {
+        "step": "White supremacy is against supporting black people's rights, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "cultural"
+    ]
+  },
+  {
+    "id": "C58",
+    "query": "Marc de Cacqueray-Valménier has won awards for his work as a director.",
+    "answer": false,
+    "KG Entities": {
+      "Marc de Cacqueray-Valménier": "Q110007957"
+    },
+    "Inference Rule": "Marc de Cacqueray-Valménier must have been a director and won awards for his movies to make the statement correct.",
+    "KG Triples": "1- (Marc de Cacqueray-Valménier, occupation, political activist)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Marc de Cacqueray-Valménier was a political activist.",
+        "facts used in this step": [
+          "(Marc de Cacqueray-Valménier, occupation, political activist)"
+        ]
+      },
+      {
+        "step": "There is no evidence of Marc de Cacqueray-Valménier being a director, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entertainment"
+    ]
+  },
+  {
+    "id": "C59",
+    "query": "Victor Mermelstein treated people in Israel.",
+    "answer": true,
+    "KG Entities": {
+      "Victor Mermelstein": "Q96679554"
+    },
+    "Inference Rule": "Victor Mermelstein must have an occupation related to treating people such as being a nurse or a medical doctor for him to be likely to treat people in Israel.",
+    "KG Triples": "1- (Victor Mermelstein, residence, Petah Tikva), 2- (Victor Mermelstein, occupation, neurologist), 3- (Petah Tikva, country, Israel)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 2, Victor Mermelstein was a neurologist, which is an occupation related to treating people.",
+        "facts used in this step": [
+          "(Victor Mermelstein, occupation, neurologist)"
+        ]
+      },
+      {
+        "step": "Based on the tiple 1, Victor Mermelstein lived in Petah Tikva",
+        "facts used in this step": [
+          "(Victor Mermelstein, residence, Petah Tikva)"
+        ]
+      },
+      {
+        "step": "Based on the triple 3, Petah Tikva is located in Israel, so the claim is true.",
+        "facts used in this step": [
+          "(Petah Tikva, country, Israel)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "geographical"
+    ]
+  },
+  {
+    "id": "C60",
+    "query": "Javier Milei is likely to live in Argentina during 2024.",
+    "answer": true,
+    "KG Entities": {
+      "Javier Milei": "Q52395487"
+    },
+    "Inference Rule": "Javier Milei must be an Argentinian or have an occupation that forces him to live in Argentina to make the claim correct.",
+    "KG Triples": "1- (Javier Milei, description, economist, politician and president of Argentina since 2023)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Javier Milei is the president of Argentina since 2023.",
+        "facts used in this step": [
+          "(Javier Milei, description, economist, politician and president of Argentina since 2023)"
+        ]
+      },
+      {
+        "step": "The president of Argentina needs to reside in Argentina, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "geographical"
+    ]
+  },
+  {
+    "id": "C61",
+    "query": "Árpád Klatsmányi was likely to be aware of the second law of thermodynamics.",
+    "answer": true,
+    "KG Entities": {
+      "Árpád Klatsmányi": "Q1113547"
+    },
+    "Inference Rule": "Árpád Klatsmányi must be familiar with thermodynamics to make the claim correct.",
+    "KG Triples": "1- (Árpád Klatsmányi, occupation, mechanical engineer)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Árpád Klatsmányi was a mechanical engineer",
+        "facts used in this step": [
+          "(Árpád Klatsmányi, occupation, mechanical engineer)"
+        ]
+      },
+      {
+        "step": "Mechanical engineers are familiar with thermodynamics, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "education"
+    ]
+  },
+  {
+    "id": "C62",
+    "query": "Persian Constitutional Revolution inspired the Shinpūren Rebellion.",
+    "answer": false,
+    "KG Entities": {
+      "Constitutional Revolution": "Q1368440",
+      "Shinpūren Rebellion": "Q2975371"
+    },
+    "Inference Rule": "Persian Constitutional Revolution must have occured before the Shinpūren Rebellion to be able to have influence on it.",
+    "KG Triples": "1- (Persian Constitutional Revolution, point in time, 1905), 2- (Shinpūren Rebellion, point in time, 1876)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Persian Constitutional Revolution occured in 1905",
+        "facts used in this step": [
+          "(Persian Constitutional Revolution, point in time, 1905)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Shinpūren Rebellion occured in 1876",
+        "facts used in this step": [
+          "(Shinpūren Rebellion, point in time, 1876)"
+        ]
+      },
+      {
+        "step": "Persian Constitutional Revolution occured after the Shinpūren Rebellion, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical",
+      "temporal reasoning"
+    ]
+  },
+  {
+    "id": "C63",
+    "query": "Elvíra Němečková had to use her body to perform her job.",
+    "answer": true,
+    "KG Entities": {
+      "Elvíra Němečková": "Q95396788"
+    },
+    "Inference Rule": "Elvíra Němečková's occupation must involve physical activity and considerable body movement to make the claim correct.",
+    "KG Triples": "1- (Elvíra Němečková, occupation, dancer)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Elvíra Němečková was a dancer.",
+        "facts used in this step": [
+          "(Elvíra Němečková, occupation, dancer)"
+        ]
+      },
+      {
+        "step": "Dancing requires physical activity and considerable body movement, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "physical"
+    ]
+  },
+  {
+    "id": "C64",
+    "query": "Léocadie Gascoin considered her job as being holy.",
+    "answer": true,
+    "KG Entities": {
+      "Léocadie Gascoin": "Q3270596"
+    },
+    "Inference Rule": "Léocadie Gascoin must have an occupation that is relevant to her religous beliefs to cosinder her job holy. ",
+    "KG Triples": "1- (Léocadie Gascoin, occupation, nun)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Léocadie Gascoin was a nun.",
+        "facts used in this step": [
+          "(Léocadie Gascoin, occupation, nun)"
+        ]
+      },
+      {
+        "step": "Nuns consider their job as being holy, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "religious"
+    ]
+  },
+  {
+    "id": "C65",
+    "query": "The Dome of Soltaniyeh stands taller than the Alaviyan Dome.",
+    "answer": true,
+    "KG Entities": {
+      "Dome of Soltaniyeh": "Q20645774",
+      "Alaviyan Dome": "Q5910145"
+    },
+    "Inference Rule": "The height of the dome of Soltaniyeh must be greater than the height of the Alaviyan Dome to make the claim correct.",
+    "KG Triples": "1- (Dome of Soltaniyeh, height, 49 metre), 2- (Alaviyan Dome, height, 11.5 metre)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, the height of the Dome of Soltaniyeh is 49 metre",
+        "facts used in this step": [
+          "(Dome of Soltaniyeh, height, 49 metre)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, the height of the Alaviyan Dome is 11.5 metre",
+        "facts used in this step": [
+          "(Alaviyan Dome, height, 11.5 metre)"
+        ]
+      },
+      {
+        "step": "The height of the Dome of Soltaniyeh is greater than the height of the Alaviyan Dome, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "number comparison",
+      "physical"
+    ]
+  },
+  {
+    "id": "C66",
+    "query": "Vladimer Chanturia's occupation involves violent fighting.",
+    "answer": true,
+    "KG Entities": {
+      "Vladimer Chanturia": "Q593344"
+    },
+    "Inference Rule": "Vladimer Chanturia's occupation must require getting involved in fights to make the claim correct.",
+    "KG Triples": "1- (Vladimer Chanturia, occupation, boxer)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Vladimer Chanturia was a boxer.",
+        "facts used in this step": [
+          "(Vladimer Chanturia, occupation, boxer)"
+        ]
+      },
+      {
+        "step": "Boxing involves violent fighting, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "physical",
+      "sports"
+    ]
+  },
+  {
+    "id": "C67",
+    "query": "Lorca Spiti is likely to not believe in god.",
+    "answer": false,
+    "KG Entities": {
+      "Lorca Spiti": "Q12237569"
+    },
+    "Inference Rule": "Lorca Spiti must be an atheist to make the claim correct.",
+    "KG Triples": "1- (Lorca Spiti, religion or worldview, Islam)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Lorca Spiti was a Muslim, so the claim is false.",
+        "facts used in this step": [
+          "(Lorca Spiti, religion or worldview, Islam)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "religious",
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C68",
+    "query": "Sara Al-Hani is likely to believe in Trinity.",
+    "answer": false,
+    "KG Entities": {
+      "Sara Al-Hani": "Q12215024"
+    },
+    "Inference Rule": "Sara Al-Hani must believe in Christianity to make the claim correct.",
+    "KG Triples": "1- (Sara Al-Hani, religion or worldview, Islam)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Sara Al-Hani was a Muslim, so the claim is false.",
+        "facts used in this step": [
+          "(Sara Al-Hani, religion or worldview, Islam)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "religious",
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C69",
+    "query": "Brakes of the HSV Senator make it go faster.",
+    "answer": false,
+    "KG Entities": {
+      "HSV Senator": "Q946517"
+    },
+    "Inference Rule": "HSV Senator must not be a regular vehicle to have its brakes increasing its speed instead of decreasing it.",
+    "KG Triples": "1- (HSV Senator, instance of, automobile model)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, HSV Senator was an automobile model.",
+        "facts used in this step": [
+          "(HSV Senator, instance of, automobile model)"
+        ]
+      },
+      {
+        "step": "automobiles are instances of regular vehicles, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "physical"
+    ]
+  },
+  {
+    "id": "C70",
+    "query": "Tawfiq-e-Elahi Chowdhury needs significant physical abilities to be able to do his job.",
+    "answer": false,
+    "KG Entities": {
+      "Tawfiq-e-Elahi Chowdhury": "Q16345559"
+    },
+    "Inference Rule": "Tawfiq-e-Elahi Chowdhury's occupation must require significant physical activity to make the claim correct.",
+    "KG Triples": "1- (Tawfiq-e-Elahi Chowdhury, occupation, politician)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Tawfiq-e-Elahi Chowdhury was a politician.",
+        "facts used in this step": [
+          "(Tawfiq-e-Elahi Chowdhury, occupation, politician)"
+        ]
+      },
+      {
+        "step": "Politicians do not require significant physical abilities to do their job, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "physical"
+    ]
+  },
+  {
+    "id": "C71",
+    "query": "Mina Ahadi is likely to celebrate Lent.",
+    "answer": false,
+    "KG Entities": {
+      "Mina Ahadi": "Q113781"
+    },
+    "Inference Rule": "Mina Ahadi must be a Christian for her to be likely to celebrate Lent.",
+    "KG Triples": "1- (Mina Ahadi, religion or worldview, atheism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Mina Ahadi was an atheist, so the claim is false.",
+        "facts used in this step": [
+          "(Mina Ahadi, religion or worldview, atheism)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "religious",
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C72",
+    "query": "Arawinda Kirana is unlikely to be experiencing menopause in 2023.",
+    "answer": true,
+    "KG Entities": {
+      "Arawinda Kirana": "Q108204206"
+    },
+    "Inference Rule": "Arawinda Kirana must not be a woman older than 45 years of age in 2023, to be unlikely to be experiencing menopause in 2023.",
+    "KG Triples": "1- (Arawinda Kirana, sex or gender, female), 2- (Arawinda Kirana, date of birth, 27 September 2001)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Arawinda Kirana is a female person",
+        "facts used in this step": [
+          "(Arawinda Kirana, sex or gender, female)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Arawinda Kirana was born on 27 September 2001.",
+        "facts used in this step": [
+          "(Arawinda Kirana, date of birth, 27 September 2001)"
+        ]
+      },
+      {
+        "step": "Since Arawinda Kirana was born in 2001, she is 22 in 2023 which is younger than 45, making her unlikely to be experiencing menopause, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "medical",
+      "temporal reasoning"
+    ]
+  },
+  {
+    "id": "C73",
+    "query": "Natalie Kratenova is likely to have a uterus.",
+    "answer": true,
+    "KG Entities": {
+      "Natalie Kratenova": "Q56087479"
+    },
+    "Inference Rule": "Natalie Kratenova must be a female person to be likely to have an uretrus.",
+    "KG Triples": "1- (Natalie Kratenova, sex or gender, female)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Natalie Kratenova is a woman, so the claim is true.",
+        "facts used in this step": [
+          "(Natalie Kratenova, sex or gender, female)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "medical"
+    ]
+  },
+  {
+    "id": "C74",
+    "query": "María Subíes Forcada's home country was among the allied powers.",
+    "answer": false,
+    "KG Entities": {
+      "María Subíes Forcada": "Q105721845"
+    },
+    "Inference Rule": "María Subíes Forcada must have been a citizen of either the USA, Britain, Soviet Union, or China to make the claim correct.",
+    "KG Triples": "1- (María Subíes Forcada, country of citizenship, Spain)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, María Subíes Forcada was a citizen of Spain, so the claim is false.",
+        "facts used in this step": [
+          "(María Subíes Forcada, country of citizenship, Spain)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical"
+    ]
+  },
+  {
+    "id": "C75",
+    "query": "Marisa Mazari Hiriart is likely to celebrate the Good Friday.",
+    "answer": true,
+    "KG Entities": {
+      "Marisa Mazari Hiriart": "Q105590092"
+    },
+    "Inference Rule": "Marisa Mazari Hiriart must be a Christian to celebrate the Good Friday. ",
+    "KG Triples": "1- (Marisa Mazari Hiriart, religion or worldview, Catholicism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Marisa Mazari Hiriart was a Catholic, so the claim is true.",
+        "facts used in this step": [
+          "(Marisa Mazari Hiriart, religion or worldview, Catholicism)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "religious"
+    ]
+  },
+  {
+    "id": "C76",
+    "query": "Sahra Wagenknecht often votes like a conservative Republican.",
+    "answer": false,
+    "KG Entities": {
+      "Sahra Wagenknecht": "Q77193"
+    },
+    "Inference Rule": "Sahra Wagenknecht's political ideology must be close to conservative republicans to vote like them. ",
+    "KG Triples": "1- (Sahra Wagenknecht, political ideology, communism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Sahra Wagenknecht's political ideology was communism.",
+        "facts used in this step": [
+          "(Sahra Wagenknecht, political ideology, communism)"
+        ]
+      },
+      {
+        "step": "Communism is different from conservative republicanism, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "cultural"
+    ]
+  },
+  {
+    "id": "C77",
+    "query": "Arawinda Kirana made music for a living.",
+    "answer": true,
+    "KG Entities": {
+      "Arawinda Kirana": "Q108204206"
+    },
+    "Inference Rule": "Arawinda Kirana must be a singer to make music for a living.",
+    "KG Triples": "1- (Arawinda Kirana, occupation, singer)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Arawinda Kirana was a singer, so the claim is true.",
+        "facts used in this step": [
+          "(Arawinda Kirana, occupation, singer)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "music"
+    ]
+  },
+  {
+    "id": "C78",
+    "query": "Someone living in Gujan would most likely travel by plane to reach Aousserd.",
+    "answer": true,
+    "KG Entities": {
+      "Gujan": "Q5103164",
+      "Aousserd": "Q2026640"
+    },
+    "Inference Rule": "Gujan and Aousserd must be considerably distant from each other to make it likely for people to travel between them by plane.",
+    "KG Triples": "1- (Gujan, country, Iran), 2- (Aousserd, part of, Western Sahara)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Gujan is located in Iran",
+        "facts used in this step": [
+          "(Gujan, country, Iran)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Aousserd is located in Western Sahara",
+        "facts used in this step": [
+          "(Aousserd, part of, Western Sahara)"
+        ]
+      },
+      {
+        "step": "Iran and Western Sahara are considerably distant from each other, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "geographical"
+    ]
+  },
+  {
+    "id": "C79",
+    "query": "Avraham Betzalel is from a primarily Christian country.",
+    "answer": false,
+    "KG Entities": {
+      "Avraham Betzalel": "Q115095945"
+    },
+    "Inference Rule": "Avraham Betzalel must be the citizen of a country in which the majority of people practice Christianity to make the claim correct.",
+    "KG Triples": "1- (Avraham Betzalel, country of citizenship, Israel)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Avraham Betzalel was a citizen of Israel.",
+        "facts used in this step": [
+          "(Avraham Betzalel, country of citizenship, Israel)"
+        ]
+      },
+      {
+        "Step": "Israel is not a primarily Christian country, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "religious",
+      "geographical"
+    ]
+  },
+  {
+    "id": "C80",
+    "query": "People only know Belén Rodríguez by watching her movies or seeing her as a model.",
+    "answer": false,
+    "KG Entities": {
+      "Belén Rodríguez": "Q465805"
+    },
+    "Inference Rule": "Belén Rodríguez's only occupation that makes her famous must be modeling to make the claim correct.",
+    "KG Triples": "1- (Belén Rodríguez, occupation, actor), 2- (Belén Rodríguez, occupation, television presenter), 3- (Belén Rodríguez, occupation, model)",
+    "Reasoning Steps": [
+      {
+        "step": "Based on the tiples 1, 2, and 3 Belén Rodríguez is an actor, a model, and a television presenter.",
+        "facts used in this step": [
+          "(Belén Rodríguez, occupation, actor)",
+          "(Belén Rodríguez, occupation, television presenter)",
+          "(Belén Rodríguez, occupation, model)"
+        ]
+      },
+      {
+        "step": "Since modeling isn't the only occupation of Belén Rodríguez that makes her famous, the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entertainment"
+    ]
+  },
+  {
+    "id": "C81",
+    "query": "It makes sense for Loik Laloum to open a martial arts school to earn a living.",
+    "answer": true,
+    "KG Entities": {
+      "Loik Laloum": "Q18924156"
+    },
+    "Inference Rule": "Loik Laloum must know martial arts or be very familiar with them for him to make sense to open a martial arts school.",
+    "KG Triples": "1- (Loik Laloum, occupation, taekwondo athlete)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Loik Laloum was a taekwondo athlete.",
+        "facts used in this step": [
+          "(Loik Laloum, occupation, taekwondo athlete)"
+        ]
+      },
+      {
+        "step": "Taekwondo athletes are familiar with martial arts, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "education",
+      "sports"
+    ]
+  },
+  {
+    "id": "C82",
+    "query": "Lee Hui-ho birthed a son as part of the family of Kim Dae-jung.",
+    "answer": true,
+    "KG Entities": {
+      "Lee Hui-ho": "Q11267083",
+      "Kim Dae-jung": "Q45785"
+    },
+    "Inference Rule": "Lee Hui-ho must be married to Kim Dae-jung and have delivered at least one male child to make the claim correct. ",
+    "KG Triples": "1- (Lee Hui-ho, spouse, Kim Dae-jung), 2- (Lee Hui-ho, child, Kim Hong-gul), 3- (Kim Hong-gul, sex or gender, male)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Kim Dae-jung was the spouse of Lee Hui-ho.",
+        "facts used in this step": [
+          "(Lee Hui-ho, spouse, Kim Dae-jung)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Lee Hui-ho had a child named Kim Hong-gul",
+        "facts used in this step": [
+          "(Lee Hui-ho, child, Kim Hong-gul)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 3, Kim Hong-gul was a male child, so he was Lee Hui-ho's son.",
+        "facts used in this step": [
+          "(Kim Hong-gul, sex or gender, male)"
+        ]
+      },
+      {
+        "step": "Kim Dae-jung was the only spouse of Lee Hui-ho, so Kim Hong-gul was his son, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C83",
+    "query": "Masanobu Tsuji took place in the only war in which nuclear weapons were used.",
+    "answer": true,
+    "KG Entities": {
+      "Masanobu Tsuji": "Q256584"
+    },
+    "Inference Rule": "Masanobu Tsuji must have been involved in the World War II, the only conflict in which a nuclear weapon was used, to make the claim correct.",
+    "KG Triples": "1- (Masanobu Tsuji, conflict, World War II)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Masanobu Tsuji was involved in the World War II, so the claim is true.",
+        "facts used in this step": [
+          "(Masanobu Tsuji, conflict, World War II)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical"
+    ]
+  },
+  {
+    "id": "C84",
+    "query": "Eveline Poncio loves his country Portugal.",
+    "answer": false,
+    "KG Entities": {
+      "Eveline Poncio": "Q91345652"
+    },
+    "Inference Rule": "Eveline Poncio must be a Portugese citizen and love his country to make the claim correct.",
+    "KG Triples": "1- (Eveline Poncio, country of citizenship, Brazil)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Eveline Poncio was a citizen of Brazil, so the claim is false.",
+        "facts used in this step": [
+          "(Eveline Poncio, country of citizenship, Brazil)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C85",
+    "query": "Carla Novaes is a female but she once had a scrotum in her life.",
+    "answer": true,
+    "KG Entities": {
+      "Carla Novaes": "Q52768046"
+    },
+    "Inference Rule": "Carla Novaes must be a male or a trans female to have experienced havin a scrotum.",
+    "KG Triples": "1- (Carla Novaes, sex or gender, trans woman)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Carla Novas is a trans woman.",
+        "facts used in this step": [
+          "(Carla Novaes, sex or gender, trans woman)"
+        ]
+      },
+      {
+        "step": "Trans women have experienced having male genital organisms, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "medical"
+    ]
+  },
+  {
+    "id": "C86",
+    "query": "People from Ankita Bhambri's country typicaly love dosa.",
+    "answer": true,
+    "KG Entities": {
+      "Ankita Bhambri": "Q4766071",
+      "dosa": "Q920940"
+    },
+    "Inference Rule": "Ankita Bhambri must be the citizen of the country or be familiar with the coutnry where dosa is part of their cuisine to make the statement correct.",
+    "KG Triples": "1- (Ankita Bhambri, country of citizenship, India), 2- (dosa, description, thin pancakes originating from South India)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Ankita Bhambri was a citizen of India",
+        "facts used in this step": [
+          "(Ankita Bhambri, country of citizenship, India)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, dosa is a thin pancake originating from South India",
+        "facts used in this step": [
+          "(dosa, description, thin pancakes originating from South India)"
+        ]
+      },
+      {
+        "step": "Indian people typically love foods from their cuisine, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "cultural",
+      "foods"
+    ]
+  },
+  {
+    "id": "C87",
+    "query": "Bogna Sobiech married an athlete who does a different sport from her.",
+    "answer": true,
+    "KG Entities": {
+      "Bogna Sobiech": "Q890608"
+    },
+    "Inference Rule": "The sport that Bogna Sobiech's spouse plays must be different from Bogna Sobiech's sport to make the claim correct.",
+    "KG Triples": "1- (Bogna Sobiech, sport, handball), 2- (Bogna Sobiech, spouse, Artur Sobiech), 3- (Artur Sobiech, sport, association football)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Bogna Sobiech played handball",
+        "facts used in this step": [
+          "(Bogna Sobiech, sport, handball)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Bogna Sobiech's spouse was Artur Sobiech",
+        "facts used in this step": [
+          "(Bogna Sobiech, spouse, Artur Sobiech)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 3, Artur Sobiech played association football",
+        "facts used in this step": [
+          "(Artur Sobiech, sport, association football)"
+        ]
+      },
+      {
+        "step": "Handball and association football are different sports, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "sports",
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C88",
+    "query": "Diana Aster typically performs in front of the camera.",
+    "answer": true,
+    "KG Entities": {
+      "Diana Aster": "Q102329150"
+    },
+    "Inference Rule": "Diana Aster's occupation must involve performing in front of the camera to make the claim correct.",
+    "KG Triples": "1- (Diana Aster, occupation, video blogger)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Diana Aster was a video blogger",
+        "facts used in this step": [
+          "(Diana Aster, occupation, video blogger)"
+        ]
+      },
+      {
+        "step": "Video bloggers typically perform in front of the camera, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entertainment"
+    ]
+  },
+  {
+    "id": "C89",
+    "query": "Placida Laubhardt got paid millions of dollars for her work.",
+    "answer": false,
+    "KG Entities": {
+      "Placida Laubhardt": "Q2097888"
+    },
+    "Inference Rule": "Placida Laubhardt must have an occupation with a salary in the order of million dollars to make the claim correct.",
+    "KG Triples": "1- (Placida Laubhardt, occupation, Christian nun)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Placida Laubhardt was a Christian nun",
+        "facts used in this step": [
+          "(Placida Laubhardt, occupation, Christian nun)"
+        ]
+      },
+      {
+        "step": "Christian nuns do not get paid millions of dollars for their work, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "economic"
+    ]
+  },
+  {
+    "id": "C90",
+    "query": "Bogna Sobiech can teach classes on how to play handball.",
+    "answer": true,
+    "KG Entities": {
+      "Bogna Sobiech": "Q890608"
+    },
+    "Inference Rule": "Bogna Sobiech must know how to play handball to be able to teach it to other people.",
+    "KG Triples": "1- (Bogna Sobiech, occupation, handball player)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Bogna Sobiech was a handball player",
+        "facts used in this step": [
+          "(Bogna Sobiech, occupation, handball player)"
+        ]
+      },
+      {
+        "step": "Handball players know how to play handball, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "education",
+      "sports"
+    ]
+  },
+  {
+    "id": "C91",
+    "query": "Many actors in Belle of Old Mexico sing and dance.",
+    "answer": true,
+    "KG Entities": {
+      "Belle of Old Mexico": "Q16248655"
+    },
+    "Inference Rule": "Belle of Old Mexico must be a musical film to make the claim correct.",
+    "KG Triples": "1- (Belle of Old Mexico, genre, musical comedy)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Belle of Old Mexico was a musical comedy",
+        "facts used in this step": [
+          "(Belle of Old Mexico, genre, musical comedy)"
+        ]
+      },
+      {
+        "step": "Actors in musical comedies typically sing and dance, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "definition",
+      "entertainment"
+    ]
+  },
+  {
+    "id": "C92",
+    "query": "The paternal side of the family of Italia Walter's children originates from Germany.",
+    "answer": true,
+    "KG Entities": {
+      "Italia Walter": "Q60739448"
+    },
+    "Inference Rule": "Italia Walter's spouse or partner who fathers her children must be from Germany to make the claim correct.",
+    "KG Triples": "1- (Italia Walter, spouse, Fritz Walter), 2- (Fritz Walter, country of citizenship, Germany)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Italia Walter's spouse was Fritz Walter",
+        "facts used in this step": [
+          "(Italia Walter, spouse, Fritz Walter)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Fritz Walter was a citizen of Germany",
+        "facts used in this step": [
+          "(Fritz Walter, country of citizenship, Germany)"
+        ]
+      },
+      {
+        "step": "Fritz Walter was the only spouse of Italia Walter, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C93",
+    "query": "You can get motion sickness on the HMS Abercrombie.",
+    "answer": true,
+    "KG Entities": {
+      "HMS Abercrombie": "Q4039992"
+    },
+    "Inference Rule": "HMS Abercrombie must be a vehicle to make the claim correct.",
+    "KG Triples": "1- (HMS Abercrombie, instance of, monitor)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, HMS Abercrombie was a monitor",
+        "facts used in this step": [
+          "(HMS Abercrombie, instance of, monitor)"
+        ]
+      },
+      {
+        "step": "Monitors are vehicles, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "physical",
+      "medical"
+    ]
+  },
+  {
+    "id": "C94",
+    "query": "The attack on Pearl Harbor took place before the Shinpūren Rebellion.",
+    "answer": false,
+    "KG Entities": {
+      "Pearl Harbor": "Q52418",
+      "Shinpūren Rebellion": "Q2975371"
+    },
+    "Inference Rule": "The date in which the attack on Pearl Harbor took place must be earlier than the date in which Shinpūren Rebellion occured to make the claim correct.",
+    "KG Triples": "1- (Attack on Pearl Harbor, point in time, 7 December 1941), 2- (Shinpūren Rebellion, point in time, 1876)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, the attack on Pearl Harbor took place on 7 December 1941",
+        "facts used in this step": [
+          "(Attack on Pearl Harbor, point in time, 7 December 1941)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Shinpūren Rebellion took place in 1876",
+        "facts used in this step": [
+          "(Shinpūren Rebellion, point in time, 1876)"
+        ]
+      },
+      {
+        "step": "The date of attack on Pearl Harbor is after the date Shinpūren Rebellion took place, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical",
+      "number comparison"
+    ]
+  },
+  {
+    "id": "C95",
+    "query": "Mohammad Vali Khan Tonekaboni typed his diaries in his personal computer.",
+    "answer": false,
+    "KG Entities": {
+      "Mohammad Vali Khan Tonekaboni": "Q179901"
+    },
+    "Inference Rule": "Mohammad Vali Khan Tonekaboni must have lived after the invention of personal computers to be able to type his diaries in one of them.",
+    "KG Triples": "1- (Mohammad Vali Khan Tonekaboni, date of death, 1926)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Mohammad Vali Khan Tonekaboni died in 1926",
+        "facts used in this step": [
+          "(Mohammad Vali Khan Tonekaboni, date of death, 1926)"
+        ]
+      },
+      {
+        "step": "Personal computers were not invented in 1926, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "technological",
+      "temporal reasoning"
+    ]
+  },
+  {
+    "id": "C96",
+    "query": "Javier Milei and Najib Mikati hold the same position but in different countries.",
+    "answer": false,
+    "KG Entities": {
+      "Javier Milei": "Q52395487",
+      "Najib Mikati": "Q318493"
+    },
+    "Inference Rule": "The position that Javier Milei and the position that Najib Mikati hold must be the same but be located in different countries to make the claim correct.",
+    "KG Triples": "1- (Javier Milei, position held, President of Argentina), 2- (Najib Mikati, position held, Prime Minister of Lebanon)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Javier Milei was the President of Argentina",
+        "facts used in this step": [
+          "(Javier Milei, position held, President of Argentina)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Najib Mikati was the Prime Minister of Lebanon",
+        "facts used in this step": [
+          "(Najib Mikati, position held, Prime Minister of Lebanon)"
+        ]
+      },
+      {
+        "step": "The position of President of Argentina is different from the position of Prime Minister of Lebanon, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "entity comparison",
+      "location comparison"
+    ]
+  },
+  {
+    "id": "C97",
+    "query": "Noelia Vargas must sleep to survive.",
+    "answer": true,
+    "KG Entities": {
+      "Noelia Vargas": "Q96621468"
+    },
+    "Inference Rule": "Noelia Vargas must be a human or an animal that requires to sleep in order to survive to make the claim correct.",
+    "KG Triples": "1- (Noelia Vargas, instance of, human)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Noelia Vargas was a human, so the claim is true.",
+        "facts used in this step": [
+          "(Noelia Vargas, instance of, human)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "medical"
+    ]
+  },
+  {
+    "id": "C98",
+    "query": "Elisa Skrotzki requires a racket to do her job.",
+    "answer": false,
+    "KG Entities": {
+      "Elisa Skrotzki": "Q97729339"
+    },
+    "Inference Rule": "Elisa Skrotzki's occupation must be doing a sport that requires a racket to be played to make the claim correct.",
+    "KG Triples": "1- (Elisa Skrotzki, occupation, association football player)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Elisa Skrotzki was an association football player",
+        "facts used in this step": [
+          "(Elisa Skrotzki, occupation, association football player)"
+        ]
+      },
+      {
+        "step": "Association football players do not require a racket to do their job, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "sports",
+      "physical"
+    ]
+  },
+  {
+    "id": "C99",
+    "query": "William Francis Rhea used to decide whether a criminal is guilty or innocent.",
+    "answer": true,
+    "KG Entities": {
+      "William Francis Rhea": "Q1256903"
+    },
+    "Inference Rule": "William Francis Rhea must have been a judge to have decided whether a criminal is guilty or innocent.",
+    "KG Triples": "1- (William Francis Rhea, occupation, judge)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, William Francis Rhea was a judge, so the claim is true.",
+        "facts used in this step": [
+          "(William Francis Rhea, occupation, judge)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C100",
+    "query": "Kostas Tsakonas typically tries to make the audience laugh out loud.",
+    "answer": true,
+    "KG Entities": {
+      "Kostas Tsakonas": "Q6433528"
+    },
+    "Inference Rule": "Kostas Tsakonas must be a comedian to typically try to make the audience laugh out loud.",
+    "KG Triples": "1- (Kostas Tsakonas, occupation, comedian)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Kostas Tsakonas was a comedian, so the claim is true.",
+        "facts used in this step": [
+          "(Kostas Tsakonas, occupation, comedian)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entertainment"
+    ]
+  },
+  {
+    "id": "C101",
+    "query": "When people wanted to address Ulrik Anton Motzfeldt in a court, they said, Your Honor.",
+    "answer": true,
+    "KG Entities": {
+      "Ulrik Anton Motzfeldt": "Q947952"
+    },
+    "Inference Rule": "Ulrik Anton Motzfeldt must be a judge to be addressed \"your honor\" in a court.",
+    "KG Triples": "1- (Ulrik Anton Motzfeldt, occupation, judge)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Ulrik Anton Motzfeldt was a judge, so the claim is true.",
+        "facts used in this step": [
+          "(Ulrik Anton Motzfeldt, occupation, judge)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "cultural"
+    ]
+  },
+  {
+    "id": "C102",
+    "query": "Jan-Carlo Simić was born in the current century.",
+    "answer": true,
+    "KG Entities": {
+      "Jan-Carlo Simić": "Q123594749"
+    },
+    "Inference Rule": "Jan-Carlo Simić's date of birth must be in or after the year 2000 to be born in the current century.",
+    "KG Triples": "1- (Jan-Carlo Simić, date of birth, 2 May 2005)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Jan-Carlo Simić was born on 2 May 2005.",
+        "facts used in this step": [
+          "(Jan-Carlo Simić, date of birth, 2 May 2005)"
+        ]
+      },
+      {
+        "step": "2 May 2005 is after the year 2000, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning",
+      "number comparison"
+    ]
+  },
+  {
+    "id": "C103",
+    "query": "It is very likely for Industri Kereta Api to have hired several engineers.",
+    "answer": true,
+    "KG Entities": {
+      "Kereta Api": "Q7121061"
+    },
+    "Inference Rule": "Industri Kereta Api must be an engineering company or require several engineers to do its business for it to be likely to have hired several engineers.",
+    "KG Triples": "1- (Industri Kereta Api, instance of, rail vehicle manufacturer)\n",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Industri Kereta Api was a rail vehicle manufacturer",
+        "facts used in this step": [
+          "(Industri Kereta Api, instance of, rail vehicle manufacturer)"
+        ]
+      },
+      {
+        "step": "Rail vehicle manufacturers require several engineers to do their business, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "technological"
+    ]
+  },
+  {
+    "id": "C104",
+    "query": "Anthony Dimond expressed his opinions on his Twitter account.",
+    "answer": false,
+    "KG Entities": {
+      "Anthony Dimond": "Q573153"
+    },
+    "Inference Rule": "Anthony Dimond must have lived after the invention of Twitter to have been able to express his opinions on it.",
+    "KG Triples": "1- (Anthony Diamond, Date of death, 28 May 1953)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Anthony Dimond died on 28 May 1953",
+        "facts used in this step": [
+          "(Anthony Diamond, Date of death, 28 May 1953)"
+        ]
+      },
+      {
+        "step": "Twitter was not invented in 1953, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "technological",
+      "temporal reasoning"
+    ]
+  },
+  {
+    "id": "C105",
+    "query": "Hazin Lahiji acted in several well-known dramas.",
+    "answer": false,
+    "KG Entities": {
+      "Hazin Lahiji": "Q983299"
+    },
+    "Inference Rule": "Hazin Lahiji must have been an actor to have acted in dramas.",
+    "KG Triples": "1- (Hazin Lahiji, occupation, writer), 2- (Hazin Lahiji, occupation, poet)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Hazin Lahiji was a writer and a poet, so the claim is false.",
+        "facts used in this step": [
+          "(Hazin Lahiji, occupation, writer)",
+          "(Hazin Lahiji, occupation, poet)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entertainment"
+    ]
+  },
+  {
+    "id": "C106",
+    "query": "Abi Mansur ibn Husayn Abu Said still performs on stage occasionally.",
+    "answer": false,
+    "KG Entities": {
+      "Abi Mansur ibn Husayn Abu Said": "Q16127738"
+    },
+    "Inference Rule": "Abi Mansur ibn Husayn Abu Said must still be alive and be an active actor to make the claim correct.",
+    "KG Triples": "1- (Abi Mansur ibn Husayn Abu Said, date of death, 1031)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Abi Mansur ibn Husayn Abu Said died in 1031, so the claim is false.",
+        "facts used in this step": [
+          "(Abi Mansur ibn Husayn Abu Said, date of death, 1031)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entertainment"
+    ]
+  },
+  {
+    "id": "C107",
+    "query": "The Laotian Civil War took place in the last decade of the 20th century.",
+    "answer": false,
+    "KG Entities": {
+      "Laotian Civil War": "Q877450"
+    },
+    "Inference Rule": "The date in which the Laotian Civil war began must have been in or after the year 1990, and the date in which it ended must have been in or before the year 1999 to make the claim correct.",
+    "KG Triples": "1- (Laotian Civil War, start time, 23 May 1959), 2- (Laotian Civil War, end time, 2 December 1975)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, the Laotian Civil War began on 23 May 1959",
+        "facts used in this step": [
+          "(Laotian Civil War, start time, 23 May 1959)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, the Laotian Civil War ended on 2 December 1975",
+        "facts used in this step": [
+          "(Laotian Civil War, end time, 2 December 1975)"
+        ]
+      },
+      {
+        "step": "The dates in which the Laotian Civil war began and ended are both before the year 1990, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical",
+      "number comparison"
+    ]
+  },
+  {
+    "id": "C108",
+    "query": "Silvia Arazi and Ivan Toney's countries fought each other during the Falklands war.",
+    "answer": true,
+    "KG Entities": {
+      "Silvia Arazi": "Q96405700",
+      "Ivan Toney": "Q16239819",
+      "Falklands War": "Q48249"
+    },
+    "Inference Rule": "One of Silvia Arazi and Ivan Toney must be from one of the countries involved in the Falklands war, and the other must be from that country's opponent in the Falklands war to make the claim correct.",
+    "KG Triples": "1- (Silvia Arazi, country of citizenship, Argentina), 2- (Ivan Toney, country of citizenship, United Kingdom), 3- (Falklands war, participant, Argentina), 4- (Falklands war, participant, United Kingdom)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Silvia Arazi was a citizen of Argentina",
+        "facts used in this step": [
+          "(Silvia Arazi, country of citizenship, Argentina)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Ivan Toney was a citizen of the United Kingdom",
+        "facts used in this step": [
+          "(Ivan Toney, country of citizenship, United Kingdom)"
+        ]
+      },
+      {
+        "Step": "Based on the tiples 3 and 4, Argentina and the United Kingdom were the participants of the Falklands war, so the claim is true.",
+        "facts used in this step": [
+          "(Falklands war, participant, Argentina)",
+          "(Falklands war, participant, United Kingdom)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical",
+      "location comparison"
+    ]
+  },
+  {
+    "id": "C109",
+    "query": "Lito Bayardo kills innocent people for fun.",
+    "answer": false,
+    "KG Entities": {
+      "Lito Bayardo": "Q16592005"
+    },
+    "Inference Rule": "Lito Bayardo must have been a serial killer to make the claim correct.",
+    "KG Triples": "1- (Lito Bayardo, occupation, actor), 2- (Lito Bayardo, occupation, guitarist), 3- (Lito Bayardo, occupation, poet), 4- (Lito Bayardo, occupation, lyricist)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on facts 1, 2, 3, and 4, Lito Bayardo was an actor, a guitarist, a poet, and a lyricist.",
+        "facts used in this step": [
+          "(Lito Bayardo, occupation, actor)",
+          "(Lito Bayardo, occupation, guitarist)",
+          "(Lito Bayardo, occupation, poet)",
+          "(Lito Bayardo, occupation, lyricist)"
+        ]
+      },
+      {
+        "step": "None of Lito Bayardo's occupations are related to killing people, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C110",
+    "query": "Max Daireaux had to study law in school to be allowed to obtain his occupation.",
+    "answer": false,
+    "KG Entities": {
+      "Max Daireaux": "Q6007317"
+    },
+    "Inference Rule": "Max Daireaux's occupation must require a degree in law to make the claim correct.",
+    "KG Triples": "1- (Max Daireaux, occupation, writer), 2- (Max Daireaux, occupation, literary critic), 3- (Max Daireaux, occupation, poet), 4- (Max Daireaux, occupation, journalist), 5- (Max Daireaux, occupation, translator)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on facts 1, 2, 3, 4, and 5, Max Daireaux was a writer, a literary critic, a poet, a journalist, and a translator.",
+        "facts used in this step": [
+          "(Max Daireaux, occupation, writer)",
+          "(Max Daireaux, occupation, literary critic)",
+          "(Max Daireaux, occupation, poet)",
+          "(Max Daireaux, occupation, journalist)",
+          "(Max Daireaux, occupation, translator)"
+        ]
+      },
+      {
+        "step": "None of Max Daireaux's occupations require a degree in law, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "education"
+    ]
+  },
+  {
+    "id": "C111",
+    "query": "Maria Turtschaninoff's works use fictitious plots.",
+    "answer": true,
+    "KG Entities": {
+      "Maria Turtschaninoff": "Q4983651"
+    },
+    "Inference Rule": "Maria Turtschaninoff must be a writer who is active in the genre of fantasy to make the claim correct.",
+    "KG Triples": "1- (Maria Turtschaninoff, occupation, writer), 2- (Maria Turtschaninoff, genre, fantasy)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1 and 2, Maria Turtschaninoff was a writer who was active in the genre of fantasy, so the claim is true.",
+        "facts used in this step": [
+          "(Maria Turtschaninoff, occupation, writer)",
+          "(Maria Turtschaninoff, genre, fantasy)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "literature"
+    ]
+  },
+  {
+    "id": "C112",
+    "query": "It was very likely for Potenciano Parin Columna to know how to replace the electrical wiring in houses.",
+    "answer": true,
+    "KG Entities": {
+      "Potenciano Parin Columna": "Q105309923"
+    },
+    "Inference Rule": "Potenciano Parin Columna must have been an electrician or an electrical engineer to be likely for him to know how to replace the wirings in a house.",
+    "KG Triples": "1- (Potenciano Parin Columna, occupation, electrician)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Potenciano Parin Columna was an electrician, so the claim is true.",
+        "facts used in this step": [
+          "(Potenciano Parin Columna, occupation, electrician)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "education"
+    ]
+  },
+  {
+    "id": "C113",
+    "query": "Stephanie Soares must have played a large role in escalating U.S. involvement in Vietnam.",
+    "answer": false,
+    "KG Entities": {
+      "Stephanie Soares": "Q85877427"
+    },
+    "Inference Rule": "Stephanie Soares must have been alive and involved in politics at the time of Vietnam war to be able to make the claim correct.",
+    "KG Triples": "1- (Stephanie Soares, date of birth, 17 April 2000)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Stephanie Soares was born on 17 April 2000, which is long after the Vietnam war, so the claim is false.",
+        "facts used in this step": [
+          "(Stephanie Soares, date of birth, 17 April 2000)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "historical",
+      "temporal reasoning"
+    ]
+  },
+  {
+    "id": "C114",
+    "query": "Genc Tukiçi never learned to play an instrument.",
+    "answer": false,
+    "KG Entities": {
+      "Genc Tukiçi": "Q3100361"
+    },
+    "Inference Rule": "There must be no evidence of Genc Tukiçi being able to play an instrument to make the claim correct.",
+    "KG Triples": "1- (Genc Tukiçi, occupation, pianist)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Genc Tukiçi was a pianist, which is an evidence of him being able to play an instrument, so the claim is false.",
+        "facts used in this step": [
+          "(Genc Tukiçi, occupation, pianist)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "music"
+    ]
+  },
+  {
+    "id": "C115",
+    "query": "Jamshid Amouzegar's life began in the third decade of the 20th century.",
+    "answer": true,
+    "KG Entities": {
+      "Jamshid Amouzegar": "Q1442594"
+    },
+    "Inference Rule": "Jamshid Amouzegar's date of birth must have been in or after the year 1920 and in or before the year 1929.",
+    "KG Triples": "1- (Jamshid Amouzegar, date of birth, 25 June 1923)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Jamshid Amouzegar was born on 25 June 1923, which is after the year 1920 and before the year 1929, so the claim is true.",
+        "facts used in this step": [
+          "(Jamshid Amouzegar, date of birth, 25 June 1923)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning",
+      "number comparison"
+    ]
+  },
+  {
+    "id": "C116",
+    "query": "Belén Rodríguez was unsuccessful in finding a partner or husband because of suffering from being unattractive.",
+    "answer": false,
+    "KG Entities": {
+      "Belén Rodríguez": "Q465805"
+    },
+    "Inference Rule": "There must be no evidence of any person's interest in having romantic relationship with Belén Rodríguez to make the claim correct.",
+    "KG Triples": "1- (Belén Rodríguez, spouse, Stefano De Martino), 2- (Belén Rodríguez, unmarried partner, Marco Borriello), 3- (Belén Rodríguez, spouse, Stefano De Martino), 4- (Belén Rodríguez, unmarried partner, Fabrizio Corona)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, 2, 3, and 4, Belén Rodríguez was married to Stefano De Martino and had romantic relationships with Marco Borriello and Fabrizio Corona,.",
+        "facts used in this step": [
+          "(Belén Rodríguez, spouse, Stefano De Martino)",
+          "(Belén Rodríguez, unmarried partner, Marco Borriello)",
+          "(Belén Rodríguez, spouse, Stefano De Martino)",
+          "(Belén Rodríguez, unmarried partner, Fabrizio Corona)"
+        ]
+      },
+      {
+        "step": "The evidence of Belén Rodríguez being married and having romantic relationships with other people is evidence of her being attractive, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "cultural"
+    ]
+  },
+  {
+    "id": "C117",
+    "query": "Maren Vehring's fans love her because of her special singing skills.",
+    "answer": false,
+    "KG Entities": {
+      "Maren Vehring": "Q97730273"
+    },
+    "Inference Rule": "Maren Vehring must be a singer to make the claim correct.",
+    "KG Triples": "1- (Maren Vehring, occupation, association football player)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Maren Vehring was an association football player.",
+        "facts used in this step": [
+          "(Maren Vehring, occupation, association football player)"
+        ]
+      },
+      {
+        "step": "Association football players are not singers, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "music"
+    ]
+  },
+  {
+    "id": "C118",
+    "query": "Juan García de Zéspedes goes to synagogue to pray.",
+    "answer": false,
+    "KG Entities": {
+      "Juan García de Zéspedes": "Q6299877"
+    },
+    "Inference Rule": "Juan García de Zéspedes must be Jewish to go to synagogue to pray.",
+    "KG Triples": "1- (Juan García de Zéspedes, religion or worldview, Catholicism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Juan García de Zéspedes was Catholic.",
+        "facts used in this step": [
+          "(Juan García de Zéspedes, religion or worldview, Catholicism)"
+        ]
+      },
+      {
+        "step": "Catholics do not go to synagogue to pray, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "religious"
+    ]
+  },
+  {
+    "id": "C119",
+    "query": "Rolando Domingo Sartorio may become the president of the European parliament.",
+    "answer": false,
+    "KG Entities": {
+      "Rolando Domingo Sartorio": "Q28854048"
+    },
+    "Inference Rule": "Rolando Domingo Sartorio must be a citizen of a country that is a member of the European Union to be able to become the president of the European Union.",
+    "KG Triples": "1- (Rolando Domingo Sartorio, country of citizenship, Argentina)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Rolando Domingo Sartorio was a citizen of Argentina.",
+        "facts used in this step": [
+          "(Rolando Domingo Sartorio, country of citizenship, Argentina)"
+        ]
+      },
+      {
+        "step": "Argentina is not a member of the European Union, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political"
+    ]
+  },
+  {
+    "id": "C120",
+    "query": "Narendra Hirwani produces works that are great for dancing to.",
+    "answer": false,
+    "KG Entities": {
+      "Narendra Hirwani": "Q3521187"
+    },
+    "Inference Rule": "Narendra Hirwani must be a singer to produce works that are great for dancing to.",
+    "KG Triples": "1- (Narendra Hirwani, occupation, cricketer)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Narendra Hirwani was a cricketer.",
+        "facts used in this step": [
+          "(Narendra Hirwani, occupation, cricketer)"
+        ]
+      },
+      {
+        "step": "Cricketers are not singers, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "music"
+    ]
+  },
+  {
+    "id": "C121",
+    "query": "Casa de Chá da Boa Nova needs to hire people that know how to prepare foods.",
+    "answer": true,
+    "KG Entities": {
+      "Casa de Chá da Boa Nova": "Q9698266"
+    },
+    "Inference Rule": "Casa de Chá da Boa Nova must be a business involved in perparing food to need to hire people that know how to prepare foods.",
+    "KG Triples": "1- (Casa de Chá da Boa Nova, instance of, restaurant)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Casa de Chá da Boa Nova is a restaurant.",
+        "facts used in this step": [
+          "(Casa de Chá da Boa Nova, instance of, restaurant)"
+        ]
+      },
+      {
+        "step": "Restaurants are businesses that are involved in preparing food, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "foods"
+    ]
+  },
+  {
+    "id": "C122",
+    "query": "People with Pantea Beigi's profession can hope to win a Nobel prize some day.",
+    "answer": true,
+    "KG Entities": {
+      "Pantea Beigi": "Q7131670"
+    },
+    "Inference Rule": "Pantea Beigi's occupation must be related to one of the categories of Nobel prizes to make the claim correct.",
+    "KG Triples": "1- (Pantea Beigi, occupation, human rights activist)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Pantea Beigi is a human rights activist.",
+        "facts used in this step": [
+          "(Pantea Beigi, occupation, human rights activist)"
+        ]
+      },
+      {
+        "step": "The Nobel prize in peace is awarded to human rights activists, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C123",
+    "query": "Toku Kanaseki is likely to participate in Olympics some day.",
+    "answer": false,
+    "KG Entities": {
+      "Toku Kanaseki": "Q111631877"
+    },
+    "Inference Rule": "Toku Kanaseki must be an active athlete for him to be likely to participate in the Olympics some day.",
+    "KG Triples": "1- (Toku Kanaseki, occupation, cell biologist), 2- (Toku Kanaseki, occupation, biochemist)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1 and 2, Toku Kanaseki was a cell biologist and a biochemist,.",
+        "facts used in this step": [
+          "(Toku Kanaseki, occupation, cell biologist)",
+          "(Toku Kanaseki, occupation, biochemist)"
+        ]
+      },
+      {
+        "step": "Cell biologists and biochemists are not athletes, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "sports"
+    ]
+  },
+  {
+    "id": "C124",
+    "query": "Anayama Nobutada died peacefully due to natural causes.",
+    "answer": false,
+    "KG Entities": {
+      "Anayama Nobutada": "Q2390843"
+    },
+    "Inference Rule": "Anayama Nobutada's manner of death must be due to a natural cause such as a disease to make the claim correct.",
+    "KG Triples": "1- (Anayama Nobutada, manner of death, homicide)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Anayama Nobutada died due to homicide, so the claim is false.",
+        "facts used in this step": [
+          "(Anayama Nobutada, manner of death, homicide)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "medical"
+    ]
+  },
+  {
+    "id": "C125",
+    "query": "Chökyi Nyima Rinpoche has to practice sports all day long.",
+    "answer": false,
+    "KG Entities": {
+      "Chökyi Nyima Rinpoche": "Q1982096"
+    },
+    "Inference Rule": "Chökyi Nyima Rinpoch must be an athlete to have to practice sports all day long.",
+    "KG Triples": "1- (Chökyi Nyima Rinpoche, occupation, Bhikkhu), 2- (Chökyi Nyima Rinpoche, occupation, teacher)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1 and 2, Chökyi Nyima Rinpoche was a Bhikkhu and a teacher.",
+        "facts used in this step": [
+          "(Chökyi Nyima Rinpoche, occupation, Bhikkhu)",
+          "(Chökyi Nyima Rinpoche, occupation, teacher)"
+        ]
+      },
+      {
+        "step": "Bhikkhus and teachers are not athletes, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "sports"
+    ]
+  },
+  {
+    "id": "C126",
+    "query": "Part of Ukitsu Tanaka's job is to interpret the law impartially.",
+    "answer": true,
+    "KG Entities": {
+      "Ukitsu Tanaka": "Q97754562"
+    },
+    "Inference Rule": "Ukitsu Tanaka must be a judge to be required to interpret the law impartially.",
+    "KG Triples": "1- (Ukitsu Tanaka, occupation, judge)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Ukitsu Tanaka was a judge, so the claim is true.",
+        "facts used in this step": [
+          "(Ukitsu Tanaka, occupation, judge)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C127",
+    "query": "Vasil Glavinov was likely to support Salvador Allende over Augusto Pinochet.",
+    "answer": true,
+    "KG Entities": {
+      "Vasil Glavinov": "Q3407230",
+      "Salvador Allende": "Q440",
+      "Augusto Pinochet": "Q368"
+    },
+    "Inference Rule": "Vasil Glavinov's political ideology must be closer to that of Salvador Allende than to Augusto Pinochet's ideology to make the claim correct.",
+    "KG Triples": "1- (Vasil Glavinov, political ideology, communism), 2- (Vasil Glavinov, political ideology, socialism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1 and 2, Vasil Glavinov's political ideology was communism and socialism.",
+        "facts used in this step": [
+          "(Vasil Glavinov, political ideology, communism)",
+          "(Vasil Glavinov, political ideology, socialism)"
+        ]
+      },
+      {
+        "step": "Communism and socialism are closer to Salvador Allende's ideology than to Augusto Pinochet's ideology, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "historical"
+    ]
+  },
+  {
+    "id": "C128",
+    "query": "Alexandra Pfemfert is likely to act and produce movies in Hindi.",
+    "answer": false,
+    "KG Entities": {
+      "Alexandra Pfemfert": "Q2643653"
+    },
+    "Inference Rule": "Alexandra Pfemfert must know Hindi to be able to act and produce movies in Hindi.",
+    "KG Triples": "1- (Alexandra Pfemfert, languages spoken, written or signed, German)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Alexandra Pfemfert spoke German.",
+        "facts used in this step": [
+          "(Alexandra Pfemfert, languages spoken, written or signed, German)"
+        ]
+      },
+      {
+        "step": "Since Alexandra Pfemfert does not know Hindi, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "language"
+    ]
+  },
+  {
+    "id": "C129",
+    "query": "Aleksandar Gruev wrote multiple books.",
+    "answer": false,
+    "KG Entities": {
+      "Aleksandar Gruev": "Q20090088"
+    },
+    "Inference Rule": "Aleksandar Gruev must be a writer to have written multiple books.",
+    "KG Triples": "1- (Aleksandar Gruev, occupation, basketball player)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Aleksandar Gruev was a basketball player.",
+        "facts used in this step": [
+          "(Aleksandar Gruev, occupation, basketball player)"
+        ]
+      },
+      {
+        "step": "Basketball players are not writers, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C130",
+    "query": "Laughter can often be heard after people read \"The Inhabitant of the Lake and Less Welcome Tenants\".",
+    "answer": false,
+    "KG Entities": {
+      "The Inhabitant of the Lake and Less Welcome Tenants": "Q7742024"
+    },
+    "Inference Rule": "\"The Inhabitant of the Lake and Less Welcome Tenants\" must in the comedy genre to make the claim correct.",
+    "KG Triples": "1- (The Inhabitant of the Lake and Less Welcome Tenants, genre, fantasy), 2- (The Inhabitant of the Lake and Less Welcome Tenants, genre, horror literature)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1 and 2, \"The Inhabitant of the Lake and Less Welcome Tenants\" was in the fantasy and horror literature genres.",
+        "facts used in this step": [
+          "(The Inhabitant of the Lake and Less Welcome Tenants, genre, fantasy)",
+          "(The Inhabitant of the Lake and Less Welcome Tenants, genre, horror literature)"
+        ]
+      },
+      {
+        "step": "Fantasy and horror literature are not comedy genres, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "literature"
+    ]
+  },
+  {
+    "id": "C131",
+    "query": "Chiara Guerra earns a living by portraying different characters in front of a camera.",
+    "answer": true,
+    "KG Entities": {
+      "Chiara Guerra": "Q42415919"
+    },
+    "Inference Rule": "Chiara Guerra must be an actor to earn a living by portraying different characters in front of a camera.",
+    "KG Triples": "1- (Chiara Guerra, occupation, actor)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Chiara Guerra was an actor, so the claim is true.",
+        "facts used in this step": [
+          "(Chiara Guerra, occupation, actor)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entertainment"
+    ]
+  },
+  {
+    "id": "C132",
+    "query": "Gustav Adolf Boley made and fixed watches for a living.",
+    "answer": true,
+    "KG Entities": {
+      "Gustav Adolf Boley": "Q1320668"
+    },
+    "Inference Rule": "Gustav Adolf Boley must have been a watchmaker to have made and fixed watches for a living.",
+    "KG Triples": "1- (Gustav Adolf Boley, occupation, watchmaker)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Gustav Adolf Boley was a watchmaker, so the claim is true.",
+        "facts used in this step": [
+          "(Gustav Adolf Boley, occupation, watchmaker)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C133",
+    "query": "Some people in Bongokuhle Hlongwane's country speak the Xhosa language.",
+    "answer": true,
+    "KG Entities": {
+      "Bongokuhle Hlongwane": "Q107142105",
+      "Xhosa": "Q13218"
+    },
+    "Inference Rule": "Bongokuhle Hlongwane must come from the country in which Xhosa language is spoken to make the claim correct.",
+    "KG Triples": "1- (Bongokuhle Hlongwane, country of citizenship, South Africa), 2- (Xhosa, country, South Africa)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple, Bongokuhle Hlongwane is a citizen of South Africa.",
+        "facts used in this step": [
+          "(Bongokuhle Hlongwane, country of citizenship, South Africa)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Xhosa is spoken in South Africa, so the claim is true.",
+        "facts used in this step": [
+          "(Xhosa, country, South Africa)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "language"
+    ]
+  },
+  {
+    "id": "C134",
+    "query": "Abu Asif Barghouti was in favour of people who support the Israeli government.",
+    "answer": false,
+    "KG Entities": {
+      "Abu Asif Barghouti": "Q106204763"
+    },
+    "Inference Rule": "Abu Asif Barghouti's political views must be close to the people who support the Israeli government to make the claim correct.",
+    "KG Triples": "1- (Abu Asif Barghouti, member of political party, Hamas), 2- (Hamas, political ideology, anti-Zionism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1 and 2, Abu Asif Barghouti was a member of Hamas.",
+        "facts used in this step": [
+          "(Abu Asif Barghouti, member of political party, Hamas)"
+        ]
+      },
+      {
+        "step": "Hamas has an anti-Zionist political ideology, so The claim is false.",
+        "facts used in this step": [
+          "(Hamas, political ideology, anti-Zionism)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "political"
+    ]
+  },
+  {
+    "id": "C135",
+    "query": "RosUkrEnergo is active in a field that is not relevant to cow farming and milk production.",
+    "answer": true,
+    "KG Entities": {
+      "RosUkrEnergo": "Q673771"
+    },
+    "Inference Rule": "The field in which RosUkrEnergo is active must not be relevant to cow farming and milk production to make the claim correct.",
+    "KG Triples": "1- (RosUkrEnergo, industry, petroleum industry)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, RosUkrEnergo was active in the petroleum industry.",
+        "facts used in this step": [
+          "(RosUkrEnergo, industry, petroleum industry)"
+        ]
+      },
+      {
+        "step": "The petroleum industry is not relevant to cow farming and milk production, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "entity comparison"
+    ]
+  },
+  {
+    "id": "C136",
+    "query": "Ernest Erbstein was very likely to carry a Faravahar symbol with himself.",
+    "answer": false,
+    "KG Entities": {
+      "Ernest Erbstein": "Q841611",
+      "Faravahar": "Q161942"
+    },
+    "Inference Rule": "Ernest Erbstein must come from the culture or religion that the Faravahar is its symbol to make the claim correct.",
+    "KG Triples": "1- (Ernest Erbstein, religion or worldview, Judaism), 2- (Ernest Erbstein, country of citizenship, Hungary), 3- (Faravahar, Description, Iranian and Zoroastrian symbol)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, Ernest Erbstein was Jewish.",
+        "facts used in this step": [
+          "(Ernest Erbstein, religion or worldview, Judaism)"
+        ]
+      },
+      {
+        "Step": "Based on the tiples 2, Ernest Erbstein was from Hungary.",
+        "facts used in this step": [
+          "(Ernest Erbstein, country of citizenship, Hungary)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 3, the Faravahar was an Iranian and Zoroastrian symbol.",
+        "facts used in this step": [
+          "(Faravahar, Description, Iranian and Zoroastrian symbol)"
+        ]
+      },
+      {
+        "step": "The Faravahar was not relevant to Ernest Erbstein's religion or culture, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "cultural",
+      "religious"
+    ]
+  },
+  {
+    "id": "C137",
+    "query": "Vanda Biněvská was very likely to use a violin in his craft.",
+    "answer": false,
+    "KG Entities": {
+      "Vanda Biněvská": "Q99640555"
+    },
+    "Inference Rule": "Vanda Biněvská must have been a violinist for him to be likely to have a violin in his craft.",
+    "KG Triples": "1- (Vanda Biněvská, occupation, soldier), 2- (Vanda Biněvská, occupation, health professional), 3- (Vanda Biněvská, occupation, sniper)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, 2, and 3, Vanda Biněvská was a soldier, a health professional, and a sniper.",
+        "facts used in this step": [
+          "(Vanda Biněvská, occupation, soldier)",
+          "(Vanda Biněvská, occupation, health professional)",
+          "(Vanda Biněvská, occupation, sniper)"
+        ]
+      },
+      {
+        "step": "None of Vanda Biněvská's occupations are related to playing the violin, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "music"
+    ]
+  },
+  {
+    "id": "C138",
+    "query": "The Voice of Jingjinji is very likely to broadcast American propaganda.",
+    "answer": false,
+    "KG Entities": {
+      "The Voice of Jingjinji": "Q4881187"
+    },
+    "Inference Rule": "The Voice of Jingjinji must be located in the United States of America or a country with close ideology to it to be likely to broadcast American propaganda.",
+    "KG Triples": "1- (The Voice of Jingjinji, country, People's Republic of China)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, The Voice of Jingjinji was located in the People's Republic of China.",
+        "facts used in this step": [
+          "(The Voice of Jingjinji, country, People's Republic of China)"
+        ]
+      },
+      {
+        "step": "The People's Republic of China is not a country with close ideology to the United States of America, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political"
+    ]
+  },
+  {
+    "id": "C139",
+    "query": "Elena Karaman Karić must have an eye for detail to be successful in her job.",
+    "answer": true,
+    "KG Entities": {
+      "Elena Karaman Karić": "Q5359042"
+    },
+    "Inference Rule": "Elena Karaman Karić must have an occupation that requires her to have an eye for the details to make the claim correct.",
+    "KG Triples": "1- (Elena Karaman Karić, occupation, interior designer)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Elena Karaman Karić was an interior designer.",
+        "facts used in this step": [
+          "(Elena Karaman Karić, occupation, interior designer)"
+        ]
+      },
+      {
+        "step": "Interior designers must have an eye for the details to be successful in their job, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations"
+    ]
+  },
+  {
+    "id": "C140",
+    "query": "Jesús Ricardo Urteaga Repullés was member of a group that fought against the integrity of Spain.",
+    "answer": true,
+    "KG Entities": {
+      "Jesús Ricardo Urteaga Repullés": "Q89769898"
+    },
+    "Inference Rule": "Jesús Ricardo Urteaga Repullés must have been a member of a group that fought for independence of a part of Spain to make the claim correct.",
+    "KG Triples": "1- (Jesús Ricardo Urteaga Repullés, member of political party, Euskadi Ta Askatasuna), 2- (Euskadi Ta Askatasuna, country, Spain), 3- (Euskadi Ta Askatasuna, political ideology, separatism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, Jesús Ricardo Urteaga Repullés was a member of Euskadi Ta Askatasuna.",
+        "facts used in this step": [
+          "(Jesús Ricardo Urteaga Repullés, member of political party, Euskadi Ta Askatasuna)"
+        ]
+      },
+      {
+        "Step": "Based on the tiples 2 and 3, Euskadi Ta Askatasuna was a separatist group in Spain, so the claim is true.",
+        "facts used in this step": [
+          "(Euskadi Ta Askatasuna, country, Spain)",
+          "(Euskadi Ta Askatasuna, political ideology, separatism)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "political"
+    ]
+  },
+  {
+    "id": "C141",
+    "query": "Mamlakat Nakhangova knew how to write.",
+    "answer": true,
+    "KG Entities": {
+      "Mamlakat Nakhangova": "Q4314659"
+    },
+    "Inference Rule": "Mamlakat Nakhangova must have an occupation that requires literacy to make the claim correct. ",
+    "KG Triples": "1- (Mamlakat Nakhangova, occupatoin, occupation, scientist), 2- (Mamlakat Nakhangova, occupatoin, occupation, teacher)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1 and 2, Mamlakat Nakhangova was a scientist and a teacher.",
+        "facts used in this step": [
+          "(Mamlakat Nakhangova, occupatoin, occupation, scientist)",
+          "(Mamlakat Nakhangova, occupatoin, occupation, teacher)"
+        ]
+      },
+      {
+        "step": "Scientists and teachers must be literate to be successful in their job, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "education"
+    ]
+  },
+  {
+    "id": "C142",
+    "query": "Melahat Pars is very likely to be familiar with Doner kebab.",
+    "answer": true,
+    "KG Entities": {
+      "Melahat Pars": "Q12810805",
+      "doner kebab": "Q20734"
+    },
+    "Inference Rule": "Melahat Pars must come from or be familiar with the country that doner kebab is part of its cuisine to make the claim correct.",
+    "KG Triples": "1- (Melahat Pars, country of citizenship, Turkey), 2- (doner kebab, cuisine, Turkish cuisine)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Melahat Pars was a citizen of Turkey.",
+        "facts used in this step": [
+          "(Melahat Pars, country of citizenship, Turkey)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, doner kebab was part of the Turkish cuisine, so the claim is true.",
+        "facts used in this step": [
+          "(doner kebab, cuisine, Turkish cuisine)"
+        ]
+      }
+    ],
+    "Reasoning Strategy": [
+      "cultural",
+      "foods"
+    ]
+  },
+  {
+    "id": "C143",
+    "query": "Galiya Izmaylova's job required her to strengthen her lower body and especially her toes.",
+    "answer": true,
+    "KG Entities": {
+      "Galiya Izmaylova": "Q4198621"
+    },
+    "Inference Rule": "Galiya Izmaylova must have an occupation that requires extensive use of the lower body to make the claim correct.",
+    "KG Triples": "1- (Galiya Izmaylova, occupation, ballet dancer)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Galiya Izmaylova was a ballet dancer.",
+        "facts used in this step": [
+          "(Galiya Izmaylova, occupation, ballet dancer)"
+        ]
+      },
+      {
+        "step": "Ballet dancing requires extensive use of the lower body, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "sports"
+    ]
+  },
+  {
+    "id": "C144",
+    "query": "Jan Jonker Afrikaner was likely a customer of the Namibia Breweries Limited.",
+    "answer": false,
+    "KG Entities": {
+      "Jan Jonker Afrikaner": "Q678356",
+      "Namibia Breweries Limited": "Q1964257"
+    },
+    "Inference Rule": "Jan Jonker Afrikaner must have been alive during the time Namibia Breweries Limited was active to be able to be its customer.",
+    "KG Triples": "1- (Jan Jonker Afrikaner, date of death, 10 August 1889), 2- (Namibia Breweries Limited, inception, 1920)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Jan Jonker Afrikaner died on 10 August 1889.",
+        "facts used in this step": [
+          "(Jan Jonker Afrikaner, date of death, 10 August 1889)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Namibia Breweries Limited was founded in 1920.",
+        "facts used in this step": [
+          "(Namibia Breweries Limited, inception, 1920)"
+        ]
+      },
+      {
+        "step": "Jan Jonker Afrikaner died before Namibia Breweries Limited was founded, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "temporal reasoning",
+      "number comparison"
+    ]
+  },
+  {
+    "id": "C145",
+    "query": "Gao Jingting preferred Mao Zedong over Chiang Kai-shek.",
+    "answer": true,
+    "KG Entities": {
+      "Gao Jingting": "Q8335280",
+      "Mao Zedong": "Q5816",
+      "Chiang Kai-shek": "Q16574"
+    },
+    "Inference Rule": "Gao Jingting's political ideology must be closer to that of Mao Zedong than to Chiang Kai-shek's ideology to make the claim correct.",
+    "KG Triples": "1- (Gao Jingting, member of political party, Chinese Communist Party), 2- (Mao Zedong, member of political party, Chinese Communist Party), 3- (Chiang Kai-shek, member of political party, Chinese Revolutionary Party)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiples 1, Gao Jingting was a member of the Chinese Communist Party.",
+        "facts used in this step": [
+          "(Gao Jingting, member of political party, Chinese Communist Party)"
+        ]
+      },
+      {
+        "Step": "Based on the tiples 2, Mao Zedong was a member of the Chinese Communist Party.",
+        "facts used in this step": [
+          "(Mao Zedong, member of political party, Chinese Communist Party)"
+        ]
+      },
+      {
+        "Step": "Based on the tiples 3, Chiang Kai-shek was a member of the Chinese Revolutionary Party.",
+        "facts used in this step": [
+          "(Chiang Kai-shek, member of political party, Chinese Revolutionary Party)"
+        ]
+      },
+      {
+        "Step": "Since Gao Jingting and Mao Zedong were members of the same political party, and Chiang Kai-shek was a member of a different political party, Gao Jingting's political ideology was closer to that of Mao Zedong than to Chiang Kai-shek's ideology, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political",
+      "historical"
+    ]
+  },
+  {
+    "id": "C146",
+    "query": "Dimitris Panayiotou can rest assured he will not come down with breast cancer thanks to his gender.",
+    "answer": false,
+    "KG Entities": {
+      "Dimitris Panayiotou": "Q16746133"
+    },
+    "Inference Rule": "Dimitris Panayiotou must not have a breast to rest assured he will not come down with breast cancer.",
+    "KG Triples": "1- (Dimitris Panayiotou, sex or gender, male)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Dimitris Panayiotou is a man.",
+        "facts used in this step": [
+          "(Dimitris Panayiotou, sex or gender, male)"
+        ]
+      },
+      {
+        "Step": "Men also have breasts and can get breast cancer, so the claim is false."
+      }
+    ],
+    "Reasoning Strategy": [
+      "medical"
+    ]
+  },
+  {
+    "id": "C147",
+    "query": "Dimitris Panayiotou can rest assured he will not come down with uretrus cancer thanks to his gender.",
+    "answer": true,
+    "KG Entities": {
+      "Dimitris Panayiotou": "Q16746133"
+    },
+    "Inference Rule": "Dimitris Panayiotou must not have an uretrus to rest assured he will not come down with breast cancer.",
+    "KG Triples": "1- (Dimitris Panayiotou, sex or gender, male)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Dimitris Panayiotou is a man.",
+        "facts used in this step": [
+          "(Dimitris Panayiotou, sex or gender, male)"
+        ]
+      },
+      {
+        "Step": "Men don't have an uretrus, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "medical"
+    ]
+  },
+  {
+    "id": "C148",
+    "query": "Marta Harnecker supported the idea of workers owning the means of production.",
+    "answer": true,
+    "KG Entities": {
+      "Marta Harnecker": "Q452797"
+    },
+    "Inference Rule": "Marta Harnecker must be in favour of Marxism, the ideology that advocates for workers owning the means of production, to make the claim correct.",
+    "KG Triples": "1- (Marta Harnecker, political ideology, Marxism)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Marta Harnecker was a Marxist.",
+        "facts used in this step": [
+          "(Marta Harnecker, political ideology, Marxism)"
+        ]
+      },
+      {
+        "step": "Marxism advocates for workers owning the means of production, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "political"
+    ]
+  },
+  {
+    "id": "C149",
+    "query": "Christian Kmiotek has worked in both entertainment and education.",
+    "answer": true,
+    "KG Entities": {
+      "Christian Kmiotek": "Q13102115"
+    },
+    "Inference Rule": "Christian Kmiotek must have experienced at least one occupation that is related to education, and one occupation that is related to the entertainment industry.",
+    "KG Triples": "1- (Christian Kmiotek, occupation, stage actor), 2- (Christian Kmiotek, occupation, teacher)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Christian Kmiotek was a stage actor, which is an occupation related to the entertainment industry.",
+        "facts used in this step": [
+          "(Christian Kmiotek, occupation, stage actor)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Christian Kmiotek was a teacher, which is an occupation related to education.",
+        "facts used in this step": [
+          "(Christian Kmiotek, occupation, teacher)"
+        ]
+      },
+      {
+        "step": "Christian Kmiotek has experienced at least one occupation that is related to education, and one occupation that is related to the entertainment industry, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "professions and occupations",
+      "entertainment",
+      "education"
+    ]
+  },
+  {
+    "id": "C150",
+    "query": "Takeuchi Shigeyo and Ida Duretto could have communicated directly without the need for translation.",
+    "answer": true,
+    "KG Entities": {
+      "Takeuchi Shigeyo": "Q18818470",
+      "Ida Duretto": "Q108352815"
+    },
+    "Inference Rule": "Takeuchi Shigeyo and Ida Duretto must have both known a common language to be able to communicate without the need for a translator.",
+    "KG Triples": "1- (Takeuchi Shigeyo, languages spoken, written or signed, Japanese), 2- (Ida Duretto, languages spoken, written or signed, Japanese)",
+    "Reasoning Steps": [
+      {
+        "Step": "Based on the tiple 1, Takeuchi Shigeyo spoke Japanese.",
+        "facts used in this step": [
+          "(Takeuchi Shigeyo, languages spoken, written or signed, Japanese)"
+        ]
+      },
+      {
+        "Step": "Based on the tiple 2, Ida Duretto spoke Japanese.",
+        "facts used in this step": [
+          "(Ida Duretto, languages spoken, written or signed, Japanese)"
+        ]
+      },
+      {
+        "step": "Takeuchi Shigeyo and Ida Duretto both spoke Japanese, so they could have communicated directly without the need for translation, so the claim is true."
+      }
+    ],
+    "Reasoning Strategy": [
+      "language"
+    ]
+  }
+]
