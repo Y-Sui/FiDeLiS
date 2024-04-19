@@ -6,7 +6,9 @@ import time
 from tqdm import tqdm
 from src import utils
 from src.utils import prompt_list_cwq, prompt_list_webqsp
-from path_rag import Path_RAG, LLM_Backbone
+from src.path_rag import Path_RAG
+from src.utils.llm_backbone import LLM_Backbone
+from src.utils.data_types import Graph
 
 class LLM_Navigator():
    def __init__(self, args) -> None:
@@ -192,7 +194,14 @@ class LLM_Navigator():
       id  = data['id']
       question = data['question']
       hop = data['hop']
-      graph = utils.build_graph(data["graph"])
+      graph = Graph(
+         args=self.args,
+         graph=utils.build_graph(data["graph"]), 
+         cache_path=self.args.save_cache, 
+         id=id, 
+         embedding_method=self.args.embedding_model,
+         replace=False
+      )
       answer = data['a_entity']
       starting_entities = data['q_entity']
       pred_list_direct_answer = []
@@ -218,7 +227,7 @@ class LLM_Navigator():
          reasoning_paths = [] # final reasoning paths
          active_beam_reasoning_paths = [[node]] # store the reasoning paths for each step, the the length of the list is equal to the number of top-k
          
-         for step in tqdm(range(self.args.max_length), desc="Beam searching...", delay=0.5, leave=False):
+         for step in tqdm(range(self.args.max_length + 1), desc="Beam searching...", delay=0.5, leave=False):
          
             all_candidates = []
             
@@ -243,14 +252,15 @@ class LLM_Navigator():
             if not all_candidates:
                break
             
-            llm_states["next_step_candidates"] = all_candidates
-            active_beam_reasoning_paths = self.decide_top_k_candidates(
-                  state=llm_states
-               )
-            
-            logging.info("<<<<<<<<")
-            logging.info("Active Beam Reasoning Paths: {}".format(active_beam_reasoning_paths))
-            logging.info(">>>>>>>>")
+            if step != self.args.max_length: # if not the last step
+               llm_states["next_step_candidates"] = all_candidates
+               active_beam_reasoning_paths = self.decide_top_k_candidates(
+                     state=llm_states
+                  )
+               
+               logging.info("<<<<<<<<")
+               logging.info("Active Beam Reasoning Paths: {}".format(active_beam_reasoning_paths))
+               logging.info(">>>>>>>>")
             
          # if there are no candidates fit the criteria, return the active_beam_raesoning_paths
          if not reasoning_paths:
