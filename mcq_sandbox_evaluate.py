@@ -1,6 +1,6 @@
 import os
 import argparse
-from src.qa_prediction.evaluate_results import eval_result
+from src.evaluate_results import eval_result
 
 def main(args):
    output_dir = os.path.join(args.output_path, args.model_name)

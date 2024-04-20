@@ -95,6 +95,8 @@ class Path_RAG():
          
       except Exception as e:
          print(f"query_embeddiong: {query_embedding}")
+         print(f"relations: {relations}")
+         print(f"neighbors: {neighbors}")
          print(f"relations_embeddings: {relations_embeddings}")
          print(f"neighbors_embeddings: {neighbors_embeddings}")
          print(query_embedding.shape, relations_embeddings.shape, neighbors_embeddings.shape)
@@ -116,7 +118,7 @@ class Path_RAG():
       graph: Graph
    ) -> list:
       """
-      given a list of relations and neighbors with ratings, return top-k relations and neighbors with the corresponding ratings
+      given a list of relations and neighbors with ratings, return top-k relations and neighbors
       """
       # concatenate the relations and neighbors
       rated_paths = [] # [(path, score)]
@@ -179,8 +181,12 @@ class Path_RAG():
       # get embeddings
       embeddings = self.llm_backbone.get_embeddings(keywords)
       
-      # get relations and neighbors with the corresponding ratings
-      rated_relations, rated_neighbors = self.get_relations_neighbors_set_with_ratings(relations, neighbors, embeddings)
+      if relations and neighbors:
+         # get relations and neighbors with the corresponding ratings
+         rated_relations, rated_neighbors = self.get_relations_neighbors_set_with_ratings(relations, neighbors, embeddings)
+      
+      else:
+         return []
                
       # top-n scoring paths
       paths = self.scoring_path(keyword_embeddings=embeddings, reasoning_path=reasoning_path, rated_relations=rated_relations, rated_neighbors=rated_neighbors, hub_node=hub_node, graph=graph)

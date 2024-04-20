@@ -108,7 +108,21 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
                 hit = eval_hit(prediction_str, answer)
                 acc_list.append(acc)
                 hit_list.append(hit)
-                f2.write(json.dumps({'method': item, 'id': id, 'prediction': prediction, 'ground_truth': answer, 'acc': acc, 'hit': hit, 'f1': f1_score, 'precission': precision_score, 'recall': recall_score}) + '\n')
+                f2.write(
+                    json.dumps(
+                        {
+                            'method': item, 
+                            'id': id, 
+                            'prediction': prediction, 
+                            'ground_truth': answer, 
+                            'acc': acc, 
+                            'hit': hit, 
+                            'f1': f1_score, 
+                            'precission': precision_score, 
+                            'recall': recall_score
+                            }
+                        ) + '\n')
+                
                 if hit == 0:
                     f3.write(
                         json.dumps(
@@ -174,7 +188,7 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
         result_name = "_eval_result_top_{topk}.txt" if topk > 0 else '_eval_result.txt'
         eval_result_path = predict_file.replace('.jsonl', result_name)
         with open(eval_result_path, 'a') as f:
-            f.write(result_str)
+            f.write(result_str + '\n')
     return llm_result, direct_ans_result
     
 

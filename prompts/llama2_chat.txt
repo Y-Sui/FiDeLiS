@@ -1,4 +1,0 @@
-[INST] <<SYS>>
-<</SYS>>
-{reasoning_path_history}
-{instruction}{input} [/INST]
