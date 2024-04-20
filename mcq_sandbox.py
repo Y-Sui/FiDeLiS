@@ -12,14 +12,15 @@ import re
 import time
 import litellm
 import networkx as nx
-from src.qa_prediction.evaluate_results import eval_result
+from src.prompts import webqsp
+from src.evaluate_results import eval_result
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
 from openai import OpenAI
 from litellm import completion, embedding, batch_completion # import litellm for calling multiple llms using the same input/output format 
 from datasets import load_dataset, load_from_disk
 from src import utils
-from src.utils import prompt_list_cwq, prompt_list_webqsp
+from src.utils import prompt_list_cwq
 
 litellm.set_verbose=False
 set_verbose = False
@@ -209,7 +210,7 @@ def find_top_k_candidates(
         
     elif args.strategy == "discrete_rating":
         if args.d == "RoG-webqsp":
-            prompt_list = prompt_list_webqsp
+            prompt_list = webqsp
         elif args.d == "RoG-cwq":
             prompt_list = prompt_list_cwq
             
@@ -255,7 +256,7 @@ def meets_condition(
     planning_context: str = ""
 ):
     if args.d == "RoG-webqsp":
-        prompt_list = prompt_list_webqsp
+        prompt_list = webqsp
     elif args.d == "RoG-cwq":
         prompt_list = prompt_list_cwq
     
@@ -340,7 +341,7 @@ def beam_search(data, args):
     logging.info(f"Starting Nodes: {starting_nodes}")
     
     if args.d == "RoG-webqsp":
-        prompt_list = prompt_list_webqsp
+        prompt_list = webqsp
     elif args.d == "RoG-cwq":
         prompt_list = prompt_list_cwq
     

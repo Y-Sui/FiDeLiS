@@ -1,5 +1,0 @@
-[INST] <<SYS>>
-<</SYS>>
-{instruction}
-
-{input} [/INST]

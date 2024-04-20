@@ -8,7 +8,7 @@ import wandb
 import datetime
 import litellm
 from concurrent.futures import ProcessPoolExecutor
-from src.qa_prediction.evaluate_results import eval_result
+from src.evaluate_results import eval_result
 from tqdm import tqdm
 from datasets import load_dataset, load_from_disk
 from src import utils
@@ -152,8 +152,8 @@ if __name__ == "__main__":
    parser.add_argument("--squeeze", type=bool, default=True)
    parser.add_argument("--verifier", type=str, default="deductive+planning")
    parser.add_argument("--embedding_model", type=str, default="text-embedding-3-small")
-   parser.add_argument("--add_hop_information", type=bool, default=True)
-   parser.add_argument("--generate_embeddings", type=bool, default=False)
+   parser.add_argument("--add_hop_information", action="store_true")
+   parser.add_argument("--generate_embeddings", action="store_false")
    parser.add_argument("--alpha", type=float, default=0.3)
    args = parser.parse_args()
    main(args)

@@ -8,7 +8,7 @@ from tqdm import tqdm
 from llms.language_models import get_registed_model
 import os
 from datasets import load_dataset
-from qa_prediction.evaluate_results import eval_result
+from src.evaluate_results import eval_result
 import json
 from multiprocessing import Pool
 from qa_prediction.build_qa_input import PromptBuilder

@@ -5,7 +5,8 @@ import json
 import time
 from tqdm import tqdm
 from src import utils
-from src.utils import prompt_list_cwq, prompt_list_webqsp
+from src.prompts import webqsp as prompt_webqsp
+from src.prompts import cwq as prompt_cwq
 from src.path_rag import Path_RAG
 from src.utils.llm_backbone import LLM_Backbone
 from src.utils.data_types import Graph
@@ -16,9 +17,9 @@ class LLM_Navigator():
       self.path_rag_engine = Path_RAG(args)
       self.args = args
       if args.d == "RoG-webqsp":
-         self.prompt_list = prompt_list_webqsp
+         self.prompt_list = prompt_webqsp
       elif args.d == "RoG-cwq":
-         self.prompt_list = prompt_list_cwq
+         self.prompt_list = prompt_cwq
       self._new_line_char = "\n" # for formatting the prompt
       
    def rpth_parser(
@@ -247,7 +248,9 @@ class LLM_Navigator():
                next_step_candidates = self.path_rag_engine.get_path(
                   state=llm_states
                )
-               all_candidates.extend(next_step_candidates)
+               
+               if next_step_candidates: # if there are no next_step_candidates, skip the current step
+                  all_candidates.extend(next_step_candidates)
             
             if not all_candidates:
                break
