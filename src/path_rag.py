@@ -83,7 +83,7 @@ class Path_RAG():
       """
       given a list of relations and neighbors, return top-n relations and neighbors with the corresponding ratings [(relation, 0.9), (relation, 0.8), ...]
       """
-      query_embedding = np.array(query_embedding[0])
+      query_embedding = np.array(query_embedding)
       
       relations_embeddings = np.array([relation.embedding for relation in relations])
       neighbors_embeddings = np.array([neighbor.embedding for neighbor in neighbors])
@@ -108,7 +108,7 @@ class Path_RAG():
    
    def scoring_path(
       self,
-      keywords: str,
+      keyword_embeddings: list,
       rated_relations: list,
       rated_neighbors: list,
       hub_node: str,
@@ -136,11 +136,9 @@ class Path_RAG():
                   #TODO using vectorspace to store the embeddings, otherwise the efficiency is pretty low
                   # 1-hop neighbors = relation + neighbor
                   one_hop_relations, one_hop_neighbors = self.get_entity_edges(neighbor, graph)
-                  texts = [keywords]
-                  embeddings = self.llm_backbone.get_embeddings(texts)  
                   
                   if one_hop_relations and one_hop_neighbors:
-                     one_hop_rated_relations, one_hop_rated_neighbors = self.get_relations_neighbors_set_with_ratings(one_hop_relations, one_hop_neighbors, embeddings)
+                     one_hop_rated_relations, one_hop_rated_neighbors = self.get_relations_neighbors_set_with_ratings(one_hop_relations, one_hop_neighbors, keyword_embeddings)
                      
                   else:
                      # if there is no one-hop neighbors, set the score to 0
@@ -179,14 +177,13 @@ class Path_RAG():
       
       #TODO load the embeddings from the vectorspace
       # get embeddings
-      texts = [keywords]
-      embeddings = self.llm_backbone.get_embeddings(texts)
+      embeddings = self.llm_backbone.get_embeddings(keywords)
       
       # get relations and neighbors with the corresponding ratings
       rated_relations, rated_neighbors = self.get_relations_neighbors_set_with_ratings(relations, neighbors, embeddings)
                
       # top-n scoring paths
-      paths = self.scoring_path(keywords=keywords, reasoning_path=reasoning_path, rated_relations=rated_relations, rated_neighbors=rated_neighbors, hub_node=hub_node, graph=graph)
+      paths = self.scoring_path(keyword_embeddings=embeddings, reasoning_path=reasoning_path, rated_relations=rated_relations, rated_neighbors=rated_neighbors, hub_node=hub_node, graph=graph)
       
       return paths
 
