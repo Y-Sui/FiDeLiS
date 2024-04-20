@@ -73,7 +73,7 @@ def init_embedding(data):
       cache_path=args.save_cache,
       id=id,
       embedding_method=args.embedding_model,
-      replace=True
+      replace=False
    )
    print(f"Embedding for {id} completed")
 
@@ -87,7 +87,7 @@ def main(args):
    logging.basicConfig(
       level=logging.INFO,
       format='%(asctime)s - %(levelname)s - %(message)s',
-      filename=os.path.join(output_dir,'webq.log'),
+      filename=os.path.join(output_dir,'detailed_process.log'),
       filemode='w',
    )
    
@@ -141,7 +141,7 @@ if __name__ == "__main__":
    parser.add_argument("--sample", type=int, default=-1)
    parser.add_argument("--data_path", type=str, default="rmanluo")
    parser.add_argument("--d", "-d", type=str, default="RoG-webqsp")
-   parser.add_argument("--save_cache", type=str, default="/data/shared/yuansui/rog/.cache/huggingface/datasets")
+   parser.add_argument("--save_cache", type=str, default="/data/yuansui/rog/datasets")
    parser.add_argument("--split", type=str, default="test")
    parser.add_argument("--output_path", type=str, default="results")
    parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")

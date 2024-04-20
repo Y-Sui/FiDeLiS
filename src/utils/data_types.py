@@ -61,6 +61,7 @@ class Graph:
          self.save_embeddings()
       
    def generate_embeddings(self):
+      # print("Generating embeddings...")
       nodes_attributes = [node.attribute for node in self.nodes.values()]
       edges_attributes = [edge.attribute for edge in self.edges.values()]
       embeddings = self.embedder.get_embeddings(nodes_attributes)
@@ -73,6 +74,7 @@ class Graph:
          self.edges[(edge[0], edge[1])].set_embedding(embeddings_edges[i])
    
    def load_embedddings(self):
+      # print("Loading embeddings...")
       nodes_embeddings = np.load(self.nodes_embedding_path)
       edges_embeddings = np.load(self.edges_embedding_path)
       
