@@ -115,18 +115,22 @@ def main(args):
    llm_navigator = LLM_Navigator(args)
    
    for data in tqdm(dataset, desc="Data Processing...", delay=0.5, ascii="░▒█"):
-      # try:
-      #    res = llm_navigator.beam_search(data) # run the beam search for each sample
-         
-      # except Exception as e:
-      #    logging.error("Error occurred: {}".format(e))
-      #    print("Error occurred: {}".format(e))
-      #    f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
-      #    json_str = json.dumps({"id": data['id'], "error": str(e)})
-      #    f.write(json_str + "\n")
-      #    continue
       
-      res = llm_navigator.beam_search(data)
+      if args.debug:
+         res = llm_navigator.beam_search(data) # run the beam search for each sample
+         
+      else:
+         # run the beam search for each sample, catch the exception if it occurs
+         try:
+            res = llm_navigator.beam_search(data) # run the beam search for each sample
+            
+         except Exception as e:
+            logging.error("Error occurred: {}".format(e))
+            print("Error occurred: {}".format(e))
+            f = open(os.path.join(output_dir, "error_sample.jsonl"), "a")
+            json_str = json.dumps({"id": data['id'], "error": str(e)})
+            f.write(json_str + "\n")
+            continue
       
       f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
       json_str = json.dumps(res)
@@ -155,5 +159,6 @@ if __name__ == "__main__":
    parser.add_argument("--add_hop_information", action="store_true")
    parser.add_argument("--generate_embeddings", action="store_false")
    parser.add_argument("--alpha", type=float, default=0.3)
+   parser.add_argument("--debug", action="store_true")
    args = parser.parse_args()
    main(args)
