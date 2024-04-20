@@ -114,7 +114,7 @@ def main(args):
       dataset = dataset.select(range(args.sample))
    llm_navigator = LLM_Navigator(args)
    
-   for data in tqdm(dataset, desc="Data Processing...", delay=0.5):
+   for data in tqdm(dataset, desc="Data Processing...", delay=0.5, ascii="░▒█"):
       # try:
       #    res = llm_navigator.beam_search(data) # run the beam search for each sample
          

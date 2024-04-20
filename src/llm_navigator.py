@@ -228,7 +228,7 @@ class LLM_Navigator():
          reasoning_paths = [] # final reasoning paths
          active_beam_reasoning_paths = [[node]] # store the reasoning paths for each step, the the length of the list is equal to the number of top-k
          
-         for step in tqdm(range(self.args.max_length + 1), desc="Beam searching...", delay=0.5, leave=False):
+         for step in tqdm(range(self.args.max_length + 1), desc="Beam searching...", delay=0.5, leave=False, ascii="░▒█"):
          
             all_candidates = []
             
