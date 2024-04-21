@@ -13,7 +13,6 @@ for DATA_NAME in $DATASET_LIST; do
       --d ${DATA_NAME} \
       --model_name ${MODEL_NAME} \
       --embedding_model ${EMBEDDING_MODEL} \
-      --generate_embeddings \
       --add_hop_information \
       --top_n 30 \
       --top_k 3 \

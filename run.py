@@ -7,6 +7,8 @@ import multiprocessing as mp
 import wandb
 import datetime
 import litellm
+import wandb
+from wandb.sdk.data_types import trace_tree
 from concurrent.futures import ProcessPoolExecutor
 from src.evaluate_results import eval_result
 from tqdm import tqdm
@@ -91,6 +93,8 @@ def main(args):
       filemode='w',
    )
    
+   wandb.init(project="rog", name=f"{args.d}-{args.model_name}-{args.sample}", config=args)
+   
    # load the dataset
    cached_dataset_path = os.path.join(args.save_cache, f"{args.d}_processed")
    
@@ -117,12 +121,12 @@ def main(args):
    for data in tqdm(dataset, desc="Data Processing...", delay=0.5, ascii="░▒█"):
       
       if args.debug:
-         res = llm_navigator.beam_search(data) # run the beam search for each sample
+         res, wandb_span = llm_navigator.beam_search(data) # run the beam search for each sample
          
       else:
          # run the beam search for each sample, catch the exception if it occurs
          try:
-            res = llm_navigator.beam_search(data) # run the beam search for each sample
+            res, wandb_span = llm_navigator.beam_search(data) # run the beam search for each sample
             
          except Exception as e:
             logging.error("Error occurred: {}".format(e))
@@ -131,13 +135,21 @@ def main(args):
             json_str = json.dumps({"id": data['id'], "error": str(e)})
             f.write(json_str + "\n")
             continue
-      
+         
+      for span in wandb_span:
+         span.log(name="openai")
+         
       f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
       json_str = json.dumps(res)
       f.write(json_str + "\n")
       
    # evaluate
    llm_res, direct_ans_res = eval_result(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), cal_f1=True)
+   
+   wandb.log({
+      "llm_res": llm_res,
+      "direct_ans_res": direct_ans_res
+   })
 
 if __name__ == "__main__":
    parser = argparse.ArgumentParser()
@@ -157,7 +169,7 @@ if __name__ == "__main__":
    parser.add_argument("--verifier", type=str, default="deductive+planning")
    parser.add_argument("--embedding_model", type=str, default="text-embedding-3-small")
    parser.add_argument("--add_hop_information", action="store_true")
-   parser.add_argument("--generate_embeddings", action="store_false")
+   parser.add_argument("--generate_embeddings", action="store_true")
    parser.add_argument("--alpha", type=float, default=0.3)
    parser.add_argument("--debug", action="store_true")
    args = parser.parse_args()
