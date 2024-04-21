@@ -1,6 +1,8 @@
 from collections import defaultdict
 import os
 import pickle
+import json
+from tqdm import tqdm
 
 import requests
 
@@ -215,7 +217,6 @@ class Wikidata:
 
    def verbalize_triples(self, triples):
       return [str(triple) for triple in triples]
-
    
    def _valid_response(self, response):
       return response.status_code == 200
@@ -303,46 +304,59 @@ class Wikidata:
          snak_value = None
       
       return snak_value
+
+
+def prepare_huggingface_dataset():
+   """
+   Prepare the CR-LT-QA dataset for Huggingface dataset format
+   """
+   dataset = json.load(open("../..//datasets/crlt/CR-LT-QA.json", "r"))
+
+   save_file = "../../datasets/crlt/CR-LT-QA-Wikidata-Cache.json"
+
+   # use wiki data to get triples
+   wikidata = Wikidata()
    
-      # match datatype:
-      #    case "wikibase-item":
-      #          tail_id = datavalue["id"]
-      #          tail_label = self._id_to_label(tail_id)
-      #          snak_value = (tail_id, tail_label)
+   # cache
+   update_dataset = []
+   
+   for data in tqdm(dataset, desc="Data Processing...", delay=0.5, ascii="░▒█"):
+   
+      try: 
+         entities = list(data["KG Entities"].keys())
+         is_label_ls = list(data["KG Entities"].values())
+         
+         sub_graph = []
+         triples_ls = []
+         for entity, is_label in zip(entities, is_label_ls):
+            triples, _ = wikidata.get_triples(entity, is_label)
+            triples_ls += triples
+         
+         for triple in triples_ls:
+            sub_graph.append(list(triple.triple))
+            
+         update_dataset.append(
+            {
+               "id": data["id"],
+               "question": data["query"],
+               "q_entity": entities,
+               "a_entity": data["answer"],
+               "graph": sub_graph,
+               "hop": len(data["Reasoning Steps"]),
+               "inference_rule": data["Inference Rule"],
+               "reasoning_steps": data["Reasoning Steps"],
+            }
+         )
+         
+      except Exception as e:
+         print(e)
+         continue
+         
+   open(save_file, "w").write(json.dumps(update_dataset))
 
-      #    case "time":
-      #          snak_value = datavalue["time"]
-
-      #    case "string":
-      #          snak_value = datavalue
-
-      #    case "quantity":
-      #          amount = datavalue["amount"]
-      #          unit = datavalue["unit"]
-
-      #          if unit == "1":
-      #             snak_value = amount
-      #          elif "wikidata.org/entity" in unit:
-      #             unit_id = unit.split("/")[-1]
-      #             unit_label = self._id_to_label(unit_id)
-      #             snak_value = amount + " " + unit_label
-
-      #    case "globe-coordinate":
-      #          latitude = datavalue["latitude"]
-      #          longitude = datavalue["longitude"]
-      #          snak_value = f"({latitude}, {longitude})"
-
-      #    case "math":
-      #          snak_value = datavalue
-
-      #    case _:
-      #          snak_value = None
 
 def main():
-   wikidata = Wikidata()
-   print(wikidata.get_description("Q42", False))
-   triples, tail_qids = wikidata.get_triples("Q42", False)
-   print(triples, tail_qids)
+   prepare_huggingface_dataset()
 
 if __name__ == "__main__":
    main()
