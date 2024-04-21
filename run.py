@@ -8,6 +8,7 @@ import wandb
 import datetime
 import litellm
 import wandb
+import logging
 from wandb.sdk.data_types import trace_tree
 from concurrent.futures import ProcessPoolExecutor
 from src.evaluate_results import eval_result
@@ -27,6 +28,10 @@ with open("config.json", "r") as f:
     
 os.environ["OPENAI_API_KEY"] = config["OPENAI_API_KEY"]
 
+
+def disable_logging_during_run():
+   logging.disable(logging.CRITICAL)
+   
 
 def prepare_dataset(sample):
    graph = utils.build_graph(sample["graph"])
@@ -92,6 +97,8 @@ def main(args):
       filename=os.path.join(output_dir,'detailed_process.log'),
       filemode='w',
    )
+   if not args.debug:
+      disable_logging_during_run() 
    
    wandb.init(project="rog", name=f"{args.d}-{args.model_name}-{args.sample}", config=args)
    
@@ -135,9 +142,10 @@ def main(args):
             json_str = json.dumps({"id": data['id'], "error": str(e)})
             f.write(json_str + "\n")
             continue
-         
-      for span in wandb_span:
-         span.log(name="openai")
+      
+      if args.debug:
+         for span in wandb_span:
+            span.log(name="openai")
          
       f = open(os.path.join(output_dir, f"{args.d}-{args.model_name}-{args.sample}.jsonl"), "a")
       json_str = json.dumps(res)
