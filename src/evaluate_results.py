@@ -190,7 +190,7 @@ def eval_result(predict_file, cal_f1=True, topk = -1):
         with open(eval_result_path, 'a') as f:
             f.write(result_str + '\n')
     return llm_result, direct_ans_result
-    
+
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()

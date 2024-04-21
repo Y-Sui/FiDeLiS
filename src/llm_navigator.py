@@ -3,6 +3,9 @@ import copy
 import re
 import json
 import time
+import wandb
+import datetime
+from wandb.sdk.data_types.trace_tree import Trace
 from tqdm import tqdm
 from src import utils
 from src.prompts import webqsp as prompt_webqsp
@@ -191,7 +194,7 @@ class LLM_Navigator():
    def beam_search(
       self,
       data
-   ):
+   ):   
       id  = data['id']
       question = data['question']
       hop = data['hop']
@@ -221,15 +224,47 @@ class LLM_Navigator():
       logging.info(f"Ground Truth: {answer}")
       logging.info(f"Starting Nodes: {starting_entities}")
       
+      root_spans = []
+      
       for node in starting_entities:
+      
+         start_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+         
+         # initialize the w & B root span
+         root_span = Trace(
+            name="Beam Searcher",
+            kind="agent",
+            start_time_ms=start_time_ms,
+            metadata={"id": id, "hop": hop, "q_entities": starting_entities, "answer": answer},
+         )      
+         
          llm_states["entity"] = node
          self.planning(llm_states)
+         planning_end_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+         
+         planning_span = Trace(
+            name="Planner",
+            kind="llm",
+            start_time_ms=start_time_ms,
+            end_time_ms=planning_end_time_ms,
+            inputs={"input": llm_states["question"]},
+            outputs={"planning_steps": llm_states["planning_steps"], "key_words": llm_states["key_words"], "declarative_statement": llm_states["declarative_statement"]},
+         )
+         
+         root_span.add_child(planning_span)
          
          reasoning_paths = [] # final reasoning paths
          active_beam_reasoning_paths = [[node]] # store the reasoning paths for each step, the the length of the list is equal to the number of top-k
          
          for step in tqdm(range(self.args.max_length + 1), desc="Beam searching...", delay=0.5, leave=False, ascii="░▒█"):
-         
+            
+            search_span = Trace(
+               name="Searcher",
+               kind="llm",
+               start_time_ms=start_time_ms,
+               inputs={"input": llm_states["key_words"], "reasoning paths": reasoning_paths, "active_beam_reasoning_paths": active_beam_reasoning_paths},
+            )
+            
             all_candidates = []
             
             for rpth in active_beam_reasoning_paths:
@@ -265,6 +300,11 @@ class LLM_Navigator():
                logging.info("Active Beam Reasoning Paths: {}".format(active_beam_reasoning_paths))
                logging.info(">>>>>>>>")
             
+            search_span.end_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+            search_span.outputs={"reasoning paths": reasoning_paths, "active_beam_reasoning_paths": active_beam_reasoning_paths}
+            
+            planning_span.add_child(search_span)
+            
          # if there are no candidates fit the criteria, return the active_beam_raesoning_paths
          if not reasoning_paths:
             reasoning_paths = active_beam_reasoning_paths
@@ -275,6 +315,25 @@ class LLM_Navigator():
          # LLM REASONING
          # --------------
          reasoning_res = self.reasoning(llm_states)
+         reasoning_end_time_ms = round(datetime.datetime.now().timestamp() * 1000)
+         
+         reasoniong_span = Trace(
+            name="Reasoner",
+            kind="llm",
+            start_time_ms=start_time_ms,
+            end_time_ms=reasoning_end_time_ms,
+            inputs={"input": llm_states["reasoning_paths"], "question": llm_states["question"]},
+            outputs={"response": reasoning_res},
+         )
+         
+         root_span.add_child(reasoniong_span)
+         root_span.add_inputs_and_outputs(
+            inputs={"question": llm_states["question"]},
+            outputs={"response": reasoning_res}
+         )
+         root_span.end_time_ms  = reasoning_end_time_ms
+         
+         root_spans.append(root_span)
          
          for item in reasoning_res.split(", "):
             pred_list_llm_reasoning.append(item)
@@ -295,7 +354,7 @@ class LLM_Navigator():
                "prediction_direct_answer": "\n".join(set(pred_list_direct_answer)),
                "ground_truth": answer,
          }
-      return res
+      return res, root_spans
       
 
 
