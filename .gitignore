@@ -18,3 +18,4 @@ config.json
 webq.log
 .DS_Store
 test.ipynb
+results/
