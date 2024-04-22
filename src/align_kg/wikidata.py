@@ -354,6 +354,17 @@ def prepare_huggingface_dataset():
          
    open(save_file, "w").write(json.dumps(update_dataset))
 
+   import json
+
+   # Load your JSON data from a file
+   with open("../../datasets/crlt/CR-LT-QA-Wikidata-Cache.json", 'r') as file:
+      data = json.load(file)
+
+   # Convert and save the data to a JSONL file
+   with open("../../datasets/crlt/CR-LT-QA-Wikidata-Cache.jsonl", 'w') as outfile:
+      for entry in data:
+         json.dump(entry, outfile)
+         outfile.write('\n')
 
 def main():
    prepare_huggingface_dataset()

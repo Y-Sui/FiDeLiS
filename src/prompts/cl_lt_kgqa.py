@@ -1,5 +1,5 @@
 reasoning_prompt = {
-   "system": "Given a question and the associated retrieved reasoning path from a knowledge graph, you are asked to answer the following question based on the reasoning path and your knowledge. Only return the answer to the question.",
+   "system": "Given a question and the associated retrieved reasoning path from a knowledge graph, you are asked to verifiy the correctiness of the following question based on the reasoning path and your knowledge. Only return the True or False to the question.",
    "examples": [
       {"role": "user", "content": "Question: what art movements was henri matisse involved in? \nReasoning path: Henri Matisse->visual_art.visual_artist.associated_periods_or_movements->Neo-impressionism"}, 
       {"role": "assistant", "content": "Answer: Neo-impressionism"},
@@ -48,6 +48,7 @@ terminals_prune_single_prompt = {
       {"role": "user", "content": "Question: where does selena gomez live right now 2010?\nReasoning Path: \nSelena Gomez->people.person.places_lived->m.04hmnxs->people.place_lived.location->New York City"},
       {"role": "assistant", "content": "Answer: Yes"},
    ],
+   "examples": [],
    "prompt": "Considering the planning context {plan_context} and the given question {question}, you are asked to answer whether it's sufficient for you to answer the question with the following reasoning path. {reasoning_path}. Verify if it is sufficient to answer the question with each of the provided reasoning path. Your response should either 'Yes' or 'No', corresponding to reasoning path. \nAnswer:"
 }
 
