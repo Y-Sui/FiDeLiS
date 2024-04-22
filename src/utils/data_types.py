@@ -78,6 +78,13 @@ class Graph:
       nodes_embeddings = np.load(self.nodes_embedding_path)
       edges_embeddings = np.load(self.edges_embedding_path)
       
+      # if issue occurs during embedding model
+      if len(nodes_embeddings) != len(self.graph.nodes()) or len(edges_embeddings) != len(self.graph.edges()):
+         self.generate_embeddings()
+         self.save_embeddings()
+         nodes_embeddings = np.load(self.nodes_embedding_path)
+         edges_embeddings = np.load(self.edges_embedding_path)
+      
       for i, node in enumerate(self.graph.nodes()):
          self.nodes[node].set_embedding(nodes_embeddings[i])
          

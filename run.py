@@ -9,7 +9,6 @@ import datetime
 import litellm
 import wandb
 import logging
-from wandb.sdk.data_types import trace_tree
 from concurrent.futures import ProcessPoolExecutor
 from src.evaluate_results import eval_result
 from tqdm import tqdm
@@ -49,14 +48,36 @@ def prepare_dataset(sample):
    return sample
 
 
+def prepare_crlt_dataset(sample):
+   ground_paths = []
+   for step in sample["reasoning_steps"]:
+      ground_paths.append(step["facts used in this step"])
+      
+   sample["ground_paths"] = ground_paths
+   
+   return sample
+
+
 def data_processing(args):
-   input_file = os.path.join(args.data_path, args.d)
-   output_file = os.path.join(args.save_cache, f"{args.d}_processed")
-   dataset = load_dataset(input_file, split=args.split, cache_dir=args.save_cache)
-   dataset = dataset.map(
+   
+   if args.d == "RoG-webqsp" or args.d == "RoG-cwq":
+      input_file = os.path.join(args.data_path, args.d)
+      output_file = os.path.join(args.save_cache, f"{args.d}_processed")
+      dataset = load_dataset(input_file, split=args.split, cache_dir=args.save_cache)
+      dataset = dataset.map(
          prepare_dataset,
          num_proc=args.N_CPUS,
       )
+   
+   elif args.d == "CL-LT-KGQA":   
+      input_file = os.path.join("yuansui", args.d)
+      output_file = os.path.join(args.save_cache, f"{args.d}_processed")
+      dataset = load_dataset(input_file, split="train", cache_dir=args.save_cache)
+      dataset = dataset.map(
+         prepare_crlt_dataset,
+         num_proc=args.N_CPUS,
+      )
+
    dataset = dataset.filter(
          lambda x: x.get("hop") > 0 and x.get("question") != "" and len(x.get("q_entity")) > 0 and len(x.get("a_entity")) > 0 and len(x.get("ground_paths")) > 0, 
          num_proc=args.N_CPUS
@@ -115,7 +136,7 @@ def main(args):
    # generate embeddings
    if args.generate_embeddings:
       with ProcessPoolExecutor(max_workers=args.N_CPUS) as executor:
-         # Using list to consume the results as they come in for tqdm to track
+         # Using list to consume the results as they come in for tqdm to trackß
          executor.map(init_embedding, dataset)
       print("Embedding completed!")
       return
@@ -123,11 +144,11 @@ def main(args):
    # sample the dataset
    if args.sample != -1:
       dataset = dataset.select(range(args.sample))
-   llm_navigator = LLM_Navigator(args)
    
+   llm_navigator = LLM_Navigator(args)
    for data in tqdm(dataset, desc="Data Processing...", delay=0.5, ascii="░▒█"):
       
-      if args.debug:
+      if args.debug:         
          res, wandb_span = llm_navigator.beam_search(data) # run the beam search for each sample
          
       else:
@@ -164,7 +185,7 @@ if __name__ == "__main__":
    parser.add_argument("--N_CPUS", type=int, default=mp.cpu_count())
    parser.add_argument("--sample", type=int, default=-1)
    parser.add_argument("--data_path", type=str, default="rmanluo")
-   parser.add_argument("--d", "-d", type=str, default="RoG-webqsp")
+   parser.add_argument("--d", "-d", type=str, choices=["RoG-webqsp", "RoG-cwq", "CL-LT-KGQA"], default="RoG-webqsp")
    parser.add_argument("--save_cache", type=str, default="/data/yuansui/rog/datasets")
    parser.add_argument("--split", type=str, default="test")
    parser.add_argument("--output_path", type=str, default="results")

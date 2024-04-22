@@ -10,6 +10,7 @@ from tqdm import tqdm
 from src import utils
 from src.prompts import webqsp as prompt_webqsp
 from src.prompts import cwq as prompt_cwq
+from src.prompts import cl_lt_kgqa as prompt_cl_lt_kgqa
 from src.path_rag import Path_RAG
 from src.utils.llm_backbone import LLM_Backbone
 from src.utils.data_types import Graph
@@ -23,6 +24,8 @@ class LLM_Navigator():
          self.prompt_list = prompt_webqsp
       elif args.d == "RoG-cwq":
          self.prompt_list = prompt_cwq
+      if args.d == "CL-LT-KGQA":
+         self.prompt_list = prompt_cl_lt_kgqa
       self._new_line_char = "\n" # for formatting the prompt
       
    def rpth_parser(
