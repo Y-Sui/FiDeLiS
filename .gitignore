@@ -3,8 +3,12 @@ datasets/joint_training
 datasets/AlignData
 logs/
 ref_examples/
+results/
 results/gen_rule_path/
 results/KGQA/
+results/gpt-3.5-turbo-0125
+results/gpt-3.5-turbo-0613
+results/gpt-4-0125-preview
 test/
 wandb/
 save_models/
@@ -12,5 +16,6 @@ save_models/
 *.pyc
 tmp/
 RoG_train.tar.gz
-results/
 config.json
+webq.log
+.DS_Store

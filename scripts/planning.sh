@@ -1,6 +1,9 @@
+SOURCE_PATH="/data/shared/yuansui/rog"
+export HF_HOME=${SOURCE_PATH}/.cache/huggingface
+
 SPLIT="test"
 # DATASET_LIST="RoG-webqsp RoG-cwq"
-DATASET_LIST="RoG-webqsp"
+DATASET_LIST=RoG-cwq
 MODEL_NAME=RoG
 MODEL_PATH=rmanluo/RoG
 

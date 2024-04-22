@@ -1,13 +1,14 @@
 pybind11
 openai
 transformers
-trl
-peft
+trl==0.7.1
+peft==0.5.0
 datasets
-accelerate
-pybind11
-networkx
-graph-walker
+accelerate==0.22.0
+pybind11==2.11.1
+networkx==3.1
+graph-walker==1.0.6
+tqdm
 tqdm
 walker
 sentencepiece
@@ -16,3 +17,4 @@ protobuf
 datasets
 python-dotenv
 tiktoken
+deepspeed
