@@ -5,8 +5,111 @@ import numpy as np
 import time
 import networkx as nx
 from tqdm import tqdm
-from src.utils.data_types import Graph, Node, Edge
-from src.utils.llm_backbone import LLM_Backbone
+from openai import OpenAI
+from litellm import completion, embedding, batch_completion # import litellm for calling multiple llms using the same input/output format 
+
+
+class LLM_Backbone():
+   def __init__(self, args):
+      self.client = OpenAI()
+      self.embedding_model = args.embedding_model
+      self.completion_model = args.model_name
+      self.max_attempt = 5 # number of attempts to get the completion
+      
+   def get_embeddings(self, texts: list):
+      embeddings = []
+      texts_per_batch = 2000
+      text_chunks = [texts[i:i + texts_per_batch] for i in range(0, len(texts), texts_per_batch)]
+      
+      attempt = 0
+      while attempt < self.max_attempt:
+         try:
+            for chunk in text_chunks:
+               chunk_embeddings = self.client.embeddings.create(
+                  model=self.embedding_model, 
+                  input=chunk
+                  ) # return [item['embedding'] for item in _['data']]
+               embeddings.extend([item.embedding for item in chunk_embeddings.data])
+            return embeddings
+         except Exception as e:
+            logging.error(f"Error occurred: {e}")
+            attempt += 1
+            time.sleep(1)
+            
+   def get_completion(self, prompt: dict):
+      messages = [
+         {"role": "system", "content": prompt["system"]},
+         *prompt["examples"],
+         {"role": "user", "content": prompt["prompt"]}
+      ]
+         
+      attempt = 0
+      while attempt < self.max_attempt:
+         try:
+               _ = self.client.chat.completions.create(
+                  model=self.completion_model, 
+                  messages=messages, 
+                  temperature=0, 
+                  top_p=0, 
+                  logprobs=False
+                  )
+               # return _['choices'][0]['message']['content']
+               return _.choices[0].message.content
+         except Exception as e:
+               logging.error(f"Error occurred: {e}")
+               attempt += 1
+               time.sleep(1)
+               
+   def get_log_probs(self, log_probs: list):
+      scores = []
+      for item in log_probs:
+        top_logprobs = item[0]["top_logprobs"]
+        match = False
+        for i in range(len(top_logprobs)):
+            if top_logprobs[i]["token"] in [" A", "A", "A "]:
+                scores.append(top_logprobs[i]["logprob"])
+                match = True
+                break
+        if not match:
+            scores.append(-10000.0)
+      return scores
+   
+   def get_batch_completion(self, prompt: dict, input_batch: list):
+      """
+      for item in log_probs:
+         if item["token"] == "A":
+               print(item['logprob'])
+      """
+      
+      messages = []
+      for item in input_batch:
+         messages.append(
+               [
+                  {"role": "system", "content": prompt["system"]},
+                  *prompt["examples"],
+                  {"role": "user", "content": item}
+               ]
+         )
+      attempt = 0
+      while attempt < 5: 
+         try:
+               _ = batch_completion(
+                  model=self.completion_model, 
+                  messages=messages, 
+                  temperature=0, 
+                  top_p=0, 
+                  logprobs=True,
+                  top_logprobs=5
+                  )
+               contents = [_[i]['choices'][0]['message']['content'] for i in range(len(_))]
+               log_probs = [_[i]['choices'][0]['logprobs']['content'] for i in range(len(_))]
+               return contents, log_probs
+               
+         except Exception as e:
+               logging.error(f"Error occurred: {e}")
+               attempt += 1
+               time.sleep(1)
+
 
 class Path_RAG():
    def __init__(self, args):
@@ -32,36 +135,26 @@ class Path_RAG():
    def get_entity_edges(
       self, 
       entity: str, 
-      graph: Graph
+      graph: nx.Graph
    ) -> list:
       """
       given an entity, find all edges and neighbors
       """
-      edges = [] # each edge is an instance of Edge, the attribute can be accessed through edge.attribute, and the embedding can be accessed through edge.embedding
+      edges = []
       neighbors = []
       
-      if graph.graph.has_node(entity):
-         for neighbor in graph.graph.neighbors(entity):
-            # relation = graph.edges.get((entity, neighbor), Edge(None, None))
-            # neighbor = graph.nodes.get(neighbor, Node(None))
-            try:
-               relation = graph.edges[(entity, neighbor)]
-               # print(f"x: {relation}")
-            except KeyError:
-               relation = graph.graph[entity][neighbor]['relation']
-               print(f"entity: {entity}, neighbor: {neighbor}, relation: {relation}")
-               print(f"real_entity and real_neighbor: {[k for k, v, in graph.edges.items()]}")
-               # print(f"y: {relation}, {relation in [e.attribute for e in graph.edges.values()]}")
-            neighbor = graph.nodes[neighbor]
+      if graph.has_node(entity):
+         for neighbor in graph.neighbors(entity):
+            relation = graph[entity][neighbor]['relation']
             if relation not in edges or neighbor not in neighbors: # remove the duplicates
                edges.append(relation)
                neighbors.append(neighbor)
-
+               
       return edges, neighbors
    
    def has_relation(
       self, 
-      graph: Graph,
+      graph: nx.Graph,
       entity: str,
       relation: str,
       neighbor: str
@@ -69,8 +162,8 @@ class Path_RAG():
       """
       check if the relation exists in the graph
       """
-      if graph.graph.has_edge(entity, neighbor):
-         if graph.graph[entity][neighbor]['relation'] == relation:
+      if graph.has_edge(entity, neighbor):
+         if graph[entity][neighbor]['relation'] == relation:
             return True
       return False
    
@@ -78,47 +171,36 @@ class Path_RAG():
       self,
       relations: list,
       neighbors: list,
-      query_embedding: list,
+      embeddings: list,
    ) -> list:
       """
       given a list of relations and neighbors, return top-n relations and neighbors with the corresponding ratings [(relation, 0.9), (relation, 0.8), ...]
       """
-      query_embedding = np.array(query_embedding)
+      query_embedding = np.array(embeddings[0])
+      relations_embeddings = np.array(embeddings[1:len(relations)+1])
+      neighbors_embeddings = np.array(embeddings[len(relations)+1:])
       
-      relations_embeddings = np.array([relation.embedding for relation in relations])
-      neighbors_embeddings = np.array([neighbor.embedding for neighbor in neighbors])
-      
-      try:
-         # calculate cosine similarity
-         query_relation_similarity = self.cos_simiarlity(query_embedding, relations_embeddings)
-         query_neighbor_similarity = self.cos_simiarlity(query_embedding, neighbors_embeddings)
-         
-      except Exception as e:
-         print(f"query_embeddiong: {query_embedding}")
-         print(f"relations: {relations}")
-         print(f"neighbors: {neighbors}")
-         print(f"relations_embeddings: {relations_embeddings}")
-         print(f"neighbors_embeddings: {neighbors_embeddings}")
-         print(query_embedding.shape, relations_embeddings.shape, neighbors_embeddings.shape)
+      # calculate cosine similarity
+      query_relation_similarity = self.cos_simiarlity(query_embedding, relations_embeddings)
+      query_neighbor_similarity = self.cos_simiarlity(query_embedding, neighbors_embeddings)
       
       # sort the neighbors by similarity
-      relations = [(relations[i].attribute, query_relation_similarity[i]) for i in np.argsort(query_relation_similarity)[::-1]]
-      
-      neighbors = [(neighbors[i].attribute, query_neighbor_similarity[i]) for i in np.argsort(query_neighbor_similarity)[::-1]]
+      relations = [(relations[i], query_relation_similarity[i]) for i in np.argsort(query_relation_similarity)[::-1]]
+      neighbors = [(neighbors[i], query_neighbor_similarity[i]) for i in np.argsort(query_neighbor_similarity)[::-1]]
       
       return relations, neighbors
    
    def scoring_path(
       self,
-      keyword_embeddings: list,
+      keywords: str,
       rated_relations: list,
       rated_neighbors: list,
       hub_node: str,
       reasoning_path: str,
-      graph: Graph
+      graph: nx.Graph
    ) -> list:
       """
-      given a list of relations and neighbors with ratings, return top-k relations and neighbors
+      given a list of relations and neighbors with ratings, return top-k relations and neighbors with the corresponding ratings
       """
       # concatenate the relations and neighbors
       rated_paths = [] # [(path, score)]
@@ -126,7 +208,6 @@ class Path_RAG():
       for relation, relation_score in rated_relations:
          for neighbor, neighbor_score in rated_neighbors:
             new_rpth = f"{reasoning_path} -> {relation} -> {neighbor}"
-            
             if self.has_relation(
                graph=graph, 
                entity=hub_node, 
@@ -138,13 +219,9 @@ class Path_RAG():
                   #TODO using vectorspace to store the embeddings, otherwise the efficiency is pretty low
                   # 1-hop neighbors = relation + neighbor
                   one_hop_relations, one_hop_neighbors = self.get_entity_edges(neighbor, graph)
-                  
-                  if one_hop_relations and one_hop_neighbors:
-                     one_hop_rated_relations, one_hop_rated_neighbors = self.get_relations_neighbors_set_with_ratings(one_hop_relations, one_hop_neighbors, keyword_embeddings)
-                     
-                  else:
-                     # if there is no one-hop neighbors, set the score to 0
-                     one_hop_rated_relations, one_hop_rated_neighbors = [(None, 0)], [(None, 0)]
+                  texts = [keywords] + one_hop_relations + one_hop_neighbors
+                  embeddings = self.llm_backbone.get_embeddings(texts)
+                  one_hop_rated_relations, one_hop_rated_neighbors = self.get_relations_neighbors_set_with_ratings(one_hop_relations, one_hop_neighbors, embeddings)
                   
                   # score function for path_rag
                   rpth_score = relation_score + neighbor_score + self.args.alpha * (one_hop_rated_relations[0][1] + one_hop_rated_neighbors[0][1])
@@ -169,7 +246,7 @@ class Path_RAG():
       """
       given a starting entity, find top-k one-step path to the query (keywords)
       """
-      graph = state.get("graph", Graph)
+      graph = state.get("graph", nx.Graph())
       keywords = state.get("key_words", "") # using the keywords generated from llm to represent the query
       reasoning_path = state.get("rpth", "")
       
@@ -177,19 +254,15 @@ class Path_RAG():
       
       relations, neighbors = self.get_entity_edges(hub_node, graph)
       
-      #TODO load the embeddings from the vectorspace
       # get embeddings
-      embeddings = self.llm_backbone.get_embeddings(keywords)
+      texts = [keywords] + relations + neighbors
+      embeddings = self.llm_backbone.get_embeddings(texts)
       
-      if relations and neighbors:
-         # get relations and neighbors with the corresponding ratings
-         rated_relations, rated_neighbors = self.get_relations_neighbors_set_with_ratings(relations, neighbors, embeddings)
-      
-      else:
-         return []
+      # get relations and neighbors with the corresponding ratings
+      rated_relations, rated_neighbors = self.get_relations_neighbors_set_with_ratings(relations, neighbors, embeddings)
                
       # top-n scoring paths
-      paths = self.scoring_path(keyword_embeddings=embeddings, reasoning_path=reasoning_path, rated_relations=rated_relations, rated_neighbors=rated_neighbors, hub_node=hub_node, graph=graph)
+      paths = self.scoring_path(keywords=keywords, reasoning_path=reasoning_path, rated_relations=rated_relations, rated_neighbors=rated_neighbors, hub_node=hub_node, graph=graph)
       
       return paths
 
