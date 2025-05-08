@@ -22,7 +22,7 @@ FiDELIS addresses these challenges through its innovative approach to KG-enhance
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Y-Sui/FiDELIS.git fidelis
+git clone https://github.com/Y-Sui/FiDeLiS.git fidelis
 cd fidelis
 ```
 
