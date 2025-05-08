@@ -16,6 +16,6 @@ save_models/
 *.pyc
 tmp/
 RoG_train.tar.gz
-config.json
+# config.json
 webq.log
 .DS_Store
