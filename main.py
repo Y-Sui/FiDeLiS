@@ -70,7 +70,7 @@ def data_processing(args):
       )
    
    elif args.d == "CL-LT-KGQA":   
-      input_file = os.path.join("yuansui", args.d)
+      input_file = os.path.join(args.d)
       output_file = os.path.join(args.save_cache, f"{args.d}_processed")
       dataset = load_dataset(input_file, split="train", cache_dir=args.save_cache)
       dataset = dataset.map(
@@ -186,7 +186,7 @@ if __name__ == "__main__":
    parser.add_argument("--sample", type=int, default=-1)
    parser.add_argument("--data_path", type=str, default="rmanluo")
    parser.add_argument("--d", "-d", type=str, choices=["RoG-webqsp", "RoG-cwq", "CL-LT-KGQA"], default="RoG-webqsp")
-   parser.add_argument("--save_cache", type=str, default="/data/yuansui/rog/datasets")
+   parser.add_argument("--save_cache", type=str, default="/data/rog/datasets")
    parser.add_argument("--split", type=str, default="test")
    parser.add_argument("--output_path", type=str, default="results")
    parser.add_argument("--model_name", type=str, default="gpt-3.5-turbo-0125")

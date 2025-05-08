@@ -1,4 +1,4 @@
-SOURCE_PATH="/data/yuansui/rog"
+SOURCE_PATH="/data/rog"
 export HF_HOME=${SOURCE_PATH}/.cache/huggingface
 
 # MODEL_NAME="gpt-4-0125-preview"
